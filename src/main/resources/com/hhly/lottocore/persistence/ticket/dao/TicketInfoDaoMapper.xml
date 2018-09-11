@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.ticket.dao.TicketInfoDaoMapper" >
+  
+	<select id="queryFailTicketInfo" resultType="com.hhly.skeleton.cms.ticketmgr.bo.TicketInfoSingleBO">
+		select t.order_code     orderCode,
+			   t.ticket_status  ticketStatus,
+			   t.channel_remark channelRemark
+		  from TICKET_INFO t
+		  where t.order_code=#{orderCode}
+		   and t.ticket_status=#{ticketStatus}
+	</select>
+
+	<!--/////////////////////////前端出票页面接口////////////////////////////////-->
+	<!-- 出票明细页面：分页查询 -->
+	<select id="findTicketList" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="com.hhly.skeleton.lotto.base.ticket.bo.TicketInfoBO">
+		select
+		ti.ticket_status ticketStatus,
+		ti.ticket_money ticketMoney,
+		ti.winning_status winningStatus,
+		ti.pre_bonus preBonus,
+		ti.content_type contentType,
+		ti.multiple_num multipleNum,
+		ti.ticket_content ticketContent,
+		ti.lottery_code lotteryCode,
+		ti.lottery_child_code lotteryChildCode,
+		ti.receipt_content_detail receiptContentDetail,
+		(select t.child_name from lottery_child t where t.lottery_child_code=ti.lottery_child_code) lotteryChildName
+	    from ticket_info ti
+		where ti.order_code=#{orderCode}
+		<if test="userId != null">
+		   and  ti.user_id=#{userId}
+		</if>
+		limit #{startRow,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+	</select>
+	<!-- 出票明细页面：分页查询记录数 -->
+	<select id="findTicketListCount" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="int">
+		select count(1)
+		from ticket_info ti
+		where ti.order_code=#{orderCode}
+		<if test="userId != null">
+			and  ti.user_id=#{userId}
+		</if>
+	</select>
+
+     <select id="getTicketChannel" parameterType="com.hhly.skeleton.lotto.base.ticket.vo.TicketChannelVO" resultType="String">
+        SELECT
+			ticket_channel_id
+		FROM
+			ticket_channel
+		WHERE
+			drawer_account = #{username}
+		AND account_password = #{password}
+		AND channel_status = 1
+		AND ticket_status = 1
+     </select>
+     <select id="getTicketInfo" parameterType="com.hhly.skeleton.lotto.base.ticket.vo.TicketVO" resultType="com.hhly.skeleton.lotto.base.ticket.bo.TicketInfoBO">
+		SELECT
+		  lottery_child_code lotteryChildCode,
+		  lottery_code lotteryCode,
+		  multiple_num multipleNum,
+		  ticket_content ticketcontent,
+		  ticket_money ticketmoney,
+		  id,
+		  third_num thirdnum,
+		  lotto_add lottoadd,
+		  content_type contentType,
+		  order_code ordercode
+		FROM
+			ticket_info
+		WHERE
+			lottery_code = #{lotteryCode}
+		 <if test="id != null">
+			 AND id = #{id}
+		 </if>
+		AND channel_id = #{ticketChannelId}
+		AND ticket_status = 3
+		AND (third_num is null or third_num = #{machineKey})
+		AND end_ticket_time > now()
+		order by end_ticket_time
+		LIMIT 1     
+     </select>
+     <update id="updateTicketThirdNum">
+		UPDATE ticket_info
+		SET third_num = #{machineKey}
+		,modify_time = now()
+		WHERE
+			id = #{id}
+		AND channel_id = #{ticketChannelId}
+		AND third_num IS NULL
+		AND ticket_status = 3
+     </update>
+     
+     <update id="updateTicketStatus" parameterType="com.hhly.skeleton.lotto.base.ticket.vo.TicketVO">
+        UPDATE ticket_info
+		SET ticket_status = #{status}
+		<if test="receiptContent != null and receiptContent !=''">
+		,receipt_content = #{receiptContent}
+		</if>
+		<if test="receiptContentDetail != null and receiptContentDetail !=''">
+		,receipt_content_detail = #{receiptContentDetail}
+		</if>
+		<if test="status == '4'.toString()">
+		,come_out_time = now()
+		,third_num = #{machineKey}
+		,channel_id = #{ticketChannelId}
+		</if>
+		WHERE
+			id = #{id}
+		and ticket_status != 4
+     </update>
+      <select id="getTicketInfoCache" parameterType="com.hhly.skeleton.lotto.base.ticket.vo.TicketVO" resultType="com.hhly.skeleton.lotto.base.ticket.bo.TicketInfoBO">
+	     SELECT
+			  lottery_child_code lotteryChildCode,
+			  lottery_code lotteryCode,
+			  multiple_num multipleNum,
+			  ticket_content ticketcontent,
+			  ticket_money ticketmoney,
+			  id,
+			  third_num thirdnum,
+			  content_type contentType,
+			  order_code ordercode
+			FROM
+				ticket_info
+			WHERE
+				lottery_code = #{lotteryCode}
+			AND channel_id = #{ticketChannelId}
+			AND ticket_status = 3
+			AND third_num is null
+			AND end_ticket_time > now()
+			ORDER BY end_ticket_time  
+			limit 5000
+     </select>
+     <select id="getTicketInfoCount" parameterType="com.hhly.skeleton.lotto.base.ticket.vo.TicketVO" resultType="int">
+            SELECT
+			    count(id)
+			FROM
+				ticket_info
+			WHERE
+				lottery_code = #{lotteryCode}
+			AND channel_id = #{ticketChannelId}
+			AND ticket_status = 3
+			AND third_num is null
+			and end_ticket_time > now()
+     </select>
+     <update id="updateTicketThirdNumClear">
+        UPDATE ticket_info
+		SET third_num = null
+		WHERE
+			id = #{id}
+		and ticket_status != 4
+     </update>
+     <select id="getTicketInfoOut" resultType="com.hhly.skeleton.lotto.base.ticket.bo.TicketInfoBO">
+       SELECT
+		  ticket_content ticketcontent,
+		  lottery_child_code lotteryChildCode
+		FROM
+			ticket_info
+		WHERE
+		  id = #{id}
+     </select>
+
+	<!-- 线下出票 -->
+	<select id="findO2OTicketCount" resultType="int" parameterType="com.hhly.skeleton.lotto.base.ticket.vo.TicketVO" >
+		select count(1) from ticket_info where
+		lottery_code = #{lotteryCode}
+		and end_ticket_time > #{endTicketTime}
+		and third_num=#{machineKey}
+	</select>
+
+
+	<!-- 线下出票集合 -->
+	<select id="findO2OTicketList" resultType="com.hhly.skeleton.lotto.base.ticket.bo.TicketInfoBO" parameterType="com.hhly.skeleton.lotto.base.ticket.vo.TicketVO" >
+		select
+			ti.id id,
+			ti.ticket_money ticketMoney,
+			ti.lottery_name lotteryName,
+			ti.multiple_num multipleNum,
+			ti.come_out_time comeOutTime,
+			ti.lottery_code lotteryCode,
+			ti.lottery_child_code lotteryChildCode
+		from ticket_info ti
+		where lottery_code = #{lotteryCode}
+ 		and third_num=#{machineKey}
+		and ticket_status = 4
+		and end_ticket_time > #{endTicketTime}
+		order by come_out_time desc
+		limit #{startRow,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}
+	</select>
+
+
+	<select id="getTicketInfoById" parameterType="com.hhly.skeleton.lotto.base.ticket.vo.TicketVO" resultType="com.hhly.skeleton.lotto.base.ticket.bo.TicketInfoBO">
+		SELECT
+		lottery_child_code lotteryChildCode,
+		lottery_code lotteryCode,
+		multiple_num multipleNum,
+		ticket_content ticketcontent,
+		ticket_money ticketmoney,
+		id,
+		third_num thirdnum
+		FROM
+		ticket_info
+		WHERE id = #{id}
+	</select>
+</mapper>

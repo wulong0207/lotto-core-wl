@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.recommend.dao.RcmdUserPayMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.recommend.bo.RcmdUserPayBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="rcmd_code" jdbcType="VARCHAR" property="rcmdCode" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, user_id, rcmd_code, create_time
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdUserPayBO">
+    insert into rcmd_user_pay (id, user_id, rcmd_code, 
+      create_time)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{rcmdCode,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+</mapper>

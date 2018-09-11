@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.group.dao.OrderGroupUserMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.group.bo.OrderGroupUserBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="flag" jdbcType="BIT" property="flag" />
+    <result column="grade" jdbcType="SMALLINT" property="grade" />
+    <result column="is_recommend" jdbcType="BIT" property="isRecommend" />
+    <result column="order_count" jdbcType="INTEGER" property="orderCount" />
+    <result column="order_suc_count" jdbcType="INTEGER" property="orderSucCount" />
+    <result column="order_suc_rate" jdbcType="DECIMAL" property="orderSucRate" />
+    <result column="order_amount" jdbcType="DECIMAL" property="orderAmount" />
+    <result column="order_suc_amount" jdbcType="DECIMAL" property="orderSucAmount" />
+    <result column="win_count" jdbcType="INTEGER" property="winCount" />
+    <result column="win_bw_count" jdbcType="INTEGER" property="winBwCount" />
+    <result column="win_sw_count" jdbcType="INTEGER" property="winSwCount" />
+    <result column="win_w_count" jdbcType="INTEGER" property="winWCount" />
+    <result column="win_q_count" jdbcType="INTEGER" property="winQCount" />
+    <result column="win_other_count" jdbcType="INTEGER" property="winOtherCount" />
+    <result column="win_amount" jdbcType="DECIMAL" property="winAmount" />
+    <result column="profit_amount" jdbcType="DECIMAL" property="profitAmount" />
+    <result column="profit_rate" jdbcType="DECIMAL" property="profitRate" />
+    <result column="hit_rate" jdbcType="DECIMAL" property="hitRate" />
+    <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount" />
+    <result column="customization_count" jdbcType="INTEGER" property="customizationCount" />
+    <result column="focus_count" jdbcType="INTEGER" property="focusCount" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+
+    <result column="account_name" jdbcType="VARCHAR" property="userName" />
+    <result column="head_url" jdbcType="VARCHAR" property="headPic" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    ogu.id, ogu.user_id, ogu.flag, ogu.grade, ogu.is_recommend, ogu.order_count, ogu.order_suc_count, ogu.order_suc_rate,
+    ogu.order_amount, ogu.order_suc_amount, ogu.win_count, ogu.win_bw_count,ogu.win_sw_count, ogu.win_w_count,
+    ogu.win_q_count, ogu.win_other_count, ogu.win_amount, ogu.profit_amount, ogu.profit_rate, ogu.hit_rate, ogu.commission_amount,
+    ogu.customization_count, ogu.focus_count, ogu.create_time, ogu.update_time, ogu.modify_by, ogu.modify_time,
+    ogu.remark
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.skeleton.lotto.base.group.bo.OrderGroupUserBO">
+    insert into order_group_user (id, user_id, flag, 
+      grade, is_recommend, order_count, 
+      order_suc_count, order_suc_rate, order_amount, 
+      order_suc_amount, win_count, win_bw_count, 
+      win_sw_count, win_w_count, win_q_count, 
+      win_other_count, win_amount, profit_amount, 
+      profit_rate, hit_rate, commission_amount, 
+      customization_count, focus_count, create_time, 
+      update_time, modify_by, modify_time, 
+      remark)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{flag,jdbcType=BIT}, 
+      #{grade,jdbcType=SMALLINT}, #{isRecommend,jdbcType=BIT}, #{orderCount,jdbcType=INTEGER}, 
+      #{orderSucCount,jdbcType=INTEGER}, #{orderSucRate,jdbcType=DECIMAL}, #{orderAmount,jdbcType=DECIMAL}, 
+      #{orderSucAmount,jdbcType=DECIMAL}, #{winCount,jdbcType=INTEGER}, #{winBwCount,jdbcType=INTEGER}, 
+      #{winSwCount,jdbcType=INTEGER}, #{winWCount,jdbcType=INTEGER}, #{winQCount,jdbcType=INTEGER}, 
+      #{winOtherCount,jdbcType=INTEGER}, #{winAmount,jdbcType=DECIMAL}, #{profitAmount,jdbcType=DECIMAL}, 
+      #{profitRate,jdbcType=DECIMAL}, #{hitRate,jdbcType=DECIMAL}, #{commissionAmount,jdbcType=DECIMAL}, 
+      #{customizationCount,jdbcType=INTEGER}, #{focusCount,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="queryOrderGroupUserInfo" parameterType="Integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"></include>,u.account_name,u.head_url
+     from order_group_user ogu
+    LEFT JOIN m_user_info u on ogu.user_id=u.id
+     where ogu.user_id=#{userId}
+  </select>
+
+  <select id="queryGroupRankingList" resultType="com.hhly.skeleton.lotto.base.group.bo.OrderGroupPersonLatelyInfoBO">
+        SELECT
+        u.account_name userName,
+        ogu.win_amount winAmount
+    FROM
+        order_group_user ogu
+    LEFT JOIN m_user_info u
+    on ogu.user_id = u.id
+    order BY win_amount desc limit 10
+  </select>
+
+  <!-- 获取名人列表-->
+  <select id="queryGroupFamousList" resultType="string">
+      SELECT
+        (SELECT b.account_name FROM m_user_info b WHERE a.user_id = b.id)account_name
+      FROM order_group_user a
+      WHERE flag = 2
+      ORDER BY id LIMIT 0,20
+  </select>
+
+</mapper>

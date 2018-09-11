@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.recommend.dao.RcmdUserDetailMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.recommend.bo.RcmdUserDetailBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="type" jdbcType="BIT" property="type" />
+    <result column="lottery_code" jdbcType="SMALLINT" property="lotteryCode" />
+    <result column="lottery_child_code" jdbcType="INTEGER" property="lotteryChildCode" />
+    <result column="pass_way" jdbcType="TINYINT" property="passWay" />
+    <result column="hit_rate" jdbcType="DECIMAL" property="hitRate" />
+    <result column="profit_rate" jdbcType="DECIMAL" property="profitRate" />
+    <result column="focus_num" jdbcType="INTEGER" property="focusNum" />
+    <result column="issue_num" jdbcType="INTEGER" property="issueNum" />
+    <result column="issue_amount" jdbcType="DECIMAL" property="issueAmount" />
+    <result column="hit_num" jdbcType="INTEGER" property="hitNum" />
+    <result column="hit_money" jdbcType="DECIMAL" property="hitMoney" />
+    <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount" />
+    <result column="follow_num" jdbcType="INTEGER" property="followNum" />
+    <result column="follow_amount" jdbcType="DECIMAL" property="followAmount" />
+    <result column="pay_counts" jdbcType="INTEGER" property="payCounts" />
+    <result column="pay_amount" jdbcType="DECIMAL" property="payAmount" />
+    <result column="clicks" jdbcType="INTEGER" property="clicks" />
+    <result column="recent_status" jdbcType="BIT" property="recentStatus" />
+    <result column="recent_status_trend" jdbcType="VARCHAR" property="recentStatusTrend" />
+    <result column="continue_hit" jdbcType="INTEGER" property="continueHit" />
+    <result column="recent_record" jdbcType="VARCHAR" property="recentRecord" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, user_id, type, lottery_code, lottery_child_code, pass_way, hit_rate, profit_rate, 
+    focus_num, issue_num, issue_amount, hit_num, hit_money, commission_amount, follow_num, 
+    follow_amount, pay_counts, pay_amount, clicks, recent_status, recent_status_trend, 
+    continue_hit, recent_record, create_time, update_time, modify_by, remark
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdUserDetailBO">
+    insert into rcmd_user_detail (id, user_id, type, 
+      lottery_code, lottery_child_code, pass_way, 
+      hit_rate, profit_rate, focus_num, 
+      issue_num, issue_amount, hit_num, 
+      hit_money, commission_amount, follow_num, 
+      follow_amount, pay_counts, pay_amount, 
+      clicks, recent_status, recent_status_trend, 
+      continue_hit, recent_record, create_time, 
+      update_time, modify_by, remark
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{type,jdbcType=BIT}, 
+      #{lotteryCode,jdbcType=SMALLINT}, #{lotteryChildCode,jdbcType=INTEGER}, #{passWay,jdbcType=TINYINT}, 
+      #{hitRate,jdbcType=DECIMAL}, #{profitRate,jdbcType=DECIMAL}, #{focusNum,jdbcType=INTEGER}, 
+      #{issueNum,jdbcType=INTEGER}, #{issueAmount,jdbcType=DECIMAL}, #{hitNum,jdbcType=INTEGER}, 
+      #{hitMoney,jdbcType=DECIMAL}, #{commissionAmount,jdbcType=DECIMAL}, #{followNum,jdbcType=INTEGER}, 
+      #{followAmount,jdbcType=DECIMAL}, #{payCounts,jdbcType=INTEGER}, #{payAmount,jdbcType=DECIMAL}, 
+      #{clicks,jdbcType=INTEGER}, #{recentStatus,jdbcType=BIT}, #{recentStatusTrend,jdbcType=VARCHAR}, 
+      #{continueHit,jdbcType=INTEGER}, #{recentRecord,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <select id="queryPersonStatisInfo" parameterType="Integer" resultType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdPersonStatisInfo">
+      select
+      type type,
+      pass_way passWay,
+      recent_record recentRecord,
+      hit_rate hitRate,
+      return_rate returnRate,
+      recent_status_trend recentStatusTrend
+      from rcmd_user_detail
+      where user_id=#{userId} order by type
+  </select>
+
+</mapper>

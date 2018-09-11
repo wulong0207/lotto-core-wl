@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.agent.dao.MemberCenterDaoMapper">
+
+	<!-- 排序  -->
+	<sql id="Order_SQL">
+		<if test = "sortField != null and sortOrder !=null">
+			ORDER BY ${sortField} ${sortOrder}
+		</if>
+	</sql>
+
+	<!-- 分页 -->
+	<sql id="Page_SQL">
+		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</sql>
+
+	<!-- 我的直属会员 -->
+	<resultMap id="DirectMemberMap" type="com.hhly.skeleton.lotto.base.agent.bo.DirectlyMemberInfoBO" >
+		<result property="id" column="id" javaType="INTEGER"/>
+		<result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+		<result property="registerSource" column="register_source" jdbcType="VARCHAR"/>
+		<result property="agentTime" column="agent_time" jdbcType="TIMESTAMP"/>
+		<result property="phoneNumber" column="phone_number" jdbcType="VARCHAR"/>
+		<result property="orderAmount" column="order_amount" jdbcType="DECIMAL"/>
+		<result property="headUrl" column="head_url" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<!-- 我的下级代理会员 -->
+	<resultMap id="AgentMemberMap" type="com.hhly.skeleton.lotto.base.agent.bo.AgentMemberInfoBO" >
+		<result property="agentCode" column="agent_code" jdbcType="VARCHAR"/>
+		<result property="registerSource" column="register_source" jdbcType="VARCHAR"/>
+		<result property="agentTime" column="agent_time" jdbcType="TIMESTAMP"/>
+		<result property="phoneNumber" column="phone_number" jdbcType="VARCHAR"/>
+		<result property="orderAmount" column="order_amount" jdbcType="DECIMAL"/>
+		<result property="headUrl" column="head_url"  jdbcType="VARCHAR"/>
+		<result property="accountName" column="account_name" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<!-- 代理订单详情 -->
+	<resultMap id="AgentOrderInfoMap" type="com.hhly.skeleton.lotto.base.agent.bo.AgentOrderInfoListBO">
+		<result property="buyTime" column="buy_time" jdbcType="TIMESTAMP"/>
+		<result property="orderCode" column="order_code" jdbcType="VARCHAR"/>
+		<result property="lotteryName" column="lottery_name" jdbcType="VARCHAR"/>
+		<result property="logoUrl" column="lottery_logo_url" jdbcType="VARCHAR"/>
+		<result property="orderAmount" column="order_amount" jdbcType="DECIMAL"/>
+	</resultMap>
+
+
+	<!-- 获取：我的直属会员列表 -->
+	<select id="selectDirectlyMember" parameterType="com.hhly.skeleton.lotto.base.agent.vo.AgentQueryVO" resultMap="DirectMemberMap">
+		SELECT
+			b.agent_code,
+			b.agent_level,
+			b.id agent_id,
+			a.id,
+			a.regist_time agent_time,
+			a.nick_name,
+			a.cus_mobile phone_number,
+			c.channel_name register_source,
+			a.head_url,
+			e.direct_buy_money order_amount
+		FROM m_user_info a
+		INNER JOIN (SELECT a.agent_code, a.agent_level, a.id FROM agent_info a INNER JOIN m_user_info b ON a.user_id = b.id AND b.id = #{userId}) b ON a.agent_code =  b.agent_code
+		LEFT JOIN operate_market_channel c ON a.channel_id = c.channel_id
+		LEFT JOIN (SELECT user_id,SUM(IFNULL(agent_buy_money,0) + IFNULL(add_buy_money,0))direct_buy_money
+		            FROM m_user_winning_statistics GROUP BY user_id) e ON a.id = e.user_id
+		WHERE 1=1
+		<include refid="Order_SQL"/>
+		<include refid="Page_SQL"/>
+	</select>
+
+	<!-- 获取：我的直属会员总数-->
+	<select id="selectDirectlyMemberCount" parameterType="com.hhly.skeleton.lotto.base.agent.vo.AgentQueryVO" resultType="int">
+		SELECT
+		  COUNT(1)
+		FROM m_user_info a
+		INNER JOIN (SELECT a.agent_code, a.agent_level, a.id FROM agent_info a INNER JOIN m_user_info b ON a.user_id = b.id AND b.id = #{userId}) b ON a.agent_code =  b.agent_code
+		WHERE 1=1
+		<!-- 用于限制用户，自行改参数，查询不属于自己直属的会员信息 -->
+		<if test="agentId != null">
+			AND a.id = #{agentId}
+		</if>
+	</select>
+
+	<!-- 查询：我的下级代理列表 agent_rebate-->
+	<select id="selectUnderlingAgentMember"  parameterType="com.hhly.skeleton.lotto.base.agent.vo.AgentQueryVO" resultMap="AgentMemberMap">
+		SELECT
+			d.agent_code,
+			a.regist_time agent_time,
+			a.account_name,
+			a.cus_mobile phone_number,
+			c.channel_name register_source,
+			a.head_url,
+			e.agent_buy_money order_amount
+		FROM m_user_info a
+		INNER JOIN (SELECT a.agent_code, a.agent_level, a.id FROM agent_info a INNER JOIN m_user_info b ON a.user_id = b.id AND b.id = #{userId}) b ON a.agent_code = b.agent_code
+		INNER JOIN agent_info d ON a.id = d.user_id
+		LEFT JOIN operate_market_channel c ON a.channel_id = c.channel_id
+		LEFT JOIN (SELECT user_id,SUM(IFNULL(agent_buy_money,0) + IFNULL(add_buy_money,0))agent_buy_money
+		            FROM m_user_winning_statistics GROUP BY user_id) e ON a.id = e.user_id
+		WHERE 1=1
+		AND d.agent_level = #{agentLevel}
+		AND d.agent_status = 1 <!-- 启用的代理-->
+		<include refid="Order_SQL"/>
+		<include refid="Page_SQL"/>
+	</select>
+
+	<!-- 获取：我的下级代理总数-->
+	<select id="selectUnderlingAgentMemberCount" parameterType="com.hhly.skeleton.lotto.base.agent.vo.AgentQueryVO"  resultType="int">
+		SELECT
+			COUNT(1)
+		FROM m_user_info a
+		INNER JOIN (SELECT a.agent_code, a.agent_level, a.id FROM agent_info a INNER JOIN m_user_info b ON a.user_id = b.id AND b.id = #{userId}) b ON a.agent_code = b.agent_code
+		INNER JOIN agent_info d ON a.id = d.user_id
+		WHERE 1=1
+		AND d.agent_level = #{agentLevel}
+		AND d.agent_status = 1  <!-- 启用的代理-->
+		<!-- 用于限制用户，自行改参数，查询不属于自己直属的会员信息 -->
+		<if test="agentId != null">
+			AND a.id = #{agentId}
+		</if>
+	</select>
+
+	<select id="getAgentHomeBaseInfo" parameterType="Integer" resultType="com.hhly.skeleton.lotto.base.agent.bo.AgentHomeInfoBO">
+		select a.id agentId,u.account_name account,a.agent_code code,a.agent_wallet agentWallet,SUM(m.total_cash_balance + m.eff_red_balance) balance
+		from m_user_info u LEFT JOIN agent_info a on u.id=a.user_id LEFT JOIN m_user_wallet m
+		on u.id=m.user_id  where u.id=#{userId}
+	</select>
+
+	<!-- 通过userId获取代理信息 -->
+	<select id="findAgentInfoByUserId" parameterType="com.hhly.skeleton.lotto.base.agent.vo.AgentQueryVO" resultType="com.hhly.skeleton.lotto.base.agent.bo.AgentInfoBO">
+        SELECT a.id,a.user_id userId,a.parent_agent_id parentAgentId,
+			    a.agent_level agentLevel
+		FROM agent_info a WHERE 1=1
+		<if test="userId != null">
+			AND a.user_id = #{userId}
+		</if>
+		<if test="agentId != null">
+			AND a.user_id = #{agentId}
+		</if>
+	</select>
+
+	<!-- 查询直属代理会员订单详情列表-->
+	<select id="selectAgentOrderInfoList" parameterType="com.hhly.skeleton.lotto.base.agent.vo.AgentQueryVO" resultMap="AgentOrderInfoMap">
+		SELECT
+			a.buy_time,
+			a.order_amount ,
+			b.lottery_name ,
+			b.lottery_logo_url ,
+			a.order_code
+		FROM order_info a
+		LEFT JOIN lottery_type b ON a.lottery_code = b.lottery_code
+		WHERE 1=1
+		AND user_id = #{userId}
+		AND order_status = 6
+		<include refid="Order_SQL"/>
+		<include refid="Page_SQL"/>
+	</select>
+
+	<!-- 查询直属代理会员订单总记录数-->
+	<select id="selectAgentOrderInfoListCount" parameterType="com.hhly.skeleton.lotto.base.agent.vo.AgentQueryVO" resultType="Integer">
+		SELECT
+		  COUNT(1)
+		FROM order_info a
+		WHERE 1=1
+	    AND user_id = #{userId}
+	    AND order_status = 6
+	</select>
+
+	<!-- 获取直属代理会员订单总金额-->
+	<select id="getAgentOrderTotalMoney" parameterType="Integer" resultType="com.hhly.skeleton.lotto.base.agent.bo.AgentOrderInfoBO">
+		SELECT
+			a.nick_name nickName,
+			b.totalMoney
+		FROM m_user_info a
+		LEFT JOIN (SELECT user_id,SUM(order_amount)totalMoney FROM order_info WHERE user_id = #{userId} AND order_status = 6 GROUP BY user_id )b ON b.user_id = a.id
+		WHERE 1 = 1
+		AND id = #{userId}
+	</select>
+
+	<!-- 根据userId获取状态 -->
+	<select id="findAgentStatusByUserId" parameterType="Integer" resultType="Integer">
+		SELECT agent_status agentStatus FROM agent_info  where user_id = #{userId}
+	</select>
+	
+	
+</mapper>

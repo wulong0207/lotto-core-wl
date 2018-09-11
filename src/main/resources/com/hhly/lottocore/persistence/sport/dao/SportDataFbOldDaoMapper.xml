@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.sport.dao.SportDataFbOldDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportDataFBOldBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="SPORT_AGAINST_INFO_ID" property="sportAgainstInfoId" jdbcType="DECIMAL" />
+    <result column="SP_WIN" property="spWin" jdbcType="DECIMAL" />
+    <result column="SP_DRAW" property="spDraw" jdbcType="DECIMAL" />
+    <result column="SP_FAIL" property="spFail" jdbcType="DECIMAL" />
+    <result column="SP_TYPE" property="spType" jdbcType="DECIMAL" />
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    ID, SPORT_AGAINST_INFO_ID, SP_WIN, SP_DRAW, SP_FAIL, SP_TYPE, RELEASE_TIME, 
+    UPDATE_TIME, CREATE_TIME
+  </sql>
+
+  <select id="findByAgainstInfoId" resultMap="BaseResultMap" parameterType="long" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM SPORT_DATA_FB_OLD
+    WHERE SPORT_AGAINST_INFO_ID=#{sportAgainstInfoId,jdbcType=DECIMAL}
+    ORDER BY RELEASE_TIME ASC
+  </select>
+  
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.hhly.lottocore.persistence.sport.po.SportDataFbOldPO" >
+    insert into SPORT_DATA_FB_OLD (SPORT_AGAINST_INFO_ID, 
+      SP_WIN, SP_DRAW, SP_FAIL, 
+      SP_TYPE, RELEASE_TIME, UPDATE_TIME, 
+      CREATE_TIME)
+    values (#{sportAgainstInfoId,jdbcType=DECIMAL}, 
+      #{spWin,jdbcType=DECIMAL}, #{spDraw,jdbcType=DECIMAL}, #{spFail,jdbcType=DECIMAL}, 
+      #{spType,jdbcType=DECIMAL}, #{releaseTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  
+  <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.sport.po.SportDataFbOldPO" >
+    update SPORT_DATA_FB_OLD
+    <set >
+      <if test="sportAgainstInfoId != null" >
+        SPORT_AGAINST_INFO_ID = #{sportAgainstInfoId,jdbcType=DECIMAL},
+      </if>
+      <if test="spWin != null" >
+        SP_WIN = #{spWin,jdbcType=DECIMAL},
+      </if>
+      <if test="spDraw != null" >
+        SP_DRAW = #{spDraw,jdbcType=DECIMAL},
+      </if>
+      <if test="spFail != null" >
+        SP_FAIL = #{spFail,jdbcType=DECIMAL},
+      </if>
+      <if test="spType != null" >
+        SP_TYPE = #{spType,jdbcType=DECIMAL},
+      </if>
+      <if test="releaseTime != null" >
+        RELEASE_TIME = #{releaseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+</mapper>

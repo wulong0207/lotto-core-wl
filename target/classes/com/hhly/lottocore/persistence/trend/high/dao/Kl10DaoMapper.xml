@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.hhly.lottocore.persistence.trend.high.dao.Kl10DaoMapper">
+
+	<!--
+	<resultMap id="MultiTableResultMap"
+		type="com.hhly.skeleton.lotto.base.trend.high.bo.HighOmitBaseBO">
+		<discriminator javaType="int" column="table_type">
+			<case value="1"
+				resultType="com.hhly.skeleton.lotto.base.trend.high.bo.Kl10BaseBO" />
+			<case value="2"
+				resultType="com.hhly.skeleton.lotto.base.trend.high.bo.Kl103CodeBO" />
+		</discriminator>
+	</resultMap>
+	
+	<sql id="Multi_Table_Column_List">
+		1
+		<choose>
+			<when test="base == null">
+				,
+			</when>
+			<otherwise>
+				,
+				<include refid="Base_Table_Column_List" />
+				,1 AS table_type,
+			</otherwise>
+		</choose>
+		1
+		<choose>
+			<when test="threeCode == null">
+				,
+			</when>
+			<otherwise>
+				,
+				<include refid="ThreeCode_Table_Column_List" />
+				,2 AS table_type,
+			</otherwise>
+		</choose>
+		1
+	</sql>
+	-->
+	
+	<sql id="Base_Table">
+		TREND_KL10_BASE 
+	</sql>
+
+	<sql id="Base_Result_Table">
+		TREND_KL10_RESULT base
+	</sql>
+
+	<sql id="ThreeCode_Result_Table">
+		TREND_KL10_3CODE_RESULT threeCode
+	</sql>
+	
+	
+	<sql id="Base_Column">
+		issue,drawcode drawCode,
+		b01,b02,b03,b04,b05,b06,b07,b08,b09,b10,
+		b11,b12,b13,b14,b15,b16,b17,b18,b19,b20,
+		s01,s02,s03,s04,s05,s06,s07,s08,s09,s10,
+		s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,
+		g01,g02,g03,g04,g05,g06,g07,g08,g09,g10,
+		g11,g12,g13,g14,g15,g16,g17,g18,g19,g20
+	</sql>
+	
+	<!-- base表及3code表遗漏一起查 -->
+	<select id="findResultOmit"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.high.bo.Kl10CombineBO">
+		select
+		<include refid="Base_Table_Column_List" />
+		,
+		<include refid="ThreeCode_Table_Column_List" />
+		from
+		<include refid="Base_Result_Table" />
+		,
+		<include refid="ThreeCode_Result_Table" />
+		WHERE
+		base.LOTTERY_CODE = threeCode.LOTTERY_CODE
+		and base.FLAG = threeCode.FLAG
+		and base.LOTTERY_CODE = #{lotteryCode}
+		<if test="omitTypes != null">
+			and base.FLAG in
+			<foreach collection="omitTypes" item="omitType" open="("
+				close=")" separator=",">
+				#{omitType}
+			</foreach>
+		</if>
+	</select>
+	
+	
+	<select id="findBaseTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.high.bo.Kl10TrendBaseBO">
+		select <include refid="Base_Column"/>
+		from `trend_kl10_3code`
+		where LOTTERY_CODE = #{lotteryCode}
+		<if test="startIssue!=null">
+			and issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		order by issue desc
+		<if test="qryCount!=null">
+			limit #{qryCount}
+		</if>
+	</select>
+
+	<!-- 
+	<select id="findRecentOmit"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultMap="MultiTableResultMap">
+		select
+		<include refid="Base_Table_Column_List" />
+		from <include refid="Base_Table" />
+		where LOTTERY_CODE = #{lotteryCode}
+		order by issue desc
+		limit 0,#{qryCount}
+	</select>
+	 -->
+	
+		<sql id="Base_Table_Column_List">
+		<trim suffixOverrides=",">
+			<if test="showLotteryCode">
+				lottery_code lotteryCode,
+			</if>
+			<if test="showIssue">
+				issue,
+			</if>
+			<if test="showDrawCode">
+				drawcode drawCode,
+			</if>
+			<if test="base.flag">
+				base.flag omitType,
+			</if>
+			<if test="base.n01">
+				base.b01 n01,
+			</if>
+			<if test="base.n02">
+				base.b02 n02,
+			</if>
+			<if test="base.n03">
+				base.b03 n03,
+			</if>
+			<if test="base.n04">
+				base.b04 n04,
+			</if>
+
+			<if test="base.n05">
+				base.b05 n05,
+			</if>
+			<if test="base.n06">
+				base.b06 n06,
+			</if>
+			<if test="base.n07">
+				base.b07 n07,
+			</if>
+			<if test="base.n08">
+				base.b08 n08,
+			</if>
+			<if test="base.n09">
+				base.b09 n09,
+			</if>
+			<if test="base.n10">
+				base.b10 n10,
+			</if>
+			<if test="base.n11">
+				base.b11 n11,
+			</if>
+			<if test="base.n12">
+				base.b12 n12,
+			</if>
+			<if test="base.n13">
+				base.b13 n13,
+			</if>
+			<if test="base.n14">
+				base.b14 n14,
+			</if>
+			<if test="base.n15">
+				base.b15 n15,
+			</if>
+			<if test="base.n16">
+				base.b16 n16,
+			</if>
+			<if test="base.n17">
+				base.b17 n17,
+			</if>
+			<if test="base.n18">
+				base.b18 n18,
+			</if>
+			<if test="base.n19">
+				base.b19 n19,
+			</if>
+			<if test="base.n20">
+				base.b20 n20,
+			</if>
+			<if test="base.n1920">
+				r1920 n1920,
+			</if>
+			<if test="base.zx01">
+				zx01,
+			</if>
+			<if test="base.zx02">
+				zx02,
+			</if>
+			<if test="base.zx03">
+				zx03,
+			</if>
+			<if test="base.zx04">
+				zx04,
+			</if>
+			<if test="base.zx05">
+				zx05,
+			</if>
+			<if test="base.zx06">
+				zx06,
+			</if>
+			<if test="base.zx07">
+				zx07,
+			</if>
+			<if test="base.zx08">
+				zx08,
+			</if>
+			<if test="base.zx09">
+				zx09,
+			</if>
+			<if test="base.zx10">
+				zx10,
+			</if>
+			<if test="base.zx11">
+				zx11,
+			</if>
+			<if test="base.zx12">
+				zx12,
+			</if>
+			<if test="base.zx13">
+				zx13,
+			</if>
+			<if test="base.zx14">
+				zx14,
+			</if>
+			<if test="base.zx15">
+				zx15,
+			</if>
+			<if test="base.zx16">
+				zx16,
+			</if>
+			<if test="base.zx17">
+				zx17,
+			</if>
+			<if test="base.zx18">
+				zx18,
+			</if>
+			<if test="base.zx19">
+				zx19,
+			</if>
+			<if test="base.zx20">
+				zx20,
+			</if>
+		</trim>
+	</sql>
+
+	<sql id="ThreeCode_Table_Column_List">
+		<trim suffixOverrides=",">
+			<if test="showLotteryCode">
+				lottery_code lotteryCode,
+			</if>
+			<if test="showIssue">
+				issue,
+			</if>
+			<if test="showDrawCode">
+				drawcode drawCode,
+			</if>
+			<if test="threeCode.flag">
+				flag omitType,
+			</if>
+			<if test="threeCode.b01">
+				threeCode.b01,
+			</if>
+			<if test="threeCode.b02">
+				threeCode.b02,
+			</if>
+			<if test="threeCode.b03">
+				threeCode.b03,
+			</if>
+			<if test="threeCode.b04">
+				threeCode.b04,
+			</if>
+			<if test="threeCode.b05">
+				threeCode.b05,
+			</if>
+			<if test="threeCode.b06">
+				threeCode.b06,
+			</if>
+			<if test="threeCode.b07">
+				threeCode.b07,
+			</if>
+			<if test="threeCode.b08">
+				threeCode.b08,
+			</if>
+			<if test="threeCode.b09">
+				threeCode.b09,
+			</if>
+			<if test="threeCode.b10">
+				threeCode.b10,
+			</if>
+			<if test="threeCode.b11">
+				threeCode.b11,
+			</if>
+			<if test="threeCode.b12">
+				threeCode.b12,
+			</if>
+			<if test="threeCode.b13">
+				threeCode.b13,
+			</if>
+			<if test="threeCode.b14">
+				threeCode.b14,
+			</if>
+			<if test="threeCode.b15">
+				threeCode.b15,
+			</if>
+			<if test="threeCode.b16">
+				threeCode.b16,
+			</if>
+			<if test="threeCode.b17">
+				threeCode.b17,
+			</if>
+			<if test="threeCode.b18">
+				threeCode.b18,
+			</if>
+			<if test="threeCode.b19">
+				threeCode.b19,
+			</if>
+			<if test="threeCode.b20">
+				threeCode.b20,
+			</if>
+			<if test="threeCode.s01">
+				s01,
+			</if>
+			<if test="threeCode.s02">
+				s02,
+			</if>
+			<if test="threeCode.s03">
+				s03,
+			</if>
+			<if test="threeCode.s04">
+				s04,
+			</if>
+			<if test="threeCode.s05">
+				s05,
+			</if>
+			<if test="threeCode.s06">
+				s06,
+			</if>
+			<if test="threeCode.s07">
+				s07,
+			</if>
+			<if test="threeCode.s08">
+				s08,
+			</if>
+			<if test="threeCode.s09">
+				s09,
+			</if>
+			<if test="threeCode.s10">
+				s10,
+			</if>
+			<if test="threeCode.s11">
+				s11,
+			</if>
+			<if test="threeCode.s12">
+				s12,
+			</if>
+			<if test="threeCode.s13">
+				s13,
+			</if>
+			<if test="threeCode.s14">
+				s14,
+			</if>
+			<if test="threeCode.s15">
+				s15,
+			</if>
+			<if test="threeCode.s16">
+				s16,
+			</if>
+			<if test="threeCode.s17">
+				s17,
+			</if>
+			<if test="threeCode.s18">
+				s18,
+			</if>
+			<if test="threeCode.s19">
+				s19,
+			</if>
+			<if test="threeCode.s20">
+				s20,
+			</if>
+			<if test="threeCode.g01">
+				g01,
+			</if>
+			<if test="threeCode.g02">
+				g02,
+			</if>
+			<if test="threeCode.g03">
+				g03,
+			</if>
+			<if test="threeCode.g04">
+				g04,
+			</if>
+			<if test="threeCode.g05">
+				g05,
+			</if>
+			<if test="threeCode.g06">
+				g06,
+			</if>
+			<if test="threeCode.g07">
+				g07,
+			</if>
+			<if test="threeCode.g08">
+				g08,
+			</if>
+			<if test="threeCode.g09">
+				g09,
+			</if>
+			<if test="threeCode.g10">
+				g10,
+			</if>
+			<if test="threeCode.g11">
+				g11,
+			</if>
+			<if test="threeCode.g12">
+				g12,
+			</if>
+			<if test="threeCode.g13">
+				g13,
+			</if>
+			<if test="threeCode.g14">
+				g14,
+			</if>
+			<if test="threeCode.g15">
+				g15,
+			</if>
+			<if test="threeCode.g16">
+				g16,
+			</if>
+			<if test="threeCode.g17">
+				g17,
+			</if>
+			<if test="threeCode.g18">
+				g18,
+			</if>
+			<if test="threeCode.g19">
+				g19,
+			</if>
+			<if test="threeCode.g20">
+				g20,
+			</if>
+		</trim>
+	</sql>
+</mapper>

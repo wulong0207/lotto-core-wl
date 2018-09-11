@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.group.dao.OrderGroupLotteryMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.group.bo.OrderGroupLotteryBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="lottery_code" jdbcType="SMALLINT" property="lotteryCode" />
+    <result column="grade" jdbcType="SMALLINT" property="grade" />
+    <result column="order_count" jdbcType="INTEGER" property="orderCount" />
+    <result column="order_suc_count" jdbcType="INTEGER" property="orderSucCount" />
+    <result column="order_suc_rate" jdbcType="DECIMAL" property="orderSucRate" />
+    <result column="order_amount" jdbcType="DECIMAL" property="orderAmount" />
+    <result column="order_suc_amount" jdbcType="DECIMAL" property="orderSucAmount" />
+    <result column="win_count" jdbcType="INTEGER" property="winCount" />
+    <result column="win_bw_count" jdbcType="INTEGER" property="winBwCount" />
+    <result column="win_sw_count" jdbcType="INTEGER" property="winSwCount" />
+    <result column="win_w_count" jdbcType="INTEGER" property="winWCount" />
+    <result column="win_q_count" jdbcType="INTEGER" property="winQCount" />
+    <result column="win_other_count" jdbcType="INTEGER" property="winOtherCount" />
+    <result column="win_amount" jdbcType="DECIMAL" property="winAmount" />
+    <result column="profit_amount" jdbcType="DECIMAL" property="profitAmount" />
+    <result column="profit_rate" jdbcType="DECIMAL" property="profitRate" />
+    <result column="hit_rate" jdbcType="DECIMAL" property="hitRate" />
+    <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+
+  <!-- 排序  -->
+  <sql id="Order_SQL">
+    <if test="sortField != null and sortOrder !=null">
+      ORDER BY ${sortField} ${sortOrder}
+    </if>
+  </sql>
+
+  <!-- 分页 -->
+  <sql id="Page_SQL">
+    LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </sql>
+
+  <sql id="Base_Column_List">
+    id, user_id, lottery_code, grade, order_count, order_suc_count, order_suc_rate, order_amount, 
+    order_suc_amount, win_count, win_bw_count, win_sw_count, win_w_count, win_q_count, 
+    win_other_count, win_amount, profit_amount, profit_rate, hit_rate, commission_amount, 
+    create_time, update_time, modify_by, modify_time, remark
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.skeleton.lotto.base.group.bo.OrderGroupLotteryBO">
+    insert into order_group_lottery (id, user_id, lottery_code, 
+      grade, order_count, order_suc_count, 
+      order_suc_rate, order_amount, order_suc_amount, 
+      win_count, win_bw_count, win_sw_count, 
+      win_w_count, win_q_count, win_other_count, 
+      win_amount, profit_amount, profit_rate, 
+      hit_rate, commission_amount, create_time, 
+      update_time, modify_by, modify_time, 
+      remark)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{lotteryCode,jdbcType=SMALLINT}, 
+      #{grade,jdbcType=SMALLINT}, #{orderCount,jdbcType=INTEGER}, #{orderSucCount,jdbcType=INTEGER}, 
+      #{orderSucRate,jdbcType=DECIMAL}, #{orderAmount,jdbcType=DECIMAL}, #{orderSucAmount,jdbcType=DECIMAL}, 
+      #{winCount,jdbcType=INTEGER}, #{winBwCount,jdbcType=INTEGER}, #{winSwCount,jdbcType=INTEGER}, 
+      #{winWCount,jdbcType=INTEGER}, #{winQCount,jdbcType=INTEGER}, #{winOtherCount,jdbcType=INTEGER}, 
+      #{winAmount,jdbcType=DECIMAL}, #{profitAmount,jdbcType=DECIMAL}, #{profitRate,jdbcType=DECIMAL}, 
+      #{hitRate,jdbcType=DECIMAL}, #{commissionAmount,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="queryOrderGroupLotteryInfo" parameterType="Integer" resultType="com.hhly.skeleton.lotto.base.group.bo.OrderGroupLotteryBO">
+      SELECT
+        ogt.lottery_code lotteryCode,
+        ogt.order_count orderCount,
+        ogt.order_suc_rate orderSucRate,
+        ogt.win_count winCount,
+        ogt.grade grade,
+        ogt.win_amount winAmount
+      FROM
+      order_group_lottery ogt
+      where user_id=#{userId} order by lottery_code
+  </select>
+
+</mapper>

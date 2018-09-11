@@ -1,0 +1,1188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.ordercopy.dao.v1_1.OrderIssueInfoDaoMapperV11">
+	<resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.OrderIssueInfoBO">
+		<id column="id" jdbcType="INTEGER" property="id"/>
+		<result column="user_issue_id" jdbcType="INTEGER" property="userIssueId"/>
+		<result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+		<result column="max_roi" jdbcType="DECIMAL" property="maxRoi"/>
+		<result column="recommend_reason" jdbcType="VARCHAR" property="recommendReason"/>
+		<result column="is_show" jdbcType="BIT" property="isShow"/>
+		<result column="order_visible_type" jdbcType="BIT" property="orderVisibleType"/>
+		<result column="commission_rate" jdbcType="DECIMAL" property="commissionRate"/>
+		<result column="follow_num" jdbcType="INTEGER" property="followNum"/>
+		<result column="follow_amount" jdbcType="DECIMAL" property="followAmount"/>
+		<result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount"/>
+		<result column="is_top" jdbcType="BIT" property="isTop"/>
+		<result column="is_recommend" jdbcType="BIT" property="isRecommend"/>
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+		<result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+		<result column="modify_by" jdbcType="VARCHAR" property="modifyBy"/>
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+	</resultMap>
+
+	<!-- 综合查询：实单列表 -->
+	<resultMap id="BaseBOResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.QueryBO">
+		<id column="id" jdbcType="INTEGER" property="id"/>
+		<result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+		<result column="order_amount" jdbcType="VARCHAR" property="orderAmount"/>
+		<result column="max_roi" jdbcType="DECIMAL" property="maxRoiDb"/>
+		<result column="order_visible_type" jdbcType="BIT" property="orderVisibleType"/>
+		<result column="follow_num" jdbcType="INTEGER" property="followNum"/>
+		<result column="is_top" jdbcType="INTEGER" property="isTop"/>
+		<result column="is_recommend" jdbcType="INTEGER" property="isRecommend"/>
+		<result column="recent_record" jdbcType="VARCHAR" property="recentRecord"/>
+		<result column="hit_rate" jdbcType="DECIMAL" property="hitRateDb"/>
+		<result column="continue_hit" jdbcType="INTEGER" property="continueHit"/>
+		<result column="level" jdbcType="INTEGER" property="level"/>
+		<result column="head_url" jdbcType="VARCHAR" property="headUrl"/>
+		<result column="end_time" jdbcType="TIMESTAMP" property="endTimeDb"/>
+		<result column="continue_hit" jdbcType="INTEGER" property="continueHitDb"/>
+		<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+		<result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+		<result column="winning_status" jdbcType="INTEGER" property="winStatus"/>
+		<result column="user_issue_id" jdbcType="INTEGER" property="userIssueId"/>
+		<result column="issue_type" jdbcType="INTEGER" property="issueType"/>
+		<result column="begin_team_name" jdbcType="VARCHAR" property="beginTeamName"/>
+		<result column="recommend_reason" jdbcType="VARCHAR" property="recommendReason"/>
+		<result column="lottery_code" jdbcType="INTEGER" property="lotteryCode"/>
+	</resultMap>
+
+
+
+
+
+	<sql id="Base_Column_List">
+		id, user_issue_id, order_code, max_roi, recommend_reason, is_show, order_visible_type,
+		commission_rate, follow_num, follow_amount, commission_amount, is_top, is_recommend,
+		create_time, modify_time, modify_by, update_time
+	</sql>
+
+	<!-- 排序  -->
+	<sql id="Order_SQL">
+		<if test = "sortField != null and sortOrder !=null">
+			ORDER BY ${sortField} ${sortOrder}
+		</if>
+	</sql>
+
+	<!-- 分页 -->
+	<sql id="Page_SQL">
+		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</sql>
+
+
+	<!-- 查询实单列表 :queryType=3-->
+	<select id="selectByQueryType" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultMap="BaseBOResultMap">
+		SELECT cccc.* FROM (
+		SELECT aaa.* FROM(
+		SELECT
+		a.id,<!-- 发单编号 -->
+		a.order_code,<!-- 订单编号 -->
+		a.order_amount, <!-- 订单总金额 -->
+		a.end_local_time as end_time, <!-- 本站截止时间-->
+		a.winning_status ,<!-- 中奖情况 -->
+		a.begin_team_name,<!-- 最早截止的对阵名称 -->
+		a.lottery_code,<!-- 彩种-->
+		ifnull(a.issue_type,1) AS issue_type, <!-- 发单类型 -->
+		a.order_visible_type,<!-- 是否可见 -->
+		a.create_time,<!-- 发单时间 -->
+		a.max_roi,<!-- 最高回报率 -->
+		a.follow_num,<!--  跟单总人数 -->
+		a.is_top, <!-- 是否置顶 -->
+		a.is_recommend,<!-- 是否推荐 -->
+		a.continue_hit, <!-- 连红数 -->
+		a.recent_record,<!-- 最近战况 -->
+		a.hit_rate,<!--  命中率 -->
+		a.recommend_reason,<!-- 推荐理由 -->
+		d.level, <!-- 专家级别 -->
+		e.nick_name,<!-- 昵称 -->
+		c.id as user_issue_id,<!-- 发单用户表主键ID -->
+		e.head_url <!-- 用户头像地址 -->
+		FROM (SELECT
+		'' AS order_code,
+		a.amount AS order_amount,
+		a.lottery_code,
+		a.begin_team_name,
+		a.sale_end_time AS end_local_time,
+		a.order_status AS winning_status,
+		6 AS order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		issue_content_info a INNER JOIN order_issue_info b on a.id = b.issue_content_info_id
+		UNION
+		SELECT
+		a.order_code,
+		a.order_amount,
+		a.lottery_code,
+		'' begin_team_name,
+		a.end_local_time,
+		a.winning_status,
+		a.order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		order_info a INNER JOIN order_issue_info b on a.order_code = b.order_code)a
+		LEFT JOIN m_user_issue_info c ON a.user_issue_id = c.id
+		LEFT JOIN m_user_issue_level d ON c.id = d.user_issue_info_id
+		AND a.lottery_code = d.lottery_code
+		LEFT JOIN m_user_info e ON c.user_id = e.id
+		WHERE 1 = 1
+		AND c.status = 1
+		<!-- 彩种 -->
+		<if test = "lotteryCode != null">
+			AND a.lottery_code = #{lotteryCode}
+		</if>
+		<!-- 发单的用户ID, 1)专家详情 2)专家页面  实单列表查询用 -->
+		<if test="issueUserId != null">
+			AND c.id = #{issueUserId}
+		</if>
+		AND a.winning_status = 1
+		AND a.end_local_time <![CDATA[>]]> now()
+		<!-- 已出票 -->
+		<if test = "all == null">
+			AND a.order_status = 6
+		</if>
+		ORDER BY
+		a.create_time DESC)aaa
+
+		UNION
+
+		SELECT bbb.* FROM(
+		SELECT
+		a.id,<!-- 发单编号 -->
+		a.order_code,<!-- 订单编号 -->
+		a.order_amount, <!-- 订单总金额 -->
+		a.end_local_time as end_time, <!-- 本站截止时间-->
+		a.winning_status ,<!-- 中奖情况 -->
+		a.begin_team_name,<!-- 最早截止的对阵名称 -->
+		a.lottery_code,<!-- 彩种-->
+		ifnull(a.issue_type,1) AS issue_type, <!-- 发单类型 -->
+		a.order_visible_type,<!-- 是否可见 -->
+		a.create_time,<!-- 发单时间 -->
+		a.max_roi,<!-- 最高回报率 -->
+		a.follow_num,<!--  跟单总人数 -->
+		a.is_top, <!-- 是否置顶 -->
+		a.is_recommend,<!-- 是否推荐 -->
+		a.continue_hit, <!-- 连红数 -->
+		a.recent_record,<!-- 最近战况 -->
+		a.hit_rate,<!--  命中率 -->
+		a.recommend_reason,<!-- 推荐理由 -->
+		d.level, <!-- 专家级别 -->
+		e.nick_name,<!-- 昵称 -->
+		c.id as user_issue_id,<!-- 发单用户表主键ID -->
+		e.head_url <!-- 用户头像地址 -->
+		FROM (SELECT
+		'' AS order_code,
+		a.amount AS order_amount,
+		a.lottery_code,
+		a.begin_team_name,
+		a.sale_end_time AS end_local_time,
+		a.order_status AS winning_status,
+		6 AS order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		issue_content_info a INNER JOIN order_issue_info b on a.id = b.issue_content_info_id
+		UNION
+		SELECT
+		a.order_code,
+		a.order_amount,
+		a.lottery_code,
+		'' begin_team_name,
+		a.end_local_time,
+		a.winning_status,
+		a.order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		order_info a INNER JOIN order_issue_info b on a.order_code = b.order_code)a
+		LEFT JOIN m_user_issue_info c ON a.user_issue_id = c.id
+		LEFT JOIN m_user_issue_level d ON c.id = d.user_issue_info_id
+		AND a.lottery_code = d.lottery_code
+		LEFT JOIN m_user_info e ON c.user_id = e.id
+		WHERE 1 = 1
+		AND c.status = 1
+		<!-- 彩种 -->
+		<if test = "lotteryCode != null">
+			AND a.lottery_code = #{lotteryCode}
+		</if>
+		<!-- 发单的用户ID, 1)专家详情 2)专家页面  实单列表查询用 -->
+		<if test="issueUserId != null">
+			AND c.id = #{issueUserId}
+		</if>
+		AND a.end_local_time <![CDATA[<]]> now()
+		<!-- 已出票 -->
+		<if test = "all == null">
+			AND a.order_status = 6
+		</if>
+		ORDER BY
+		a.create_time DESC
+		)bbb
+		)cccc
+
+		<include refid="Page_SQL"/>
+	</select>
+
+	<!-- 查询实单总记录 queryType=3-->
+	<select id="selectByQueryTypeCount" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultType="int">
+		SELECT count(0) FROM (
+		SELECT aaa.* FROM(
+		SELECT
+		a.id,<!-- 发单编号 -->
+		a.order_code,<!-- 订单编号 -->
+		a.order_amount, <!-- 订单总金额 -->
+		a.end_local_time as end_time, <!-- 本站截止时间-->
+		a.winning_status ,<!-- 中奖情况 -->
+		a.begin_team_name,<!-- 最早截止的对阵名称 -->
+		a.lottery_code,<!-- 彩种-->
+		ifnull(a.issue_type,1) AS issue_type, <!-- 发单类型 -->
+		a.order_visible_type,<!-- 是否可见 -->
+		a.create_time,<!-- 发单时间 -->
+		a.max_roi,<!-- 最高回报率 -->
+		a.follow_num,<!--  跟单总人数 -->
+		a.is_top, <!-- 是否置顶 -->
+		a.is_recommend,<!-- 是否推荐 -->
+		a.continue_hit, <!-- 连红数 -->
+		a.recent_record,<!-- 最近战况 -->
+		a.hit_rate,<!--  命中率 -->
+		a.recommend_reason,<!-- 推荐理由 -->
+		d.level, <!-- 专家级别 -->
+		e.nick_name,<!-- 昵称 -->
+		c.id as user_issue_id,<!-- 发单用户表主键ID -->
+		e.head_url <!-- 用户头像地址 -->
+		FROM (SELECT
+		'' AS order_code,
+		a.amount AS order_amount,
+		a.lottery_code,
+		a.begin_team_name,
+		a.sale_end_time AS end_local_time,
+		a.order_status AS winning_status,
+		6 AS order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		issue_content_info a INNER JOIN order_issue_info b on a.id = b.issue_content_info_id
+		UNION
+		SELECT
+		a.order_code,
+		a.order_amount,
+		a.lottery_code,
+		'' begin_team_name,
+		a.end_local_time,
+		a.winning_status,
+		a.order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		order_info a INNER JOIN order_issue_info b on a.order_code = b.order_code)a
+		LEFT JOIN m_user_issue_info c ON a.user_issue_id = c.id
+		LEFT JOIN m_user_issue_level d ON c.id = d.user_issue_info_id
+		AND a.lottery_code = d.lottery_code
+		LEFT JOIN m_user_info e ON c.user_id = e.id
+		WHERE 1 = 1
+		AND c.status = 1
+		<!-- 彩种 -->
+		<if test = "lotteryCode != null">
+			AND a.lottery_code = #{lotteryCode}
+		</if>
+		<!-- 发单的用户ID, 1)专家详情 2)专家页面  实单列表查询用 -->
+		<if test="issueUserId != null">
+			AND c.id = #{issueUserId}
+		</if>
+		AND a.winning_status = 1
+		AND a.end_local_time <![CDATA[>]]> now()
+		<!-- 已出票 -->
+		<if test = "all == null">
+			AND a.order_status = 6
+		</if>
+		ORDER BY
+		a.create_time DESC)aaa
+
+		UNION
+
+		SELECT bbb.* FROM(
+		SELECT
+		a.id,<!-- 发单编号 -->
+		a.order_code,<!-- 订单编号 -->
+		a.order_amount, <!-- 订单总金额 -->
+		a.end_local_time as end_time, <!-- 本站截止时间-->
+		a.winning_status ,<!-- 中奖情况 -->
+		a.begin_team_name,<!-- 最早截止的对阵名称 -->
+		a.lottery_code,<!-- 彩种-->
+		ifnull(a.issue_type,1) AS issue_type, <!-- 发单类型 -->
+		a.order_visible_type,<!-- 是否可见 -->
+		a.create_time,<!-- 发单时间 -->
+		a.max_roi,<!-- 最高回报率 -->
+		a.follow_num,<!--  跟单总人数 -->
+		a.is_top, <!-- 是否置顶 -->
+		a.is_recommend,<!-- 是否推荐 -->
+		a.continue_hit, <!-- 连红数 -->
+		a.recent_record,<!-- 最近战况 -->
+		a.hit_rate,<!--  命中率 -->
+		a.recommend_reason,<!-- 推荐理由 -->
+		d.level, <!-- 专家级别 -->
+		e.nick_name,<!-- 昵称 -->
+		c.id as user_issue_id,<!-- 发单用户表主键ID -->
+		e.head_url <!-- 用户头像地址 -->
+		FROM (SELECT
+		'' AS order_code,
+		a.amount AS order_amount,
+		a.lottery_code,
+		a.begin_team_name,
+		a.sale_end_time AS end_local_time,
+		a.order_status AS winning_status,
+		6 AS order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		issue_content_info a INNER JOIN order_issue_info b on a.id = b.issue_content_info_id
+		UNION
+		SELECT
+		a.order_code,
+		a.order_amount,
+		a.lottery_code,
+		'' begin_team_name,
+		a.end_local_time,
+		a.winning_status,
+		a.order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		order_info a INNER JOIN order_issue_info b on a.order_code = b.order_code)a
+		LEFT JOIN m_user_issue_info c ON a.user_issue_id = c.id
+		LEFT JOIN m_user_issue_level d ON c.id = d.user_issue_info_id
+		AND a.lottery_code = d.lottery_code
+		LEFT JOIN m_user_info e ON c.user_id = e.id
+		WHERE 1 = 1
+		AND c.status = 1
+		<!-- 彩种 -->
+		<if test = "lotteryCode != null">
+			AND a.lottery_code = #{lotteryCode}
+		</if>
+		<!-- 发单的用户ID, 1)专家详情 2)专家页面  实单列表查询用 -->
+		<if test="issueUserId != null">
+			AND c.id = #{issueUserId}
+		</if>
+		AND a.end_local_time <![CDATA[<]]> now()
+		<!-- 已出票 -->
+		<if test = "all == null">
+			AND a.order_status = 6
+		</if>
+		ORDER BY
+		a.create_time DESC
+		)bbb
+		)cccc
+
+	</select>
+
+
+	<!-- 查询实单列表 -->
+	<select id="selectByCondition_bak" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultMap="BaseBOResultMap">
+		SELECT b.id,<!-- 发单编号 -->
+		a.order_code,<!-- 订单编号 -->
+		a.order_amount, <!-- 订单总金额 -->
+		a.end_local_time as end_time, <!-- 本站截止时间-->
+		a.winning_status ,<!-- 中奖情况 -->
+		b.order_visible_type,<!-- 是否可见 -->
+		b.create_time,<!-- 发单时间 -->
+		b.max_roi,<!-- 最高回报率 -->
+		b.follow_num,<!--  跟单总人数 -->
+		b.is_top, <!-- 是否置顶 -->
+		b.is_recommend,<!-- 是否推荐 -->
+		b.continue_hit, <!-- 连红数 -->
+		b.recent_record,<!-- 最近战况 -->
+		b.hit_rate,<!--  命中率 -->
+		d.level, <!-- 专家级别 -->
+		e.nick_name,<!-- 昵称 -->
+		c.id as user_issue_id,<!-- 发单用户表主键ID -->
+		e.head_url <!-- 用户头像地址 -->
+		FROM order_issue_info b
+		INNER JOIN order_info a  ON a.order_code = b.order_code
+		LEFT JOIN m_user_issue_info c ON b.user_issue_id = c.id
+		LEFT JOIN m_user_issue_level d ON c.id = d.user_issue_info_id and a.lottery_code = d.lottery_code
+		LEFT JOIN m_user_info e ON c.user_id = e.id
+		<if test="userId != null">
+			LEFT JOIN m_user_issue_link f ON c.id = f.user_issue_id
+		</if>
+		WHERE 1 = 1
+		AND c.status = 1
+		<!-- 彩种 -->
+		<if test = "lotteryCode != null">
+			AND a.lottery_code = #{lotteryCode}
+		</if>
+		<!-- 专家级别 -->
+		<if test = "level != null">
+			AND ifnull(d.level,0) = #{level}
+		</if>
+		<!-- 关注表数据有限性 -->
+		<if test = "userId !=null and dataStatus != null">
+			AND f.data_status = #{dataStatus}
+		</if>
+		<!-- 关注的用户ID，1)与我相关  实单列表查询用 -->
+		<if test="userId != null">
+			AND f.user_id = #{userId}
+		</if>
+		<!-- 发单的用户ID, 1)专家详情 2)专家页面  实单列表查询用 -->
+		<if test="issueUserId != null">
+			AND c.id = #{issueUserId}
+		</if>
+		<!-- 未开赛 -->
+		<if test="flag != null">
+			AND DATE_FORMAT(a.end_local_time,'%Y-%m-%d %H:%i:%s') > DATE_FORMAT(now(),'%Y-%m-%d %H:%i:%s')
+		</if>
+		<!-- 已出票 -->
+		<if test = "all == null">
+			AND a.order_status = 6
+		</if>
+		<include refid="Order_SQL"/>
+		<include refid="Page_SQL"/>
+	</select>
+
+	<!-- 查询实单列表 -->
+	<select id="selectByCondition" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultMap="BaseBOResultMap">
+		SELECT a.id,<!-- 发单编号 -->
+		a.order_code,<!-- 订单编号 -->
+		a.order_amount, <!-- 订单总金额 -->
+		a.end_local_time as end_time, <!-- 本站截止时间-->
+		a.winning_status ,<!-- 中奖情况 -->
+		a.begin_team_name,<!-- 最早截止的对阵名称 -->
+		a.lottery_code,<!-- 彩种-->
+		ifnull(a.issue_type,1) AS issue_type, <!-- 发单类型 -->
+		a.order_visible_type,<!-- 是否可见 -->
+		a.create_time,<!-- 发单时间 -->
+		a.max_roi,<!-- 最高回报率 -->
+		a.follow_num,<!--  跟单总人数 -->
+		a.is_top, <!-- 是否置顶 -->
+		a.is_recommend,<!-- 是否推荐 -->
+		a.continue_hit, <!-- 连红数 -->
+		a.recent_record,<!-- 最近战况 -->
+		a.hit_rate,<!--  命中率 -->
+		a.recommend_reason,<!-- 推荐理由 -->
+		d.level, <!-- 专家级别 -->
+		e.nick_name,<!-- 昵称 -->
+		c.id as user_issue_id,<!-- 发单用户表主键ID -->
+		e.head_url <!-- 用户头像地址 -->
+		FROM (SELECT
+		'' AS order_code,
+		a.amount AS order_amount,
+		a.lottery_code,
+		a.begin_team_name,
+		a.sale_end_time AS end_local_time,
+		a.order_status AS winning_status,
+		6 AS order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		issue_content_info a INNER JOIN order_issue_info b on a.id = b.issue_content_info_id
+		UNION
+		SELECT
+		a.order_code,
+		a.order_amount,
+		a.lottery_code,
+		'' begin_team_name,
+		a.end_local_time,
+		a.winning_status,
+		a.order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id,
+		b.id
+		FROM
+		order_info a INNER JOIN order_issue_info b on a.order_code = b.order_code)a
+		LEFT JOIN m_user_issue_info c ON a.user_issue_id = c.id
+		LEFT JOIN m_user_issue_level d ON c.id = d.user_issue_info_id and a.lottery_code = d.lottery_code
+		LEFT JOIN m_user_info e ON c.user_id = e.id
+		<if test="userId != null">
+			LEFT JOIN m_user_issue_link f ON c.id = f.user_issue_id
+		</if>
+		WHERE 1 = 1
+		AND c.status = 1
+		<!-- 彩种 -->
+		<if test = "lotteryCode != null">
+			AND a.lottery_code = #{lotteryCode}
+		</if>
+		<!-- 专家级别 -->
+		<if test = "level != null">
+			AND ifnull(d.level,0) = #{level}
+		</if>
+		<!-- 关注表数据有限性 -->
+		<if test = "userId !=null and dataStatus != null">
+			AND f.data_status = #{dataStatus}
+		</if>
+		<!-- 关注的用户ID，1)与我相关  实单列表查询用 -->
+		<if test="userId != null">
+			AND f.user_id = #{userId}
+		</if>
+		<!-- 发单的用户ID, 1)专家详情 2)专家页面  实单列表查询用 -->
+		<if test="issueUserId != null">
+			AND c.id = #{issueUserId}
+		</if>
+		<!-- 未开赛 -->
+		<if test="flag != null">
+			AND DATE_FORMAT(a.end_local_time,'%Y-%m-%d %H:%i:%s') > DATE_FORMAT(now(),'%Y-%m-%d %H:%i:%s')
+		</if>
+		<!-- 发单类型 -->
+		<if test="issueType != null">
+			AND ifnull(a.issue_type,1) = #{issueType}
+		</if>
+		<!-- 已出票 -->
+		<if test = "all == null">
+			AND a.order_status = 6
+		</if>
+		<include refid="Order_SQL"/>
+		<include refid="Page_SQL"/>
+	</select>
+
+	<!-- 查询实单总记录 -->
+	<select id="selectByConditionCount_bak" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultType="int">
+		SELECT
+		count(0)
+		FROM order_issue_info b
+		INNER JOIN order_info a ON a.order_code = b.order_code
+		LEFT JOIN m_user_issue_info c ON b.user_issue_id = c.id
+		LEFT JOIN m_user_issue_level d ON c.id = d.user_issue_info_id and a.lottery_code = d.lottery_code
+		LEFT JOIN m_user_info e ON c.user_id = e.id
+		<if test="userId != null">
+			LEFT JOIN m_user_issue_link f ON c.id = f.user_issue_id
+		</if>
+		WHERE 1 = 1
+		AND c.status = 1
+		<!-- 彩种 -->
+		<if test = "lotteryCode != null">
+			AND a.lottery_code = #{lotteryCode}
+		</if>
+		<!-- 专家级别 -->
+		<if test = "level != null">
+			AND ifnull(d.level,0) = #{level}
+		</if>
+		<!-- 关注表数据有限性 -->
+		<if test = "userId !=null and dataStatus != null">
+			AND f.data_status = #{dataStatus}
+		</if>
+		<!-- 关注的用户ID，1)与我相关  实单列表查询用 -->
+		<if test="userId != null">
+			AND f.user_id = #{userId}
+		</if>
+		<!-- 发单的用户ID, 1)专家详情 2)专家页面  实单列表查询用 -->
+		<if test="issueUserId != null">
+			AND c.id = #{issueUserId}
+		</if>
+		<!-- 未开赛 -->
+		<if test="flag != null">
+			AND DATE_FORMAT(a.end_local_time,'%Y-%m-%d %H:%i:%s') > DATE_FORMAT(now(),'%Y-%m-%d %H:%i:%s')
+		</if>
+		<!-- 已出票 -->
+		<if test="all == null">
+			AND a.order_status = 6
+		</if>
+	</select>
+
+	<!-- 查询实单总记录 -->
+	<select id="selectByConditionCount" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultType="int">
+		SELECT
+		count(0)
+		FROM (SELECT
+		'' AS order_code,
+		a.amount AS order_amount,
+		a.lottery_code,
+		a.begin_team_name,
+		a.sale_end_time AS end_local_time,
+		a.order_status AS winning_status,
+		6 AS order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id
+		FROM
+		issue_content_info a INNER JOIN order_issue_info b on a.id = b.issue_content_info_id
+		UNION
+		SELECT
+		a.order_code,
+		a.order_amount,
+		a.lottery_code,
+		'' begin_team_name,
+		a.end_local_time,
+		a.winning_status,
+		a.order_status,
+		b.issue_type,
+		b.order_visible_type,
+		b.create_time,
+		b.max_roi,
+		b.follow_num,
+		b.is_top,
+		b.is_recommend,
+		b.continue_hit,
+		b.recent_record,
+		b.hit_rate,
+		b.recommend_reason,
+		b.user_issue_id
+		FROM
+		order_info a INNER JOIN order_issue_info b on a.order_code = b.order_code)a
+		LEFT JOIN m_user_issue_info c ON a.user_issue_id = c.id
+		LEFT JOIN m_user_issue_level d ON c.id = d.user_issue_info_id and a.lottery_code = d.lottery_code
+		LEFT JOIN m_user_info e ON c.user_id = e.id
+		<if test="userId != null">
+			LEFT JOIN m_user_issue_link f ON c.id = f.user_issue_id
+		</if>
+		WHERE 1 = 1
+		AND c.status = 1
+		<!-- 彩种 -->
+		<if test = "lotteryCode != null">
+			AND a.lottery_code = #{lotteryCode}
+		</if>
+		<!-- 专家级别 -->
+		<if test = "level != null">
+			AND ifnull(d.level,0) = #{level}
+		</if>
+		<!-- 关注表数据有限性 -->
+		<if test = "userId !=null and dataStatus != null">
+			AND f.data_status = #{dataStatus}
+		</if>
+		<!-- 关注的用户ID，1)与我相关  实单列表查询用 -->
+		<if test="userId != null">
+			AND f.user_id = #{userId}
+		</if>
+		<!-- 发单的用户ID, 1)专家详情 2)专家页面  实单列表查询用 -->
+		<if test="issueUserId != null">
+			AND c.id = #{issueUserId}
+		</if>
+		<!-- 未开赛 -->
+		<if test="flag != null">
+			AND DATE_FORMAT(a.end_local_time,'%Y-%m-%d %H:%i:%s') > DATE_FORMAT(now(),'%Y-%m-%d %H:%i:%s')
+		</if>
+		<!-- 发单类型 -->
+		<if test="issueType != null">
+			AND ifnull(a.issue_type,1) = #{issueType}
+		</if>
+		<!-- 已出票 -->
+		<if test="all == null">
+			AND a.order_status = 6
+		</if>
+	</select>
+
+	<!-- 首页-动态更新数 -->
+	<select id="getDynamicUpdateCount" resultType="int">
+		SELECT
+		count(1)
+		FROM order_issue_info info
+		WHERE 1=1
+		AND DATE_FORMAT(info.create_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
+	</select>
+
+	<!-- 查询订单是否存在 -->
+	<select id="findOrderIssueBOCountByOrderCode" resultType="java.lang.Integer" parameterType="java.lang.String">
+		SELECT count(1)
+		FROM order_issue_info a
+		WHERE a.order_code = #{orderCode,jdbcType=VARCHAR}
+	</select>
+
+	<select id="findOrderCopyMainOrderIssueBO">
+		SELECT
+		a.id,
+		a.order_code,
+		a.order_visible_type,
+		a.follow_num
+		FROM order_issue_info a
+		INNER JOIN m_user_issue_info b ON a.user_issue_id = b.id
+		LEFT JOIN m_user_issue_level d ON b.id = d.user_issue_info_id AND d.user_issue_info_id IS NOT NULL
+		INNER JOIN order_info c ON a.order_code = c.order_code AND c.end_sys_time > now() AND c.order_status = 6
+		WHERE a.is_recommend = 1
+
+	</select>
+
+
+	<!-- 根据id查询发单信息 -->
+	<select id="findIssueBOById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List"/>
+		from order_issue_info a
+		where id=#{id}
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		DELETE FROM order_issue_info
+		WHERE id = #{id,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="insert" parameterType="com.hhly.lottocore.persistence.ordercopy.po.OrderIssueInfoPO">
+		INSERT INTO order_issue_info (id, user_issue_id, order_code,
+		max_roi, recommend_reason, is_show,
+		order_visible_type, commission_rate, follow_num,
+		follow_amount, commission_amount, is_top,
+		is_recommend, create_time, modify_time,
+		modify_by, update_time)
+		VALUES (#{id,jdbcType=INTEGER}, #{userIssueId,jdbcType=INTEGER}, #{orderCode,jdbcType=VARCHAR},
+		#{maxRoi,jdbcType=DECIMAL}, #{recommendReason,jdbcType=VARCHAR},
+		#{isShow,jdbcType=BIT},
+		#{orderVisibleType,jdbcType=BIT}, #{commissionRate,jdbcType=DECIMAL},
+		#{followNum,jdbcType=INTEGER},
+		#{followAmount,jdbcType=DECIMAL}, #{commissionAmount,jdbcType=DECIMAL},
+		#{isTop,jdbcType=BIT},
+		#{isRecommend,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP},
+		#{modifyBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="com.hhly.lottocore.persistence.ordercopy.po.OrderIssueInfoPO">
+		insert into order_issue_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="userIssueId != null">
+				user_issue_id,
+			</if>
+			<if test="orderCode != null">
+				order_code,
+			</if>
+			<if test="maxRoi != null">
+				max_roi,
+			</if>
+			<if test="recommendReason != null">
+				recommend_reason,
+			</if>
+			<if test="isShow != null">
+				is_show,
+			</if>
+			<if test="orderVisibleType != null">
+				order_visible_type,
+			</if>
+			<if test="commissionRate != null">
+				commission_rate,
+			</if>
+			<if test="followNum != null">
+				follow_num,
+			</if>
+			<if test="followAmount != null">
+				follow_amount,
+			</if>
+			<if test="commissionAmount != null">
+				commission_amount,
+			</if>
+			<if test="isTop != null">
+				is_top,
+			</if>
+			<if test="isRecommend != null">
+				is_recommend,
+			</if>
+			<if test="recentRecord != null">
+				recent_record,
+			</if>
+			<if test="hitRate != null">
+				hit_rate,
+			</if>
+			<if test="continueHit != null">
+				continue_hit,
+			</if>
+			create_time,
+			update_time
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="userIssueId != null">
+				#{userIssueId,jdbcType=INTEGER},
+			</if>
+			<if test="orderCode != null">
+				#{orderCode,jdbcType=VARCHAR},
+			</if>
+			<if test="maxRoi != null">
+				#{maxRoi,jdbcType=DECIMAL},
+			</if>
+			<if test="recommendReason != null">
+				#{recommendReason,jdbcType=VARCHAR},
+			</if>
+			<if test="isShow != null">
+				#{isShow,jdbcType=BIT},
+			</if>
+			<if test="orderVisibleType != null">
+				#{orderVisibleType,jdbcType=BIT},
+			</if>
+			<if test="commissionRate != null">
+				#{commissionRate,jdbcType=DECIMAL},
+			</if>
+			<if test="followNum != null">
+				#{followNum,jdbcType=INTEGER},
+			</if>
+			<if test="followAmount != null">
+				#{followAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="commissionAmount != null">
+				#{commissionAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="isTop != null">
+				#{isTop,jdbcType=BIT},
+			</if>
+			<if test="isRecommend != null">
+				#{isRecommend,jdbcType=BIT},
+			</if>
+			<if test="recentRecord != null">
+				#{recentRecord,jdbcType=VARCHAR},
+			</if>
+			<if test="hitRate != null">
+				#{hitRate,jdbcType=VARCHAR},
+			</if>
+			<if test="continueHit != null">
+				#{continueHit,jdbcType=VARCHAR},
+			</if>
+			now(),
+			now()
+		</trim>
+	</insert>
+
+	<update id="updateByPrimaryKeySelective"
+			parameterType="com.hhly.lottocore.persistence.ordercopy.po.OrderIssueInfoPO">
+		update order_issue_info
+		<set>
+			<if test="userIssueId != null">
+				user_issue_id = #{userIssueId,jdbcType=INTEGER},
+			</if>
+			<if test="orderCode != null">
+				order_code = #{orderCode,jdbcType=VARCHAR},
+			</if>
+			<if test="maxRoi != null">
+				max_roi = #{maxRoi,jdbcType=DECIMAL},
+			</if>
+			<if test="recommendReason != null">
+				recommend_reason = #{recommendReason,jdbcType=VARCHAR},
+			</if>
+			<if test="isShow != null">
+				is_show = #{isShow,jdbcType=BIT},
+			</if>
+			<if test="orderVisibleType != null">
+				order_visible_type = #{orderVisibleType,jdbcType=BIT},
+			</if>
+			<if test="commissionRate != null">
+				commission_rate = #{commissionRate,jdbcType=DECIMAL},
+			</if>
+			<if test="followNum != null">
+				follow_num = #{followNum,jdbcType=INTEGER},
+			</if>
+			<if test="followAmount != null">
+				follow_amount = #{followAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="commissionAmount != null">
+				commission_amount = #{commissionAmount,jdbcType=DECIMAL},
+			</if>
+			<if test="isTop != null">
+				is_top = #{isTop,jdbcType=BIT},
+			</if>
+			<if test="isRecommend != null">
+				is_recommend = #{isRecommend,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyBy != null">
+				modify_by = #{modifyBy,jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.ordercopy.po.OrderIssueInfoPO">
+		UPDATE order_issue_info
+		SET user_issue_id      = #{userIssueId,jdbcType=INTEGER},
+		order_code         = #{orderCode,jdbcType=VARCHAR},
+		max_roi            = #{maxRoi,jdbcType=DECIMAL},
+		recommend_reason   = #{recommendReason,jdbcType=VARCHAR},
+		is_show            = #{isShow,jdbcType=BIT},
+		order_visible_type = #{orderVisibleType,jdbcType=BIT},
+		commission_rate    = #{commissionRate,jdbcType=DECIMAL},
+		follow_num         = #{followNum,jdbcType=INTEGER},
+		follow_amount      = #{followAmount,jdbcType=DECIMAL},
+		commission_amount  = #{commissionAmount,jdbcType=DECIMAL},
+		is_top             = #{isTop,jdbcType=BIT},
+		is_recommend       = #{isRecommend,jdbcType=BIT},
+		create_time        = #{createTime,jdbcType=TIMESTAMP},
+		modify_time        = #{modifyTime,jdbcType=TIMESTAMP},
+		modify_by          = #{modifyBy,jdbcType=VARCHAR},
+		update_time        = #{updateTime,jdbcType=TIMESTAMP}
+		WHERE id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<resultMap id="BaseMap"  type="java.util.HashMap">
+		<result column="order_code" property="orderCode"/>
+		<result column="bet_content" property="betContent"/>
+	</resultMap>
+
+	<!-- 批量查询订单详情，返回订单对应订单详情投注内容 Map<OrderCode, planContents> , 用于获取订单过关方式-->
+	<select id="getOrderDetailPlanContentByOrderCode" resultMap="BaseMap">
+		SELECT order_code,GROUP_CONCAT(plan_content)bet_content
+		FROM order_detail
+		WHERE 1 = 1
+		AND order_code in
+		<foreach collection="orderCodes" open="(" close=")" item="item" separator=",">
+			#{item}
+		</foreach>
+		GROUP BY order_code
+	</select>
+
+	<resultMap id="NumOfOrderIssueMap" type="java.util.HashMap">
+		<result column="user_issue_id" property="issueUserId"/>
+		<result column="issue_num" property="issueNum"/>
+	</resultMap>
+	<!-- 查询有推荐，表示该专家当前未截止可跟投的方案数量 -->
+	<select id="getNumOfOrderIssue" resultMap="NumOfOrderIssueMap">
+		SELECT
+		a.user_issue_id, count(0)issue_num
+		FROM order_issue_info a
+		INNER JOIN order_info b ON a.order_code = b.order_code
+		WHERE 1=1
+		AND DATE_FORMAT(b.end_local_time,'%Y-%m-%d %H:%i:%s') > DATE_FORMAT(now(),'%Y-%m-%d %H:%i:%s')
+		AND a.user_issue_id in
+		<foreach collection="userIssueIds" open="(" close=")" item="item" separator=",">
+			#{item}
+		</foreach>
+		GROUP BY a.user_issue_id
+	</select>
+
+	<!-- 查询方案详情 -->
+	<select id="findOrderCopyInfoBOById" resultType="com.hhly.skeleton.lotto.base.ordercopy.bo.OrderCopyInfoBO">
+		SELECT
+		a.id                 AS id,
+		a.user_issue_id      AS userIssueId,
+		b.user_id            AS userId,
+		a.order_code         AS orderCode,
+		a.max_roi AS maxRoiStr,
+		a.recommend_reason   AS recommendReason,
+		a.is_recommend       AS isRecommend,
+		a.order_visible_type AS orderVisibleType,
+		a.commission_rate    AS commissionRateTemp,
+		a.follow_num         AS followNum,
+		a.create_time        AS createTime,
+		c.head_url           AS headUrl,
+		c.nick_name          AS nickName,
+		b.hit_rate AS hitRateTemp,
+		b.recent_record AS recentRecordStr,
+		b.continue_hit AS continueHitTemp,
+		a.is_show as isShow,
+		b.profit_rate as profitRateTemp,
+		d.end_local_time as endLocalTime
+		FROM order_issue_info a
+		INNER JOIN m_user_issue_info b ON a.user_issue_id = b.id
+		INNER JOIN m_user_info c ON b.user_id = c.id
+		INNER  join order_info  d on d.order_code=a.order_code
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findOrderIssueByOrderCode" parameterType="String" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from order_issue_info
+		where order_code=#{orderCode}
+	</select>
+
+	<select id="queryOrderInfoStatistics" parameterType="int"
+			resultType="com.hhly.skeleton.lotto.base.ordercopy.bo.OrderCopyViewBO">
+		select count(1) issueCount,
+		sum(order_amount) issueAmount
+		from order_info
+		where user_id=#{userId}
+		and pay_status=2
+		and order_status=6
+		and order_type=2
+	</select>
+
+	<update id="updateUserIssueInfo" parameterType="com.hhly.skeleton.lotto.base.ordercopy.bo.OrderCopyViewBO">
+		update m_user_issue_info
+		<set>
+			<if test="issueCount!=null">
+				issue_num = #{issueCount},
+			</if>
+			<if test="issueAmount!=null">
+				issue_amount=#{issueAmount},
+			</if>
+			<if test="followCount!=null">
+				follow_num=#{followCount},
+			</if>
+			<if test="followAmount!=null">
+				follow_amount=#{followAmount},
+			</if>
+			<if test="commissionAmount!=null">
+				commission_amount = #{commissionAmount},
+			</if>
+			<if test="recentRecord!=null">
+				recent_record = #{recentRecord},
+			</if>
+			<if test="hitRate!=null">
+				hit_rate = #{hitRate},
+			</if>
+			<if test="profitRate!=null">
+				profit_rate = #{profitRate},
+			</if>
+			<if test="hitNum!=null">
+				hit_num = #{hitNum},
+			</if>
+			<if test="hitMoney!=null">
+				hit_money = #{hitMoney},
+			</if>
+			<if test="winAmount!=null">
+				win_amount = #{winAmount},
+			</if>
+			<if test="continueHit!=null">
+				continue_hit = #{continueHit},
+			</if>
+
+		</set>
+		where id = #{userIssueId}
+	</update>
+
+	<select id="getCopyOrderInfoForPay" parameterType="String" resultMap="baseBoResultPayMap">
+		SELECT
+		t1.user_issue_id userIssueId,
+		t2.sale_end_time saleEndDate,
+		t2.lottery_code lotteryCode,
+		t2.issue_code issueCode,
+		(
+		SELECT
+		t.lottery_logo_url
+		FROM
+		lottery_type t
+		WHERE
+		t.lottery_code = t2.lottery_code
+		) lotteryLogoUrl,
+		t2.amount price,
+		t1.master_id masterId
+		FROM
+		order_issue_info t1
+		LEFT JOIN issue_content_info t2 ON t1.issue_content_info_id = t2.id
+		WHERE
+		t1.id =#{orderIssueId}
+	</select>
+
+
+	<resultMap id="baseBoResultPayMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.OrderCopyPayInfoBO">
+		<result column="userIssueId" jdbcType="INTEGER" property="userIssueId" />
+		<result column="saleEndDate" jdbcType="TIMESTAMP" property="saleEndDate" />
+		<result column="lotteryCode" jdbcType="INTEGER" property="lotteryCode" />
+		<result column="issueCode" jdbcType="VARCHAR" property="issueCode" />
+		<result column="lotteryLogoUrl" jdbcType="VARCHAR" property="lotteryLogoUrl" />
+		<result column="price" jdbcType="DECIMAL" property="price" />
+		<result column="masterId" jdbcType="VARCHAR" property="masterId" />
+	</resultMap>
+
+
+	<!--- ==========================================V1.0=====================================================================================  -->
+</mapper>

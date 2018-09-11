@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.group.dao.OrderGroupMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.group.bo.OrderGroupBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="order_code" jdbcType="VARCHAR" property="orderCode" />
+    <result column="grpbuy_status" jdbcType="INTEGER" property="grpbuyStatus" />
+    <result column="min_buy_ratio" jdbcType="DECIMAL" property="minBuyRatio" />
+    <result column="min_buy_amount" jdbcType="DECIMAL" property="minBuyAmount" />
+    <result column="guarantee_ratio" jdbcType="DECIMAL" property="guaranteeRatio" />
+    <result column="guarantee_amount" jdbcType="DECIMAL" property="guaranteeAmount" />
+    <result column="visible_type" jdbcType="INTEGER" property="visibleType" />
+    <result column="commission_ratio" jdbcType="DECIMAL" property="commissionRatio" />
+    <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount" />
+    <result column="apply_way" jdbcType="INTEGER" property="applyWay" />
+    <result column="apply_code" jdbcType="VARCHAR" property="applyCode" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="is_top" jdbcType="INTEGER" property="isTop" />
+    <result column="is_recommend" jdbcType="INTEGER" property="isRecommend" />
+    <result column="progress" jdbcType="DECIMAL" property="progress" />
+    <result column="progress_amount" jdbcType="DECIMAL" property="progressAmount" />
+    <result column="buy_count" jdbcType="INTEGER" property="buyCount" />
+    <result column="bonus_flag" jdbcType="INTEGER" property="bonusFlag" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="account_name" jdbcType="VARCHAR" property="nickName" />
+
+  </resultMap>
+
+  <!-- 合买大厅列表ResultMap-->
+  <sql id="Order_SQL">
+    <if test="sortField != null and sortOrder !=null">
+      ORDER BY ${sortField} ${sortOrder}
+    </if>
+  </sql>
+
+  <!-- 排序  -->
+  <resultMap id="OrderGroupDetailMap" type="com.hhly.skeleton.lotto.base.group.bo.OrderGroupDetailBO">
+    <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+    <result column="order_amount" jdbcType="DECIMAL" property="orderAmount"/>
+    <result column="lottery_code" jdbcType="VARCHAR" property="lotteryCode"/>
+    <result column="lottery_name" jdbcType="VARCHAR" property="lotteryName"/>
+    <result column="buy_count" jdbcType="DECIMAL" property="buyCount"/>
+    <result column="guarantee_process" jdbcType="VARCHAR" property="gProcess"/>
+    <result column="progress" jdbcType="VARCHAR" property="process"/>
+    <result column="remain_amount" jdbcType="DECIMAL" property="remainAmount"/>
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+    <result column="end_time" jdbcType="VARCHAR" property="endTime"/>
+    <result column="is_top" jdbcType="DECIMAL" property="isTop"/>
+    <result column="is_recommend" jdbcType="DECIMAL" property="isRecommend"/>
+    <result column="flag" jdbcType="DECIMAL" property="flag"/>
+    <result column="grpbuy_status" jdbcType="DECIMAL" property="gOrderStatus"/>
+    <result column="title" jdbcType="VARCHAR" property="title"/>
+    <result column="visible_type" jdbcType="DECIMAL" property="visibleType"/>
+    <result column="user_id" jdbcType="DECIMAL" property="userId"/>
+  </resultMap>
+
+  <!-- 分页 -->
+  <sql id="Page_SQL">
+    LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </sql>
+
+  <sql id="Base_Column_List">
+    o.id, o.user_id, o.order_code, o.grpbuy_status, o.min_buy_ratio, o.min_buy_amount, o.guarantee_ratio,
+    o.guarantee_amount, o.visible_type, o.commission_ratio, o.commission_amount, o.apply_way, o.apply_code,
+    o.title, o.description, o.is_top, o.is_recommend, o.progress, o.progress_amount, o.buy_count,o.bonus_flag,o.create_time,
+    o.update_time, o.remark
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.lottocore.persistence.group.po.OrderGroupPO">
+    insert into order_group (user_id, order_code,
+    grpbuy_status, min_buy_ratio, min_buy_amount,
+    guarantee_ratio, guarantee_amount, visible_type,
+    commission_ratio, commission_amount, apply_way,
+    apply_code, title, description,
+    is_top, is_recommend, progress,
+    progress_amount, buy_count, create_time,
+    update_time, remark,site_guarantee_ratio,site_guarantee_amount)
+    values (#{userId,jdbcType=INTEGER}, #{orderCode,jdbcType=VARCHAR},
+    #{grpbuyStatus,jdbcType=INTEGER}, #{minBuyRatio,jdbcType=DECIMAL}, #{minBuyAmount,jdbcType=DECIMAL},
+    #{guaranteeRatio,jdbcType=DECIMAL}, #{guaranteeAmount,jdbcType=DECIMAL}, #{visibleType,jdbcType=INTEGER},
+    #{commissionRatio,jdbcType=DECIMAL}, #{commissionAmount,jdbcType=DECIMAL}, #{applyWay,jdbcType=INTEGER},
+    #{applyCode,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
+    #{isTop,jdbcType=INTEGER}, #{isRecommend,jdbcType=INTEGER}, #{progress,jdbcType=DECIMAL},
+    #{progressAmount,jdbcType=DECIMAL}, #{buyCount,jdbcType=INTEGER}, now(),
+    #{updateTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR},#{siteGuaranteeRatio,jdbcType=DECIMAL},
+    #{siteGuaranteeAmount,jdbcType=DECIMAL})
+  </insert>
+
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.hhly.lottocore.persistence.group.po.OrderGroupPO">
+    update order_group
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="orderCode != null">
+        order_code = #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="grpbuyStatus != null">
+        grpbuy_status = #{grpbuyStatus,jdbcType=INTEGER},
+      </if>
+      <if test="minBuyRatio != null">
+        min_buy_ratio = #{minBuyRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="minBuyAmount != null">
+        min_buy_amount = #{minBuyAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="guaranteeRatio != null">
+        guarantee_ratio = #{guaranteeRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="guaranteeAmount != null">
+        guarantee_amount = #{guaranteeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="visibleType != null">
+        visible_type = #{visibleType,jdbcType=INTEGER},
+      </if>
+      <if test="commissionRatio != null">
+        commission_ratio = #{commissionRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="commissionAmount != null">
+        commission_amount = #{commissionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="applyWay != null">
+        apply_way = #{applyWay,jdbcType=INTEGER},
+      </if>
+      <if test="applyCode != null">
+        apply_code = #{applyCode,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="isTop != null">
+        is_top = #{isTop,jdbcType=INTEGER},
+      </if>
+      <if test="isRecommend != null">
+        is_recommend = #{isRecommend,jdbcType=INTEGER},
+      </if>
+      <if test="progress != null">
+        progress = #{progress,jdbcType=DECIMAL},
+      </if>
+      <if test="progressAmount != null">
+        progress_amount = #{progressAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="buyCount != null">
+        buy_count = #{buyCount,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      update_time = now()
+    </set>
+    where order_code = #{orderCode,jdbcType=VARCHAR}
+  </update>
+
+  <!-- 合买大厅列表查询 -->
+  <select id="queryOrderGroupList" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultMap="OrderGroupDetailMap">
+    SELECT
+      a.end_local_time end_time,
+      a.lottery_code,
+      (SELECT d.lottery_name FROM lottery_type d WHERE d.lottery_code = a.lottery_code)lottery_name,
+      a.order_amount,
+      a.order_code,
+      (SELECT c.account_name FROM m_user_info c WHERE a.user_id = c.id)nick_name,
+      b.progress,
+      (a.order_amount - b.progress_amount) remain_amount,
+      b.buy_count,
+      b.guarantee_ratio guarantee_process
+    FROM order_info a
+    INNER JOIN order_group b ON a.order_code = b.order_code
+    WHERE 1=1
+    AND a.lottery_code in(300,301)<!-- 兼容一期 -->
+    AND b.apply_way = 1<!-- 兼容一期 -->
+    AND a.pay_status = 2<!-- 支付成功-->
+    AND a.end_local_time > now()
+    AND b.grpbuy_status in(1,2)<!-- 招募中、已满员-->
+    <include refid="Order_SQL"/>
+    <include refid="Page_SQL"/>
+  </select>
+
+  <select id="queryOrderGroupListV11" parameterType="com.hhly.skeleton.lotto.base.group.vo.OrderGroupQueryVO" resultMap="OrderGroupDetailMap">
+    SELECT
+      a.end_local_time end_time,
+      a.lottery_code,
+      (SELECT d.lottery_name FROM lottery_type d WHERE d.lottery_code = a.lottery_code)lottery_name,
+      a.order_amount,
+      a.order_code,
+      a.user_id,
+      c.account_name nick_name,
+      b.progress,<!-- 合买进度 -->
+      (a.order_amount - b.progress_amount) remain_amount,
+      b.buy_count,<!-- 合买人数 -->
+      b.grpbuy_status,<!-- 合买订单状态 -->
+      b.guarantee_ratio guarantee_process,<!-- 保底进度 -->
+      b.is_top,<!-- 是否置顶 -->
+      b.is_recommend,<!-- 是否推荐 -->
+      IF(e.NUM>0,1,0) flag,<!-- 是否已参与 -->
+      b.title,<!-- 标题 -->
+      b.visible_type<!-- 公开类型 -->
+    FROM order_info a
+    INNER JOIN order_group b ON a.order_code = b.order_code
+    INNER JOIN m_user_info c ON a.user_id = c.id
+    LEFT JOIN  (SELECT user_id,order_code,COUNT(0) NUM FROM order_group_content WHERE user_id = #{checkUserId} GROUP BY user_id,order_code)e ON a.order_code = e.order_code
+    WHERE 1=1
+    AND a.pay_status = 2 <!--支付成功的 -->
+    AND a.end_local_time > now()<!-- 没截止的 -->
+    AND b.grpbuy_status in(1,2)<!-- 招募中、已满员-->
+    <if test="queryText != null">
+      AND (a.order_code = #{queryText} OR c.account_name LIKE concat('%',#{queryText},'%'))
+    </if>
+    <if test="lotteryCode != null">
+      AND a.lottery_code = #{lotteryCode}
+    </if>
+    <if test="visibleType != null">
+      AND b.visible_type = #{visibleType}
+    </if>
+    <if test="type == 1"><!-- 当前合买-->
+      AND b.user_id = #{userId}
+    </if>
+    <if test="guaranteeDb != null">
+      ${guaranteeDb}
+    </if>
+    <if test="progressDb != null">
+      ${progressDb}
+    </if>
+    <if test="commissionDb != null ">
+      ${commissionDb}
+    </if>
+    <if test="orderAmountDb != null ">
+      ${orderAmountDb}
+    </if>
+    <include refid="Order_SQL"/>
+    <include refid="Page_SQL"/>
+  </select>
+
+  <select id="queryOrderGroupListCountV11" parameterType="com.hhly.skeleton.lotto.base.group.vo.OrderGroupQueryVO" resultType="int">
+    SELECT
+      COUNT(0)
+    FROM order_info a
+    INNER JOIN order_group b ON a.order_code = b.order_code
+    INNER JOIN m_user_info c ON a.user_id = c.id
+    WHERE 1=1
+    AND a.pay_status = 2 <!--支付成功的 -->
+    AND a.end_local_time > now()<!-- 没截止的 -->
+    AND b.grpbuy_status in(1,2)<!-- 招募中、已满员-->
+    <if test="queryText != null">
+      AND (a.order_code = #{queryText} OR c.account_name LIKE concat('%',#{queryText},'%'))
+    </if>
+    <if test="lotteryCode != null">
+      AND a.lottery_code = #{lotteryCode}
+    </if>
+    <if test="visibleType != null">
+      AND b.visible_type = #{visibleType}
+    </if>
+    <if test="type == 1"><!-- 当前合买-->
+      AND b.user_id = #{userId}
+    </if>
+    <if test="guaranteeDb != null">
+      ${guaranteeDb}
+    </if>
+    <if test="progressDb != null">
+      ${progressDb}
+    </if>
+    <if test="commissionDb != null ">
+      ${commissionDb}
+    </if>
+    <if test="orderAmountDb != null ">
+      ${orderAmountDb}
+    </if>
+  </select>
+
+  <select id="queryOrderGroupListCount" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultType="int">
+    SELECT
+      COUNT(0)
+    FROM order_info a
+    INNER JOIN order_group b ON a.order_code = b.order_code
+    WHERE 1=1
+    AND a.lottery_code in(300,301)<!-- 兼容一期 -->
+    AND b.apply_way = 1<!-- 兼容一期 -->
+    AND a.pay_status = 2<!-- 支付成功-->
+    AND a.end_local_time > now()
+    AND b.grpbuy_status in(1,2)<!-- 招募中、已满员-->
+
+  </select>
+  <select id="queryOrderGroupByOrderCode" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    ,m.account_name
+    from order_group o left join m_user_info m on o.user_id = m.id where o.order_code = #{orderCode}
+  </select>
+
+  <select id="queryLatelyThreeRecord" parameterType="Integer" resultType="com.hhly.skeleton.lotto.base.group.bo.OrderGroupPersonLatelyInfoBO">
+      SELECT
+        oi.lottery_code lotteryCode,
+        oi.pre_bonus winAmout
+      FROM
+          order_group og
+      LEFT JOIN order_info oi ON og.order_code = oi.order_code
+      WHERE
+          oi.winning_status IN (3, 4)
+      AND oi.user_id = #{userId}
+      ORDER BY
+          og.create_time DESC
+      LIMIT 3
+  </select>
+
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.sport.dao.SportTeamInfoDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.lottocore.persistence.sport.po.SportTeamInfoPO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="TEAM_DATA_URL" property="teamDataUrl" jdbcType="VARCHAR" />
+    <result column="TEAM_FULL_NAME" property="teamFullName" jdbcType="VARCHAR" />
+    <result column="TEAM_SHORT_NAME" property="teamShortName" jdbcType="VARCHAR" />
+    <result column="TEAM_ORDER" property="teamOrder" jdbcType="VARCHAR" />
+    <result column="LOGO_URL" property="logoUrl" jdbcType="VARCHAR" />
+    <result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR" />
+    <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="BOResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportTeamInfoBO">
+  	<id column="ID" property="id" jdbcType="DECIMAL" />
+  	<result column="TEAM_FULL_NAME" property="teamFullName" jdbcType="VARCHAR" />
+  	<result column="TEAM_SHORT_NAME" property="teamShortName" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    ID, TEAM_DATA_URL, TEAM_FULL_NAME, TEAM_SHORT_NAME, TEAM_ORDER, LOGO_URL, 
+    MODIFY_TIME, MODIFY_BY, CREATE_BY, UPDATE_TIME, CREATE_TIME, REMARK
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer"  >
+    select 
+    <include refid="Base_Column_List" />
+    from SPORT_TEAM_INFO
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from SPORT_TEAM_INFO
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.hhly.lottocore.persistence.sport.po.SportTeamInfoPO" >
+    insert into SPORT_TEAM_INFO (ID, TEAM_DATA_URL, TEAM_FULL_NAME, 
+      TEAM_SHORT_NAME, TEAM_ORDER, LOGO_URL, 
+      MODIFY_TIME, MODIFY_BY, CREATE_BY, 
+      UPDATE_TIME, CREATE_TIME, REMARK
+      )
+    values (#{teamDataUrl,jdbcType=VARCHAR}, #{teamFullName,jdbcType=VARCHAR}, 
+      #{teamShortName,jdbcType=VARCHAR}, #{teamOrder,jdbcType=VARCHAR}, #{logoUrl,jdbcType=VARCHAR}, 
+      #{modifyTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR},
+      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.sport.po.SportTeamInfoPO" >
+    update SPORT_TEAM_INFO
+    <set >
+      <if test="teamDataUrl != null" >
+        TEAM_DATA_URL = #{teamDataUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="teamFullName != null" >
+        TEAM_FULL_NAME = #{teamFullName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamShortName != null" >
+        TEAM_SHORT_NAME = #{teamShortName,jdbcType=VARCHAR},
+      </if>
+      <if test="teamOrder != null" >
+        TEAM_ORDER = #{teamOrder,jdbcType=VARCHAR},
+      </if>
+      <if test="logoUrl != null and logoUrl !=''" >
+        LOGO_URL = #{logoUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null" >
+        MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifyBy != null" >
+        MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="find" resultMap="BOResultMap" resultType="com.hhly.skeleton.cms.sportmgr.vo.SportTeamInfoVO">
+  	select ID, TEAM_FULL_NAME, TEAM_SHORT_NAME from SPORT_TEAM_INFO sti where 1=1
+  	<if test="teamType != null">
+  		and TEAM_TYPE=#{teamType}
+  	</if>
+  	<if test="teamFullName != null and teamFullName != ''">
+  		and TEAM_FULL_NAME like concat('%',#{teamFullName},'%')
+  	</if>
+  	order by UPDATE_TIME desc
+  </select>
+</mapper>

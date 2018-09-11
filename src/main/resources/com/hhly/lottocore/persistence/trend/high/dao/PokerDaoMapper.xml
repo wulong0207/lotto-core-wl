@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.trend.high.dao.PokerDaoMapper">
+  <sql id="Base_Column_List">
+	<trim suffixOverrides=",">
+		<if test="showLotteryCode">
+			lottery_code lotteryCode,
+		</if>
+		<if test="showIssue">
+			issue,
+		</if>
+		<if test="showDrawCode">
+			drawcode drawCode,
+		</if>
+		<if test="showFlag">
+			flag omitType,
+		</if>
+		<if test="pa">
+			pa,
+		</if>
+		<if test="p2">
+			p2,
+		</if>
+		<if test="p3">
+			p3,
+		</if>
+		<if test="p4">
+			p4,
+		</if>
+		<if test="p5">
+			p5,
+		</if>
+		<if test="p6">
+			p6,
+		</if>
+		<if test="p7">
+			p7,
+		</if>
+		<if test="p8">
+			p8,
+		</if>
+		<if test="p9">
+			p9,
+		</if>
+		<if test="p10">
+			p10,
+		</if>
+		<if test="pj">
+			pj,
+		</if>
+		<if test="pq">
+			pq,
+		</if>
+		<if test="pk">
+			pk,
+		</if>
+		<if test="pt">
+			pt,
+		</if>
+		<if test="pt1">
+			pt1,
+		</if>
+		<if test="pt2">
+			pt2,
+		</if>
+		<if test="pt3">
+			pt3,
+		</if>
+		<if test="pt4">
+			pt4,
+		</if>
+		<if test="px">
+			px,
+		</if>
+		<if test="pxa23">
+			pxa23,
+		</if>
+		<if test="px234">
+			px234,
+		</if>
+		<if test="px345">
+			px345,
+		</if>
+		<if test="px456">
+			px456,
+		</if>
+		<if test="px567">
+			px567,
+		</if>
+		<if test="px678">
+			px678,
+		</if>
+		<if test="px789">
+			px789,
+		</if>
+		<if test="px8910">
+			px8910,
+		</if>
+		<if test="px910j">
+			px910j,
+		</if>
+		<if test="px10jq">
+			px10jq,
+		</if>
+		<if test="pxjqk">
+			pxjqk,
+		</if>
+		<if test="pxqka">
+			pxqka,
+		</if>
+		<if test="pd">
+			pd,
+		</if>
+		<if test="pda">
+			pda,
+		</if>
+		<if test="pd2">
+			pd2,
+		</if>
+		<if test="pd3">
+			pd3,
+		</if>
+		<if test="pd4">
+			pd4,
+		</if>
+		<if test="pd5">
+			pd5,
+		</if>
+		<if test="pd6">
+			pd6,
+		</if>
+		<if test="pd7">
+			pd7,
+		</if>
+		<if test="pd8">
+			pd8,
+		</if>
+		<if test="pd9">
+			pd9,
+		</if>
+		<if test="pd10">
+			pd10,
+		</if>
+		<if test="pdj">
+			pdj,
+		</if>
+		<if test="pdq">
+			pdq,
+		</if>
+		<if test="pdk">
+			pdk,
+		</if>
+		<if test="pb">
+			pb,
+		</if>
+		<if test="pba">
+			pba,
+		</if>
+		<if test="pb2">
+			pb2,
+		</if>
+		<if test="pb3">
+			pb3,
+		</if>
+		<if test="pb4">
+			pb4,
+		</if>
+		<if test="pb5">
+			pb5,
+		</if>
+		<if test="pb6">
+			pb6,
+		</if>
+		<if test="pb7">
+			pb7,
+		</if>
+		<if test="pb8">
+			pb8,
+		</if>
+		<if test="pb9">
+			pb9,
+		</if>
+		<if test="pb10">
+			pb10,
+		</if>
+		<if test="pbj">
+			pbj,
+		</if>
+		<if test="pbq">
+			pbq,
+		</if>
+		<if test="pbk">
+			pbk,
+		</if>
+		<if test="type">
+			type,
+		</if>
+	</trim>
+	</sql>
+
+	<sql id="Base_Table">
+		TREND_PK_BASE
+	</sql>
+
+	<sql id="Result_Table">
+		TREND_PK_RESULT
+	</sql>
+
+  <sql id="Base_Column_List_Base_Test" >
+    issue,drawcode drawCode,type, pa, p2, p3, p4, p5, p6, p7, p8, p9, p10, pj, pq, pk, 
+    pt, pt1, pt2, pt3, pt4, px, pxa23, px234, px345, px456, px567, px678, px789, px8910, 
+    px10jq, pxjqk, pxqka, pd, pda, pd2, pd3, pd4, pd5, pd6, pd7, pd8, pd9, pd10, pdj, 
+    pdq, pdk, pb, pba, pb2, pb3, pb4, pb5, pb6, pb7, pb8, pb9, pb10, pbj, pbq, pbk
+  </sql>
+
+	<select id="findBaseTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.high.bo.PokerTrendBaseBO">
+		select <include refid="Base_Column_List_Base_Test"/>
+		from <include refid="Base_Table"/>
+		where LOTTERY_CODE = #{lotteryCode}
+		<if test="startIssue!=null">
+			and issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		order by issue desc
+		<if test="qryCount!=null">
+			limit #{qryCount}
+		</if>
+	</select>
+		
+
+	<select id="findResultOmit"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.high.bo.PokerOmitBO">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Result_Table" />
+		WHERE LOTTERY_CODE = #{lotteryCode}
+		<if test="omitTypes != null">
+			and FLAG in
+			<foreach collection="omitTypes" item="omitType" open="("
+				close=")" separator=",">
+				#{omitType}
+			</foreach>
+		</if>
+	</select>
+
+	<select id="findRecentOmit"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.high.bo.PokerOmitBO">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Base_Table" />
+		where LOTTERY_CODE = #{lotteryCode}
+		order by issue desc
+		limit #{qryCount}
+	</select>
+
+	<select id="findRecentIssue"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.high.bo.PokerOmitBO">
+		select
+		<trim suffixOverrides=",">
+			<if test="showIssue">
+				li.issue_code issue,
+			</if>
+			<if test="showDrawCode">
+				li.draw_code drawcode,
+			</if>
+			<if test="type">
+				type,
+			</if>
+		</trim>
+		from lottery_issue li
+		left outer join
+		<include refid="Base_Table" />
+		tkb
+		on
+		li.lottery_code = tkb.lottery_code and li.issue_code = tkb.issue
+		where
+		li.lottery_code = #{lotteryCode}
+		and li.issue_code <![CDATA[<]]>
+		(select li.issue_code
+		from lottery_issue li
+		where lottery_code =
+		#{lotteryCode}
+		and current_issue = 1
+		limit 1)
+		order by li.issue_code desc
+		limit #{qryCount}
+	</select>
+	  <!--
+   <sql id="Base_Column_List" >
+    <trim suffixOverrides="," >
+      <if test="showLotteryCode" >
+        lottery_code,
+      </if>
+      <if test="showFlag" >
+        flag,
+      </if>
+      <if test="pa" >
+        pa,
+      </if>
+      <if test="p2" >
+        p2,
+      </if>
+      <if test="p3" >
+        p3,
+      </if>
+      <if test="p4" >
+        p4,
+      </if>
+      <if test="p5" >
+        p5,
+      </if>
+      <if test="p6" >
+        p6,
+      </if>
+      <if test="p7" >
+        p7,
+      </if>
+      <if test="p8" >
+        p8,
+      </if>
+      <if test="p9" >
+        p9,
+      </if>
+      <if test="p10" >
+        p10,
+      </if>
+      <if test="pj" >
+        pj,
+      </if>
+      <if test="pq" >
+        pq,
+      </if>
+      <if test="pk" >
+        pk,
+      </if>
+      <if test="pt" >
+        pt,
+      </if>
+      <if test="pt1" >
+        pt1,
+      </if>
+      <if test="pt2" >
+        pt2,
+      </if>
+      <if test="pt3" >
+        pt3,
+      </if>
+      <if test="pt4" >
+        pt4,
+      </if>
+      <if test="px" >
+        px,
+      </if>
+      <if test="pxa23" >
+        pxa23,
+      </if>
+      <if test="px234" >
+        px234,
+      </if>
+      <if test="px345" >
+        px345,
+      </if>
+      <if test="px456" >
+        px456,
+      </if>
+      <if test="px567" >
+        px567,
+      </if>
+      <if test="px678" >
+        px678,
+      </if>
+      <if test="px789" >
+        px789,
+      </if>
+      <if test="px8910" >
+        px8910,
+      </if>
+      <if test="px10jq" >
+        px10jq,
+      </if>
+      <if test="pxjqk" >
+        pxjqk,
+      </if>
+      <if test="pxqka" >
+        pxqka,
+      </if>
+      <if test="pd" >
+        pd,
+      </if>
+      <if test="pda" >
+        pda,
+      </if>
+      <if test="pd2" >
+        pd2,
+      </if>
+      <if test="pd3" >
+        pd3,
+      </if>
+      <if test="pd4" >
+        pd4,
+      </if>
+      <if test="pd5" >
+        pd5,
+      </if>
+      <if test="pd6" >
+        pd6,
+      </if>
+      <if test="pd7" >
+        pd7,
+      </if>
+      <if test="pd8" >
+        pd8,
+      </if>
+      <if test="pd9" >
+        pd9,
+      </if>
+      <if test="pd10" >
+        pd10,
+      </if>
+      <if test="pdj" >
+        pdj,
+      </if>
+      <if test="pdq" >
+        pdq,
+      </if>
+      <if test="pdk" >
+        pdk,
+      </if>
+      <if test="pb" >
+        pb,
+      </if>
+      <if test="pba" >
+        pba,
+      </if>
+      <if test="pb2" >
+        pb2,
+      </if>
+      <if test="pb3" >
+        pb3,
+      </if>
+      <if test="pb4" >
+        pb4,
+      </if>
+      <if test="pb5" >
+        pb5,
+      </if>
+      <if test="pb6" >
+        pb6,
+      </if>
+      <if test="pb7" >
+        pb7,
+      </if>
+      <if test="pb8" >
+        pb8,
+      </if>
+      <if test="pb9" >
+        pb9,
+      </if>
+      <if test="pb10" >
+        pb10,
+      </if>
+      <if test="pbj" >
+        pbj,
+      </if>
+      <if test="pbq" >
+        pbq,
+      </if>
+      <if test="pbk" >
+        pbk,
+      </if>
+      </trim>
+  </sql>
+   -->
+    
+
+   <!--
+    <sql id="Base_Column_List_Result_Test" >
+    lottery_code, flag, pa, p2, p3, p4, p5, p6, p7, p8, p9, p10, pj, pq, pk, pt, pt1, 
+    pt2, pt3, pt4, px, pxa23, px234, px345, px456, px567, px678, px789, px8910, px10jq, 
+    pxjqk, pxqka, pd, pda, pd2, pd3, pd4, pd5, pd6, pd7, pd8, pd9, pd10, pdj, pdq, pdk, 
+    pb, pba, pb2, pb3, pb4, pb5, pb6, pb7, pb8, pb9, pb10, pbj, pbq, pbk, updatetime
+  </sql>
+  -->
+</mapper>

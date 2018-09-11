@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.trend.high.dao.X115DaoMapper">
+	<sql id="findRecentIssueCode">
+		SELECT
+			issue_code,draw_code
+		FROM
+			lottery_issue li
+		WHERE
+			li.lottery_code = #{lotteryCode}
+		AND li.issue_code <![CDATA[ < ]]> (
+			SELECT
+				li.issue_code
+			FROM
+				lottery_issue li
+			WHERE
+				lottery_code = #{lotteryCode}
+			AND current_issue = 1
+			LIMIT 1
+		)
+		ORDER BY
+			li.issue_code DESC
+		LIMIT #{qryCount}
+	</sql>
+	
+	<resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.trend.high.bo.X115OmitBO" >
+	    <result column="ISSUE" property="issue" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="DRAWCODE" property="drawCode" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="BTYPE" property="subPlay" jdbcType="TINYINT" javaType="string"/>
+	    <result column="FLAG" property="omitType" jdbcType="TINYINT" javaType="string"/>
+	    <result column="B01" property="b01" jdbcType="INTEGER" />
+	    <result column="B02" property="b02" jdbcType="INTEGER" />
+	    <result column="B03" property="b03" jdbcType="INTEGER" />
+	    <result column="B04" property="b04" jdbcType="INTEGER" />
+	    <result column="B05" property="b05" jdbcType="INTEGER" />
+	    <result column="B06" property="b06" jdbcType="INTEGER" />
+	    <result column="B07" property="b07" jdbcType="INTEGER" />
+	    <result column="B08" property="b08" jdbcType="INTEGER" />
+	    <result column="B09" property="b09" jdbcType="INTEGER" />
+	    <result column="B10" property="b10" jdbcType="INTEGER" />
+	    <result column="B11" property="b11" jdbcType="INTEGER" />
+ 	</resultMap>
+ 	
+ 	<resultMap id="BaseTrendMap" type="com.hhly.skeleton.lotto.base.trend.high.bo.X115BaseBO" >
+	    <result column="ISSUE" property="issue" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="DRAWCODE" property="drawCode" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="LOTTERY_CODE" property="lotteryCode" jdbcType="SMALLINT" javaType="Integer"/>
+	    <result column="BTYPE" property="subPlay" jdbcType="TINYINT" javaType="string"/>
+	    <result column="B01" property="b01" jdbcType="INTEGER" />
+	    <result column="B02" property="b02" jdbcType="INTEGER" />
+	    <result column="B03" property="b03" jdbcType="INTEGER" />
+	    <result column="B04" property="b04" jdbcType="INTEGER" />
+	    <result column="B05" property="b05" jdbcType="INTEGER" />
+	    <result column="B06" property="b06" jdbcType="INTEGER" />
+	    <result column="B07" property="b07" jdbcType="INTEGER" />
+	    <result column="B08" property="b08" jdbcType="INTEGER" />
+	    <result column="B09" property="b09" jdbcType="INTEGER" />
+	    <result column="B10" property="b10" jdbcType="INTEGER" />
+	    <result column="B11" property="b11" jdbcType="INTEGER" />
+ 	</resultMap>
+ 	
+ 	<resultMap  id="trendMap"  type="com.hhly.skeleton.lotto.base.trend.bo.TreadStatistics">
+ 		<result column="lottery_code" property="lotteryCode" jdbcType="INTEGER" javaType="int"/>
+	    <result column="fatype" property="fatype" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="sontype" property="sontype" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="ylcode" property="ylCode" jdbcType="VARCHAR" javaType="string"/>
+	    <result column="occurnum" property="occurNum" jdbcType="INTEGER" javaType="int"/>
+	    <result column="maxomit" property="maxOmit" jdbcType="INTEGER" javaType="int"/>
+	    <result column="maxoccur" property="maxOccur" jdbcType="INTEGER" javaType="int"/>
+	    <result column="preomit" property="preOmit" jdbcType="INTEGER" javaType="int"/>
+	    <result column="lastomit" property="lastOmit" jdbcType="INTEGER" javaType="int"/>
+	    <result column="aveomit" property="aveOmit" jdbcType="INTEGER" javaType="int"/>
+	    <result column="proccu" property="proccu" jdbcType="DECIMAL" javaType="double"/>
+	    <result column="occupro" property="occupro" jdbcType="DECIMAL" javaType="double"/>
+	    <result column="lastoccur" property="lastOccur" jdbcType="INTEGER" javaType="int"/> 	
+ 	</resultMap>
+ 	
+  	<sql id="Base_Column_List" >
+	    LOTTERY_CODE, BTYPE, FLAG, B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11
+	</sql>
+	
+  	<sql id="Base_Column" >
+	    LOTTERY_CODE, BTYPE, ISSUE,DRAWCODE, B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11
+	</sql>
+	
+  	<sql id="Trend_11x5_Base_Column_List" >
+	    ISSUE, DRAWCODE, BTYPE, B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11
+	</sql>
+	
+	<sql id="Table">
+  		TREND_11X5_RESULT
+	</sql>
+	
+	<select id="findBaseTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultMap="BaseTrendMap">
+		select <include refid="Base_Column"/>,drawcode drawCode
+		from `TREND_11x5_BASE`
+		where LOTTERY_CODE = #{lotteryCode}
+		<if test="startIssue!=null">
+			and issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		<if test="btype!=null">
+			and btype = #{btype}
+		</if>
+		order by issue desc
+		<if test="qryCount!=null">
+			limit #{qryCount}
+		</if>
+	</select>
+	
+
+	
+	<select id="findRecentTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultMap="BaseTrendMap">
+		select 
+		b.LOTTERY_CODE, b.BTYPE, a.issue_code ISSUE,a.draw_code DRAWCODE, b.B01, b.B02, b.B03, b.B04, b.B05, b.B06, b.B07, b.B08, b.B09, b.B10, b.B11
+		from (<include refid="findRecentIssueCode"/>) a 
+		left join TREND_11x5_BASE b
+		on a.issue_code = b.issue and b.lottery_code = #{lotteryCode}
+		<if test="startIssue!=null">
+			and b.issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and b.issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		<if test="btype!=null">
+			and b.btype = #{btype}
+		</if>
+		order by issue 
+		<if test="qryCount!=null">
+			limit #{qryCount}
+		</if>
+	</select>
+	
+	
+	<sql id="Query_Condition">
+  		<where>
+	  		<if test="lotteryCode != null">
+				and LOTTERY_CODE = #{lotteryCode}
+	  		</if>
+	  		<if test="subPlays != null">
+	  			and BTYPE in
+	  			<foreach collection="subPlays" item="subPlay" open="(" close=")" separator=",">
+	  				#{subPlay}
+	  			</foreach>
+	  		</if>
+	  		<if test="omitTypes != null">
+	  			and FLAG in
+	  			<foreach collection="omitTypes" item="omitType" open="(" close=")" separator=",">
+	  				#{omitType}
+	  			</foreach>
+	  		</if>
+  		</where>
+	</sql>
+	
+	<select id="findResultOmit" parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO" resultMap="BaseResultMap">
+     	select <include refid="Base_Column_List"/>
+			from <include refid="Table"/>
+			<include refid="Query_Condition"/>
+	</select>
+	
+	<select id="findRecentOmit" parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO" resultMap="BaseResultMap">
+     	<foreach collection="subPlays" item="subPlay" index="index" separator="UNION ALL">
+         (
+         	select <include refid="Trend_11x5_Base_Column_List"/>
+			from TREND_11X5_BASE
+			where LOTTERY_CODE = #{lotteryCode} and BTYPE = #{subPlay}
+         	order by issue desc
+			limit 0,#{qryCount}
+		)
+      </foreach>
+	</select>
+	
+	<!-- 遗漏投注  begin -->
+	<sql id="base_property">
+		lottery_code,fatype,sontype,ylcode,occurnum,maxomit,maxoccur,preomit,lastomit,aveomit,proccu,occupro,lastoccur 
+	</sql>
+	<sql id="base_condition">
+			<where>
+			<if test="lotteryCode!=null">
+				and lottery_code = #{lotteryCode}
+			</if>
+			<if test="fatypes!=null">
+				and fatype in 
+				<foreach collection="fatypes" item="fatype" open="(" close=")" separator=",">
+					#{fatype}
+				</foreach>
+			</if>
+			<if test="sontypes!=null">
+				and sonType in 
+				<foreach collection="sontypes" item="sontype" open="(" close=")" separator=",">
+					#{sontype}
+				</foreach>
+			</if>
+			<if test="ylCode!=null">
+				and ylcode = #{ylCode}
+			</if>
+			</where>
+	</sql>
+	<sql id="page_condition">
+		<if test="sortField!=null">
+			order by #{sortField}
+			<if test="desc">
+			 	 desc 
+			</if>
+		</if>
+		<if test="qryCount!=null">
+			limit #{qryCount}
+		</if>
+	</sql>
+	
+	<!-- 遗漏投注查询 -->
+	<select id="findOmitBetOfLX" parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighOmitBetVO" resultMap="trendMap">
+		SELECT <include refid="base_property"/>
+		from 
+		trend_11x5_lxomit 
+		<include refid="base_condition"/>
+		<include refid="page_condition"/>
+	</select>
+	
+	
+	<select id="findOmitBetOfQT" parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighOmitBetVO" resultMap="trendMap">
+		SELECT <include refid="base_property"/>
+		from 
+		trend_11x5_qtomit 
+		<include refid="base_condition"/>
+		<include refid="page_condition"/>
+	</select>
+	
+	<sql id="front_sql_columns_11x5_base_trend">
+			   tdb.issue,
+               tdb.b01,
+               tdb.b02,
+               tdb.b03,
+               tdb.b04,
+               tdb.b05,
+               tdb.b06,
+               tdb.b07,
+               tdb.b08,
+               tdb.b09,
+               tdb.b10,
+               tdb.b11
+	</sql>
+	
+	<!-- 统计100冷热,子玩法为任选 btype = 1-->
+  	<select id="findTrendRangeFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.high.bo.X115TrendBO">
+  		select <include refid="front_sql_columns_11x5_base_trend" />
+        from TREND_11x5_BASE tdb
+        where btype = 1
+         <if test="issueCode != null and issueCode != ''">
+          	and tdb.issue  <![CDATA[<=]]> #{issueCode,jdbcType=VARCHAR}
+         </if>
+         order by tdb.issue desc
+         LIMIT 0,#{qryCount}
+  	</select>
+	
+	<!-- 前三直选 -->
+	
+	
+	<!-- 遗漏投注  end -->
+	
+	
+	<!-- 走势投注 -->
+	
+	
+	
+</mapper>

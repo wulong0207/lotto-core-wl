@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.recommend.dao.RcmdUserTypeMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.recommend.bo.RcmdUserTypeBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="lottery_code" jdbcType="SMALLINT" property="lotteryCode" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+      <result column="level" jdbcType="SMALLINT" property="level" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, lottery_code, type, status, create_time, update_time, modify_by
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdUserTypeBO">
+    insert into rcmd_user_type (id, lottery_code, type, 
+      status, create_time, update_time, 
+      modify_by)
+    values (#{id,jdbcType=INTEGER}, #{lotteryCode,jdbcType=SMALLINT}, #{type,jdbcType=VARCHAR}, 
+      #{status,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{modifyBy,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="queryRcmdUserTypeByUserId" parameterType="Integer" resultMap="BaseResultMap">
+      SELECT
+          ut.level
+      FROM
+          m_user_issue_info ui
+      INNER JOIN m_user_issue_level il ON ui.id = il.user_issue_info_id
+      INNER JOIN rcmd_user_type ut on il.`level` = ut.id
+      where ui.user_id=#{userId}
+  </select>
+
+</mapper>

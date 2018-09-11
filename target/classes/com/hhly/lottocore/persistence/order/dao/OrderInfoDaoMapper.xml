@@ -1,0 +1,1913 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.order.dao.OrderInfoDaoMapper" >
+  
+  	<!--                           Used to LOTTO                           -->
+  	
+  	<!-- 订单入库处理 -->
+	<insert id="addOrder" parameterType="com.hhly.lottocore.persistence.order.po.OrderInfoPO">
+		insert into ORDER_INFO
+		(order_code,
+		   lottery_code,
+		   lottery_name,
+		   lottery_issue,
+		   user_id,
+		   buy_time,
+		   order_amount,
+		   multiple_num,
+		   buy_type,
+		   pay_status,
+		   order_status,
+		   winning_status,
+		   channel_id,
+		   is_dlt_add,
+		   buy_screen,
+		   max_buy_screen,
+		   end_ticket_time,
+		   end_check_time,
+		   create_time,
+		   update_time,
+		   end_sys_time,
+		   lottery_child_code,
+		   buy_number,
+		   betting_content_url,
+		   activity_source,
+		   platform,
+        <if test="orderType != null">
+            order_type,
+        </if>
+        max_bonus,
+        end_local_time,
+        category_id,
+		redeem_code
+        )
+		values(
+		  #{orderCode,jdbcType=VARCHAR},
+		  #{lotteryCode,jdbcType=INTEGER},
+		  #{lotteryName,jdbcType=VARCHAR},
+		  #{lotteryIssue,jdbcType=VARCHAR},
+		  #{userId,jdbcType=INTEGER},
+		  now(),
+		  #{orderAmount,jdbcType=DECIMAL},
+		  #{multipleNum,jdbcType=INTEGER},
+		  #{buyType,jdbcType=INTEGER},
+		  #{payStatus,jdbcType=INTEGER},
+		  #{orderStatus,jdbcType=INTEGER},
+		  #{winningStatus,jdbcType=INTEGER},
+		  #{channelId,jdbcType=VARCHAR},
+		  #{isDltAdd,jdbcType=INTEGER},
+		  #{buyScreen,jdbcType=VARCHAR},
+		  #{maxBuyScreen,jdbcType=VARCHAR},
+		  #{endTicketTime,jdbcType=TIMESTAMP},
+		  #{endCheckTime,jdbcType=TIMESTAMP},
+		  now(),
+		  now(),
+		  #{endSysTime,jdbcType=TIMESTAMP},
+		  #{lotteryChildCode,jdbcType=INTEGER},
+		  #{buyNumber,jdbcType=INTEGER},
+		  #{bettingContentUrl,jdbcType=VARCHAR},
+		  #{activitySource,jdbcType=VARCHAR},
+		  #{platform,jdbcType=INTEGER},
+        <if test="orderType != null">
+            #{orderType,jdbcType=INTEGER},
+        </if>
+        #{maxBonus,jdbcType=DECIMAL},
+        #{endLocalTime,jdbcType=TIMESTAMP},
+        #{categoryId,jdbcType=INTEGER},
+		#{redeemCode,jdbcType=VARCHAR}
+        )
+	</insert>
+	<insert id="addOrderDetail" parameterType="java.util.List">
+		insert into ORDER_DETAIL
+		  (order_code,
+		   buy_screen,
+		   plan_content,
+		   multiple,
+		   amount,
+		   play_intro,
+		   code_way,
+		   content_type,
+		   lottery_child_code,
+		   create_time,
+		   update_time,
+		   buy_number)
+		values
+		<foreach collection="list" index="index" item="item" open="" close="" separator=",">
+			 (#{item.orderCode,jdbcType=VARCHAR},
+			  #{item.buyScreen,jdbcType=VARCHAR},
+			  #{item.planContent,jdbcType=VARCHAR},
+			  #{item.multiple,jdbcType=INTEGER},
+			  #{item.amount,jdbcType=DECIMAL},
+			  #{item.playIntro,jdbcType=INTEGER},
+			  #{item.codeWay,jdbcType=INTEGER},
+			  #{item.contentType,jdbcType=INTEGER},
+			  #{item.lotteryChildCode,jdbcType=INTEGER},
+			  now(),
+			  now(),
+			  #{item.buyNumber,jdbcType=INTEGER}
+			  )
+		</foreach>
+	</insert>
+
+
+	<insert id="addSingleOrderDetail" parameterType="com.hhly.lottocore.persistence.order.po.OrderDetailPO">
+			insert into ORDER_DETAIL
+			(order_code,
+			buy_screen,
+			plan_content,
+			multiple,
+			amount,
+			play_intro,
+			code_way,
+			content_type,
+			lottery_child_code,
+			create_time,
+			update_time,
+			buy_number)
+			values
+			(#{item.orderCode,jdbcType=VARCHAR},
+			#{item.buyScreen,jdbcType=VARCHAR},
+			#{item.planContent,jdbcType=VARCHAR},
+			#{item.multiple,jdbcType=INTEGER},
+			#{item.amount,jdbcType=DECIMAL},
+			#{item.playIntro,jdbcType=INTEGER},
+			#{item.codeWay,jdbcType=INTEGER},
+			#{item.contentType,jdbcType=INTEGER},
+			#{item.lotteryChildCode,jdbcType=INTEGER},
+			now(),
+			now(),
+			#{item.buyNumber,jdbcType=INTEGER}
+			);
+	</insert>
+
+	<!-- 查询订单详情 , 从order_detail表-->
+	<select id="queryListFromOrderDetail" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderInfoDetailLimitBO" >
+	      select 
+	         order_code orderCode,
+	         buy_number betNum,
+	         plan_content betContent,
+	         content_type contentType,
+			 c.child_name lotteryChildName
+	      from ORDER_DETAIL d left join lottery_child c
+	      on d.lottery_child_code = c.lottery_child_code
+	     where 1 = 1
+	     and code_way != 3
+	     <if test="orderCodes!=null">
+			and order_code in
+			<foreach collection="orderCodes" open="(" close=")" item="item" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		 
+	</select>
+
+	<!-- 查询订单详情 ，从order_added_content表-->
+	<select id="queryListFromOrderAddedContent" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderInfoDetailLimitBO" >
+	      select 
+	         order_add_code orderCode,
+	         buy_number betNum,
+	         plan_content betContent,
+	         content_type contentType,
+			 c.child_name lotteryChildName
+	      from ORDER_ADDED_CONTENT ac left join lottery_child c
+	      on ac.lottery_child_code = c.lottery_child_code	      
+	     where 1 = 1
+		  <if test="orderCodes!=null">
+			and order_add_code in
+			<foreach collection="orderCodes" open="(" close=")" item="item" separator=",">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+
+	<!-- 用户中心 订单列表-->
+	<select id="queryOrderListInfo" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderBaseInfoBO">
+		(select c.* from (
+				select oi.* from (
+				select o.id             id,
+				o.order_code     orderCode,
+				o.LOTTERY_CODE   lotteryCode,
+				o.LOTTERY_CHILD_CODE   lotteryChildCode,
+				o.create_time    showDate,
+				o.aft_bonus      preBonus,
+				o.LOTTERY_ISSUE  lotteryIssue,
+				o.BUY_TYPE       buyType,
+				o.ORDER_AMOUNT   orderAmount,
+				o.order_status   orderStatus,
+	        	0                addStatus,
+				o.PAY_STATUS     payStatus,
+				o.RED_CODE_USED  redCode,
+		        o.RED_CODE_GET   redCodeGet,
+				o.WINNING_STATUS winningStatus,
+				o.END_TICKET_TIME endTicketTime,
+				o.END_SYS_TIME   endSaleTime,
+				o.MAX_BUY_SCREEN maxBuyScreen,
+		        o.buy_screen buyScreen,
+				o.added_bonus addedBonus,
+				o.website_bonus getRedAmount,
+				o.remark         remark,
+				0                totalIssue,
+				0                hadIssue,
+		        o.channel_id     channelId,
+		        0                orderGroupContentId,
+				(case when o.pay_status in(1,7) then 1 /*未支付*/
+				when o.pay_status =2 and o.winning_status in (1,3) and o.order_status !=8 then 2 /*进行中*/
+				when o.pay_status in (3,4) or o.order_status=8 or o.winning_status in (2,4) then 3 /*已完成*/
+		        else 4 end) colSort,
+		        o.order_type orderType,
+				o.max_bonus maxBonusStr,
+				o.end_local_time endLocalTime
+				from ORDER_INFO o
+				where o.USER_ID = #{userId} and o.pay_status in(1,7) and o.BUY_TYPE!=3 /*合买订单单独查*/
+				) oi
+			  UNION ALL
+				select oad.* from (
+				select oa.id             id,
+				oa.order_add_code orderCode,
+				oa.lottery_code   lotteryCode,
+				oa.lottery_code   lotteryChildCode,
+				oa.create_time    showDate,
+				(select ifnull(sum(oi.aft_bonus),0) from order_added_issue oai join order_info oi on oai.order_code=oi.order_code
+				where oai.order_add_code = oa.order_add_code AND oi.winning_status IN (3,4) and oi.order_status=6)      
+				                  preBonus,
+				oa.issue_code     lotteryIssue,
+				4                 buyType,
+				oa.add_amount     orderAmount,
+		        0                 orderStatus,
+				oa.add_status     addStatus,
+				oa.pay_status     payStatus,
+				oa.RED_CODE_USED  redCode,
+		        ''   redCodeGet,
+				0                 winningStatus,
+				'' 				  endTicketTime,
+				oa.PAY_END_TIME   endSaleTime,
+				''                maxBuyScreen,
+                '' buyScreen,
+		        '' addedBonus,
+		        '' getRedAmount,
+				''         remark,
+				oa.issue_amount   totalIssue,
+				oa.had_issue      hadIssue,
+		        oa.channel_id     channelId,
+		        0                orderGroupContentId,
+				(case when oa.pay_status in(1,7) then 1 /*未支付*/
+				when (oa.pay_status=2 and  oa.add_status=1) then 2 /*进行中*/
+		        else 3 end /*已完成*/
+				) colSort,
+				0 orderType,
+				'' maxBonusStr,
+				now() endLocalTime
+				from ORDER_ADDED oa
+				where oa.USER_ID = #{userId} and oa.pay_status in(1,7) ) oad
+				) c
+		        where 1=1
+				<if test="buyType==1">
+					and buyType in (1,2)
+				</if>
+				<if test="buyType==2">
+					and buyType=4
+				</if>
+				<if test="buyType==3">
+					and buyType=3
+				</if>
+				<if test="lotteryCode !=null ">
+					and lotteryCode = #{lotteryCode}
+				</if>
+				/*进行中的方案，未支付和进行中两块*/
+				<if test="type==1">
+					and colSort in (1,2)
+				</if>
+				/*中奖方案,3，已中奖 4已派奖 追号的没有是否中奖*/
+				<if test="type==2">
+					and payStatus=2 and orderStatus=6 and winningStatus in (3,4)
+				</if>
+				<if test="type==3">
+					and payStatus=2 and orderStatus=6 and winningStatus=1
+				</if>
+				<if test="startDate!=null">
+					and showDate >= #{startDate}
+				</if>
+				<if test="finishDate!=null">
+					and showDate <![CDATA[<=]]> #{finishDate}
+				</if>
+                <if test="source==2 and channelId!=null">
+                    and channelId = #{channelId}
+                </if>
+				order by concat(endSaleTime,id) LIMIT #{total})
+		UNION ALL
+	   (select c.* from (
+				select oi.* from (
+				select o.id             id,
+				o.order_code     orderCode,
+				o.LOTTERY_CODE   lotteryCode,
+				o.LOTTERY_CHILD_CODE   lotteryChildCode,
+				o.create_time    showDate,
+				o.aft_bonus      preBonus,
+				o.LOTTERY_ISSUE  lotteryIssue,
+				o.BUY_TYPE       buyType,
+				o.ORDER_AMOUNT   orderAmount,
+				o.order_status   orderStatus,
+				0                addStatus,
+				o.PAY_STATUS     payStatus,
+				o.RED_CODE_USED  redCode,
+		        o.RED_CODE_GET   redCodeGet,
+				o.WINNING_STATUS winningStatus,
+				o.END_TICKET_TIME endTicketTime,				
+				o.END_SYS_TIME   endSaleTime,
+				o.MAX_BUY_SCREEN maxBuyScreen,
+		        o.buy_screen buyScreen,
+				o.added_bonus addedBonus,
+				o.website_bonus getRedAmount,
+				o.remark         remark,
+				0                totalIssue,
+				0                hadIssue,
+		        o.channel_id     channelId,
+		        0                orderGroupContentId,
+				(case when o.pay_status in(1,7) then 1 /*未支付*/
+				when o.pay_status =2 and o.winning_status in (1,3) and o.order_status !=8 then 2 /*进行中*/
+				when o.pay_status in (3,4) or o.order_status=8 or o.winning_status in (2,4) then 3 /*已完成*/
+				else 4 end) colSort,
+				o.order_type orderType,
+                o.max_bonus maxBonusStr,
+                o.end_local_time endLocalTime
+				from ORDER_INFO o
+				where o.USER_ID = #{userId} and o.pay_status not in (1,5,7) and o.BUY_TYPE!=3 /*合买订单单独查*/
+				) oi
+		      UNION ALL
+                select ogr.* from (
+                select ogc.id             id,
+                o.order_code     orderCode,
+                o.LOTTERY_CODE   lotteryCode,
+                o.LOTTERY_CHILD_CODE   lotteryChildCode,
+		        ogc.create_time    showDate,
+		        ogc.send_bonus      preBonus,
+                o.LOTTERY_ISSUE  lotteryIssue,
+                o.BUY_TYPE       buyType,
+		        ogc.buy_amount   orderAmount,
+                o.order_status   orderStatus,
+                0                addStatus,
+                o.PAY_STATUS     payStatus,
+                o.RED_CODE_USED  redCode,
+                o.RED_CODE_GET   redCodeGet,
+                o.WINNING_STATUS winningStatus,
+                o.END_TICKET_TIME endTicketTime,
+                o.END_SYS_TIME   endSaleTime,
+                o.MAX_BUY_SCREEN maxBuyScreen,
+                o.buy_screen buyScreen,
+                o.added_bonus addedBonus,
+                o.website_bonus getRedAmount,
+                o.remark         remark,
+                0                totalIssue,
+                0                hadIssue,
+                o.channel_id     channelId,
+		        ogc.id           orderGroupContentId,
+                (case when o.pay_status in(1,7) then 1 /*未支付*/
+                when o.pay_status =2 and o.winning_status in (1,3) and o.order_status !=8 then 2 /*进行中*/
+                when o.pay_status in (3,4) or o.order_status=8 or o.winning_status in (2,4) then 3 /*已完成*/
+                else 4 end) colSort,
+                o.order_type orderType,
+                o.max_bonus maxBonusStr,
+                o.end_local_time endLocalTime
+                from order_group_content ogc left join ORDER_INFO o on ogc.order_code = o.order_code
+                where ogc.USER_ID = #{userId} and o.pay_status in (2,6) and o.BUY_TYPE=3
+                ) ogr
+			  UNION ALL
+				select oad.* from (
+				select oa.id             id,
+				oa.order_add_code orderCode,
+				oa.lottery_code   lotteryCode,
+				oa.lottery_code   lotteryChildCode,
+				oa.create_time    showDate,
+				(select ifnull(sum(oi.aft_bonus),0) from order_added_issue oai join order_info oi on oai.order_code=oi.order_code
+				where oai.order_add_code = oa.order_add_code AND oi.winning_status IN (3,4) and oi.order_status=6)      
+				                  preBonus,
+				oa.issue_code     lotteryIssue,
+				4                 buyType,
+				oa.add_amount     orderAmount,
+				0                 orderStatus,
+				oa.add_status     addStatus,
+				oa.pay_status     payStatus,
+				oa.RED_CODE_USED  redCode,
+		        ''   redCodeGet,
+				0                 winningStatus,
+				'' 				  endTicketTime,				
+				oa.PAY_END_TIME   endSaleTime,
+				''                maxBuyScreen,
+                '' buyScreen,
+				'' addedBonus,
+				'' getRedAmount,
+				''         remark,
+				oa.issue_amount   totalIssue,
+				oa.had_issue      hadIssue,
+		        oa.channel_id     channelId,
+		        0           orderGroupContentId,
+				(case when oa.pay_status in(1,7) then 1 /*未支付*/
+				when (oa.pay_status=2 and  oa.add_status=1) then 2 /*进行中*/
+		        else 3 end /*已完成*/
+				) colSort,
+				0 orderType,
+                '' maxBonusStr,
+                now() endLocalTime
+				from ORDER_ADDED oa
+				where oa.USER_ID = #{userId} and oa.pay_status not in (1,5,7) ) oad
+				) c
+				where 1=1
+				<if test="buyType==1">
+					and buyType in (1,2)
+				</if>
+				<if test="buyType==2">
+					and buyType=4
+				</if>
+				<if test="buyType==3">
+					and buyType=3
+				</if>
+				<if test="lotteryCode !=null ">
+					and lotteryCode = #{lotteryCode}
+				</if>
+				/*进行中的方案，未支付和进行中两块*/
+				<if test="type==1">
+					and colSort in (1,2)
+				</if>
+				/*中奖方案,3，已中奖 4已派奖 追号的没有是否中奖*/
+				<if test="type==2">
+					and payStatus=2 and orderStatus=6 and winningStatus in (3,4)
+				</if>
+				<if test="type==3">
+					and payStatus=2 and orderStatus=6 and winningStatus=1
+				</if>
+				<if test="startDate!=null">
+					and showDate >= #{startDate}
+				</if>
+				<if test="finishDate!=null">
+					and showDate <![CDATA[<=]]> #{finishDate}
+				</if>
+				<if test="source==2 and channelId!=null">
+					and channelId = #{channelId}
+				</if>
+		        order by concat(showDate,id) desc LIMIT #{total})
+		LIMIT #{startRow},#{pageSize}
+	</select>
+
+	
+
+	<!-- 用户中心 订单列表数量-->
+	<select id="queryOrderListInfoCount" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="Integer">
+		select count(*) from (
+		 (select c.* from (
+			select oi.* from (
+				select o.id             id,
+				o.LOTTERY_CODE   lotteryCode,
+				o.create_time    showDate,
+		        o.PAY_STATUS     payStatus,
+				o.order_status   orderStatus,
+				o.WINNING_STATUS winningStatus,
+				o.channel_id     channelId,
+		        o.BUY_TYPE       buyType,
+				(case when o.pay_status in(1,7) then 1 /*未支付*/
+				when o.pay_status =2 and o.winning_status in (1,3) and o.order_status !=8 then 2 /*进行中*/
+				when o.pay_status in (3,4) or o.order_status=8 or o.winning_status in (2,4) then 3 /*已完成*/
+				else 4 end) colSort
+				from ORDER_INFO o
+				where o.USER_ID = #{userId} and o.pay_status in(1,7) and o.BUY_TYPE!=3 /*合买订单单独查*/
+				) oi
+			UNION ALL
+				select oad.* from (
+				select oa.id             id,
+				oa.lottery_code   lotteryCode,
+				oa.create_time    showDate,
+		        oa.pay_status     payStatus,
+				0                 orderStatus,
+				0                 winningStatus,
+				oa.channel_id     channelId,
+		        4                 buyType,
+				(case when oa.pay_status in(1,7) then 1 /*未支付*/
+				when (oa.pay_status=2 and  oa.add_status=1) then 2 /*进行中*/
+				else 3 end /*已完成*/
+				) colSort
+				from ORDER_ADDED oa
+				where oa.USER_ID = #{userId} and oa.pay_status in(1,7) ) oad
+			) c
+			where 1=1
+			<if test="buyType==1">
+				and buyType in (1,2)
+			</if>
+			<if test="buyType==2">
+				and buyType=4
+			</if>
+			<if test="buyType==3">
+				and buyType=3
+			</if>
+			<if test="lotteryCode !=null ">
+				and lotteryCode = #{lotteryCode}
+			</if>
+			/*进行中的方案，未支付和进行中两块*/
+			<if test="type==1">
+				and colSort in (1,2)
+			</if>
+			/*中奖方案,3，已中奖 4已派奖 追号的没有是否中奖*/
+			<if test="type==2">
+				and payStatus=2 and orderStatus=6 and winningStatus in (3,4)
+			</if>
+			<if test="type==3">
+				and payStatus=2 and orderStatus=6 and winningStatus=1
+			</if>
+			<if test="startDate!=null">
+				and showDate >= #{startDate}
+			</if>
+			<if test="finishDate!=null">
+				and showDate <![CDATA[<=]]> #{finishDate}
+			</if>
+			<if test="source==2 and channelId!=null">
+				and channelId = #{channelId}
+			</if>
+			)
+		UNION ALL
+			(select c.* from (
+				select oi.* from (
+                select o.id             id,
+                o.LOTTERY_CODE   lotteryCode,
+                o.create_time    showDate,
+                o.PAY_STATUS     payStatus,
+                o.order_status   orderStatus,
+                o.WINNING_STATUS winningStatus,
+                o.channel_id     channelId,
+		        o.BUY_TYPE       buyType,
+				(case when o.pay_status in(1,7) then 1 /*未支付*/
+				when o.pay_status =2 and o.winning_status in (1,3) and o.order_status !=8 then 2 /*进行中*/
+				when o.pay_status in (3,4) or o.order_status=8 or o.winning_status in (2,4) then 3 /*已完成*/
+				else 4 end) colSort
+				from ORDER_INFO o
+				where o.USER_ID = #{userId} and o.pay_status not in (1,5,7) and o.BUY_TYPE!=3 /*合买订单单独查*/
+				) oi
+			UNION ALL
+				select ogr.* from (
+                select o.id             id,
+                o.LOTTERY_CODE   lotteryCode,
+                o.create_time    showDate,
+                o.PAY_STATUS     payStatus,
+                o.order_status   orderStatus,
+                o.WINNING_STATUS winningStatus,
+                o.channel_id     channelId,
+		        o.BUY_TYPE       buyType,
+				(case when o.pay_status in(1,7) then 1 /*未支付*/
+				when o.pay_status =2 and o.winning_status in (1,3) and o.order_status !=8 then 2 /*进行中*/
+				when o.pay_status in (3,4) or o.order_status=8 or o.winning_status in (2,4) then 3 /*已完成*/
+				else 4 end) colSort
+				from order_group_content ogc left join ORDER_INFO o on ogc.order_code = o.order_code
+				where ogc.USER_ID = #{userId} and o.pay_status in (2,6) and o.BUY_TYPE=3
+				) ogr
+			UNION ALL
+				select oad.* from (
+                select oa.id             id,
+                oa.lottery_code   lotteryCode,
+                oa.create_time    showDate,
+                oa.pay_status     payStatus,
+                0                 orderStatus,
+                0                 winningStatus,
+                oa.channel_id     channelId,
+		        4                 buyType,
+				(case when oa.pay_status in(1,7) then 1 /*未支付*/
+				when (oa.pay_status=2 and  oa.add_status=1) then 2 /*进行中*/
+				else 3 end /*已完成*/
+				) colSort
+				from ORDER_ADDED oa
+				where oa.USER_ID = #{userId} and oa.pay_status not in (1,5,7) ) oad
+		) c
+		where 1=1
+		<if test="buyType==1">
+			and buyType in (1,2)
+		</if>
+		<if test="buyType==2">
+			and buyType=4
+		</if>
+		<if test="buyType==3">
+			and buyType=3
+		</if>
+		<if test="lotteryCode !=null ">
+			and lotteryCode = #{lotteryCode}
+		</if>
+		/*进行中的方案，未支付和进行中两块*/
+		<if test="type==1">
+			and colSort in (1,2)
+		</if>
+		/*中奖方案,3，已中奖 4已派奖 追号的没有是否中奖*/
+		<if test="type==2">
+			and payStatus=2 and orderStatus=6 and winningStatus in (3,4)
+		</if>
+		<if test="type==3">
+			and payStatus=2 and orderStatus=6 and winningStatus=1
+		</if>
+		<if test="startDate!=null">
+			and showDate >= #{startDate}
+		</if>
+		<if test="finishDate!=null">
+			and showDate <![CDATA[<=]]> #{finishDate}
+		</if>
+		<if test="source==2 and channelId!=null">
+			and channelId = #{channelId}
+		</if>
+		)
+		)ccc
+	</select>
+
+    <!--查询追号活动订单列表-->
+	<select id="queryAddOrderList" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderBaseInfoBO">
+        (select c.* from (
+			select oa.id             id,
+			oa.order_add_code orderCode,
+			oa.lottery_code   lotteryCode,
+			oa.lottery_code   lotteryChildCode,
+			oa.create_time    showDate,
+			(select ifnull(sum(oi.pre_bonus),0) from order_added_issue oai join order_info oi on oai.order_code=oi.order_code
+			where oai.order_add_code = oa.order_add_code AND oi.winning_status IN (3,4) and oi.order_status=6)
+												preBonus,
+			oa.issue_code     lotteryIssue,
+			4                 buyType,
+			oa.add_amount     orderAmount,
+			oa.add_status     addStatus,
+			oa.pay_status     payStatus,
+			oa.RED_CODE_USED  redCode,
+			oa.PAY_END_TIME   endSaleTime,
+			oa.issue_amount   totalIssue,
+			oa.had_issue      hadIssue
+			from ORDER_ADDED oa
+			where oa.USER_ID = #{userId} and oa.pay_status in(1,7)
+			  <if test="addQueryType==1">
+				  and oa.activity_id is not null and oa.activity_id!=''
+			  </if>
+			<if test="addQueryType==2 and activityCode!=null">
+				and oa.activity_id in
+				<foreach collection="activityCodes" item="activityCode" index="index" open="(" separator="," close=")">
+					#{activityCode,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+
+			  ) c
+		 order by concat(endSaleTime,id) LIMIT #{total}
+		)
+		UNION ALL
+		(select c.* from (
+			select oa.id             id,
+			oa.order_add_code orderCode,
+			oa.lottery_code   lotteryCode,
+			oa.lottery_code   lotteryChildCode,
+			oa.create_time    showDate,
+			(select ifnull(sum(oi.pre_bonus),0) from order_added_issue oai join order_info oi on oai.order_code=oi.order_code
+			where oai.order_add_code = oa.order_add_code AND oi.winning_status IN (3,4) and oi.order_status=6)
+												preBonus,
+			oa.issue_code     lotteryIssue,
+			4                 buyType,
+			oa.add_amount     orderAmount,
+			oa.add_status     addStatus,
+			oa.pay_status     payStatus,
+			oa.RED_CODE_USED  redCode,
+			oa.PAY_END_TIME   endSaleTime,
+			oa.issue_amount   totalIssue,
+			oa.had_issue      hadIssue
+			from ORDER_ADDED oa
+			where oa.USER_ID = #{userId} and oa.pay_status not in (1,5,7)
+			<if test="addQueryType==1">
+				and oa.activity_id is not null and oa.activity_id!=''
+			</if>
+			<if test="addQueryType==2 and activityCode!=null">
+				and oa.activity_id in
+				<foreach collection="activityCodes" item="activityCode" index="index" open="(" separator="," close=")">
+					#{activityCode,jdbcType=VARCHAR}
+				</foreach>
+			</if>
+
+		) c
+		  order by concat(showDate,id) desc LIMIT #{total}
+		)
+		LIMIT #{startRow},#{pageSize}
+	</select>
+
+
+	<!-- 查询追号活动订单列表数量-->
+	<select id="queryAddOrderListCount" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="Integer">
+	    select count(1) from
+        (
+          select c.* from (
+                        select oa.id  id
+                        from ORDER_ADDED oa
+                        where oa.USER_ID = #{userId} and oa.pay_status in(1,7)
+							<if test="addQueryType==1">
+								and oa.activity_id is not null and oa.activity_id!=''
+							</if>
+							<if test="addQueryType==2 and activityCode!=null">
+								and oa.activity_id in
+								<foreach collection="activityCodes" item="activityCode" index="index" open="(" separator="," close=")">
+									#{activityCode,jdbcType=VARCHAR}
+								</foreach>
+							</if>
+             ) c
+            UNION ALL
+            select c.* from (
+                        select oa.id  id
+                        from ORDER_ADDED oa
+                        where oa.USER_ID = #{userId} and oa.pay_status not in (1,5,7)
+							<if test="addQueryType==1">
+								and oa.activity_id is not null and oa.activity_id!=''
+							</if>
+							<if test="addQueryType==2 and activityCode!=null">
+								and oa.activity_id in
+								<foreach collection="activityCodes" item="activityCode" index="index" open="(" separator="," close=")">
+									#{activityCode,jdbcType=VARCHAR}
+								</foreach>
+							</if>
+            ) c
+        )b
+	</select>
+
+	<!--修改订单状态-->
+	<update id="updateSingleOrderStatus" >
+		update ORDER_INFO set pay_status=#{payStatus},UPDATE_TIME = now() where order_code =#{orderCode} and user_id =#{userId}
+	</update>
+
+
+	<!--查询订单基本信息-->
+	<select id="queryOrderInfo" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderBaseInfoBO">
+		<![CDATA[/*master*/]]>select o.id              id,
+		o.order_code      orderCode,
+		o.LOTTERY_CODE   lotteryCode,
+		o.LOTTERY_CHILD_CODE    lotteryChildCode,
+		o.create_time     showDate,
+		o.PRE_BONUS       preBonus,
+		o.AFT_BONUS       aftBonus,
+		o.LOTTERY_ISSUE   lotteryIssue,
+		o.BUY_TYPE        buyType,
+		o.MULTIPLE_NUM    multipleNum,
+		o.ORDER_AMOUNT    orderAmount,
+		o.order_status    orderStatus,
+		o.PAY_STATUS      payStatus,
+		o.RED_CODE_USED        redCode,
+		o.RED_CODE_GET    redCodeGet,
+		o.END_TICKET_TIME endTicketTime,
+		o.END_SYS_TIME    endSaleTime,
+		o.DRAW_CODE       drawCode,
+		o.MAX_BUY_SCREEN  maxBuyScreen,
+		o.buy_screen buyScreen,
+		o.remark         remark,
+		o.BUY_NUMBER      betNum,
+		o.IS_DLT_ADD      isDltAdd,
+	    o.CREATE_TIME         orderCreateTime,
+	    o.buy_time            orderBuyTime,
+	    o.update_time         orderUpdateTime,
+	    o.come_out_time       comeOutTime,
+	    o.lottery_time        lotteryTime,
+	    o.send_time           sendTime,
+	    o.platform            platform,
+	    o.WINNING_STATUS      winningStatus,
+	    o.betting_content_url bettingUrl,
+	    o.category_id         categoryId,
+	    (SELECT t.lottery_logo_url FROM lottery_type t WHERE t.lottery_code = (SELECT oi.lottery_code FROM order_info oi WHERE oi.order_code = o.order_code))            lotteryLogoUrl,
+		o.activity_source activityCode,
+		o.added_bonus addedBonus,
+		o.website_bonus getRedAmount,
+		o.order_type orderType,
+		o.max_bonus maxBonusStr,
+		o.channel_id      channelId,
+		o.user_id         userId,
+		o.end_local_time endLocalTime
+		from ORDER_INFO o
+		where
+		 <if test="userId != null">
+			 o.USER_ID = #{userId} and
+		 </if>
+		  o.order_code = #{orderCode}
+	</select>
+
+
+	<!--查询订单详情-->
+	<select id="queryOrderDetailInfo"  resultType="com.hhly.skeleton.lotto.base.order.bo.OrderDetailInfoBO" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderDetailVO">
+		select
+			o.id id,
+			o.order_code orderCode,
+			o.buy_type buyType,
+			o.lottery_issue lotteryIssue,
+			o.pay_status payStatus,
+			o.order_status orderStatus,
+			o.winning_status winningStatus,
+			o.LOTTERY_NAME lotteryChildName,
+			o.lottery_time lotteryTime,
+			o.create_time createDate,
+			o.ORDER_AMOUNT orderAmount,
+		d.amount amount,
+			d.id orderId,
+			d.content_type contentType,
+			d.plan_content betContent,
+			d.multiple multipleNum,
+			d.lottery_child_code lotteryChildCode,
+		d.BUY_NUMBER betNum,
+		d.code_way codeWay
+		from ORDER_INFO o left join ORDER_DETAIL d on o.order_code = d.order_code
+		where o.order_code=#{orderCode}
+		<if test="userId != null">
+			and o.user_id =#{userId}
+		</if>
+		<if test="sortField != null and sortField !=''">
+			ORDER BY ${sortField} ${sortOrder}
+		</if>
+		<if test="pageSize != null and pageSize !=''">
+			limit #{startRow},#{pageSize}
+		</if>
+	</select>
+
+	<select id="querySingleUploadDetailInfo"  resultType="com.hhly.skeleton.lotto.base.order.bo.OrderDetailInfoBO" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderDetailVO">
+		SELECT
+			d.id orderId,
+			d.content_type contentType,
+			d.plan_content betContent,
+			d.amount orderAmount,
+			d.multiple multipleNum,
+			d.lottery_child_code lotteryChildCode,
+			d.BUY_NUMBER betNum
+		from ORDER_DETAIL d
+		where d.order_code=#{orderCode}
+		ORDER BY d.id ASC
+		limit 0,200
+	</select>
+
+
+	<!--查询订单统计信息-->
+	<select id="queryOrderStatisInfo" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderStatisticsInfoBO">
+		select sum(t.order_amount) totalOrderAmount,sum(t.pre_bonus) winTotalAmount,count(t.id) winCount  from ORDER_INFO t
+		where t.user_id=#{userId}
+		<if test="source==1 and beginDate!=null">
+			and  t.create_time>=#{beginDate}
+		</if>
+		<if test="source==1 and endDate!=null">
+			and t.create_time <![CDATA[<=]]> #{endDate}
+		</if>
+		/*订单详情 查询中奖的订单*/
+		<if test="source==2">
+			and t.ORDER_STATUS = 6 and t.winning_status in (3,4)
+		</if>
+		/*订单列表只统计已出票的*/
+		<if test="source==1">
+			and t.ORDER_STATUS = 6
+		</if>
+
+	</select>
+
+
+	<!--用户首页订单，最多8条-->
+	<select id="queryHomeOrderList" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo"
+			resultType="com.hhly.skeleton.lotto.base.order.bo.OrderBaseInfoBO">
+		(select c.* from (
+			select o.id             id,
+			o.order_code     orderCode,
+			o.LOTTERY_CODE   lotteryCode,
+			o.LOTTERY_CHILD_CODE   lotteryChildCode,
+			o.create_time    showDate,
+			o.PRE_BONUS      preBonus,
+			o.LOTTERY_ISSUE  lotteryIssue,
+			o.BUY_TYPE       buyType,
+			o.ORDER_AMOUNT   orderAmount,
+			o.order_status   orderStatus,
+			o.PAY_STATUS     payStatus,
+			o.RED_CODE_USED  redCode,
+		    o.RED_CODE_GET   redCodeGet,
+            o.added_bonus addedBonus,
+            o.website_bonus getRedAmount,
+			o.WINNING_STATUS winningStatus,
+			o.END_SYS_TIME   endSaleTime,
+			o.MAX_BUY_SCREEN maxBuyScreen,
+			o.remark         remark,
+			0                totalIssue,
+			0                hadIssue,
+			(case when o.pay_status in(1,7) then 1 /*未支付*/
+			when o.pay_status =2 and o.winning_status in (1,3) and o.order_status !=8 then 2 /*进行中*/
+			when o.pay_status in (3,4) or o.order_status=8 or o.winning_status in (2,4) then 3 /*已完成*/
+			else 4 end) colSort
+			from ORDER_INFO o
+			where o.USER_ID = #{userId} and o.pay_status in(1,7)
+        AND date_format(create_time, '%Y-%m-%d')>= date_sub(curdate(),interval 6 day)
+			) c
+			where
+            /*进行中的,查询未支付和进行中的*/
+            <if test="status!=null and status==1">
+                colSort in (1,2)
+            </if>
+            /*已完成的*/
+            <if test="status!=null and status==2">
+                colSort=3
+            </if>
+        order by concat(endSaleTime,id) LIMIT 99999)
+		UNION ALL
+		(select c.* from (
+			select o.id             id,
+			o.order_code     orderCode,
+			o.LOTTERY_CODE   lotteryCode,
+			o.LOTTERY_CHILD_CODE   lotteryChildCode,
+			o.create_time    showDate,
+			o.PRE_BONUS      preBonus,
+			o.LOTTERY_ISSUE  lotteryIssue,
+			o.BUY_TYPE       buyType,
+			o.ORDER_AMOUNT   orderAmount,
+			o.order_status   orderStatus,
+			o.PAY_STATUS     payStatus,
+			o.RED_CODE_USED  redCode,
+		    o.RED_CODE_GET   redCodeGet,
+            o.added_bonus addedBonus,
+            o.website_bonus getRedAmount,
+			o.WINNING_STATUS winningStatus,
+			o.END_SYS_TIME   endSaleTime,
+			o.MAX_BUY_SCREEN maxBuyScreen,
+			o.remark         remark,
+			0                totalIssue,
+			0                hadIssue,
+			(case when o.pay_status in(1,7) then 1 /*未支付*/
+			when o.pay_status =2 and o.winning_status in (1,3) and o.order_status !=8 then 2 /*进行中*/
+			when o.pay_status in (3,4) or o.order_status=8 or o.winning_status in (2,4) then 3 /*已完成*/
+			else 4 end) colSort
+			from ORDER_INFO o
+			where o.USER_ID = #{userId} and o.pay_status not in (1,5,7)
+        AND date_format(create_time, '%Y-%m-%d')>= date_sub(curdate(),interval 6 day)
+			) c
+			where
+            /*进行中的,查询未支付和进行中的*/
+            <if test="status!=null and status==1">
+                colSort in (1,2)
+            </if>
+            /*已完成的*/
+            <if test="status!=null and status==2">
+                colSort=3
+            </if>
+        order by concat(showDate,id) desc LIMIT 99999)
+		LIMIT 0,8
+	</select>
+
+	<!--用户首页统计最近七天投注次数和中奖次数-->
+	<select id="statisOrderBetAndWinCount" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo"
+			resultType="com.hhly.skeleton.lotto.base.order.bo.OrderStatisBO">
+		select sum(a.betCount) betCount,sum(a.winCount) winCount from
+			(select sum(case when pay_status=2 and order_status=6 and winning_status in (3,4) then 1 else 0 end) winCount,
+					count(1) betCount
+					from ORDER_INFO
+					where user_id = #{userId} and pay_status!=5
+					and date_format(create_time, '%Y-%m-%d')>= date_sub(curdate(),interval 6 day)
+			UNION all
+			select 0 winCount,
+					count(1) betCount
+					from order_added
+					where user_id = #{userId} and pay_status!=5
+					and date_format(create_time, '%Y-%m-%d')>= date_sub(curdate(),interval 6 day))a
+	</select>
+
+	<select id="statisAddOrderBetAndWinCount" parameterType="Integer" resultType="Integer">
+		select
+		count(1) betCount
+		from order_added
+		where user_id = #{userId} and pay_status!=5
+		and date_format(create_time, '%Y-%m-%d')>= date_sub(curdate(),interval 6 day)
+	</select>
+	
+	<!-- 前端接口：用户中心-查询用户方案明细列表(分页查询-一个方案对应多个明细) -->
+	<select id="findPagingUserOrderDetail" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserNumOrderDetailQueryVO" resultType="com.hhly.skeleton.lotto.base.order.bo.UserNumOrderDetailBO">
+  		select od.plan_content planContent,
+               od.multiple multiple,
+               od.amount amount,
+               od.content_type contentType,
+               od.lottery_child_code lotteryChildCode,
+               od.buy_number buyNumber,
+               lc.child_name childName
+          from ORDER_DETAIL od left join LOTTERY_CHILD lc on od.lottery_child_code = lc.lottery_child_code
+         where od.order_code = #{orderCode,jdbcType=VARCHAR}
+           and exists (select 1
+                  from ORDER_INFO oi
+                 where oi.order_code = od.order_code
+					<if test = "userId != null">
+						and oi.user_id = #{userId,jdbcType=INTEGER}
+					</if>
+					)
+         order by od.id desc
+  		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+	<!-- 前端接口：用户中心-查询用户方案明细列表数量(一个方案对应的明细数量) -->
+  	<select id="findCountUserOrderDetail" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserNumOrderDetailQueryVO" resultType="int">
+		select count(*)
+		  from order_detail od
+		 where od.order_code = #{orderCode,jdbcType=VARCHAR}
+		   and exists (select 1
+		          from ORDER_INFO oi
+		         where oi.order_code = od.order_code
+				<if test = "userId != null">
+					   and oi.user_id = #{userId,jdbcType=INTEGER}
+				</if>
+		)
+	</select>
+
+	<!--查询未支付的订单-->
+	<select id="queryNoPayOrderList" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderInfoLimitBO">
+		select o.id              id,
+		o.order_code      orderCode,
+		o.LOTTERY_CODE    lotteryCode,
+		o.LOTTERY_NAME    lotteryName,
+		o.create_time     showDate,
+		o.PRE_BONUS       preBonus,
+		o.LOTTERY_ISSUE   lotteryIssue,
+		o.BUY_TYPE        buyType,
+		o.ORDER_AMOUNT    orderAmount,
+		o.order_status    orderStatus,
+		o.PAY_STATUS      payStatus,
+		o.RED_CODE_USED   redCode,
+		o.WINNING_STATUS  winningStatus,
+		o.END_SYS_TIME    endSaleTime,
+		0                 totalIssue,
+		0                 hadIssue
+		from ORDER_INFO o
+		where o.USER_ID = #{userId}
+		and o.activity_source is null
+		and o.PAY_STATUS in(1,7)
+		<if test = "lotteryCode != null">
+		    and o.lottery_code = #{lotteryCode}
+		</if>
+		<!--<if test="flag != null">
+			&lt;!&ndash; 竞技彩、北单 &ndash;&gt;
+			<if test="lotteryIssue == null or lotteryIssue == ''">
+			    and to_char(o.buy_time,'yyyyMMdd') = to_char(now(),'yyyyMMdd')
+			</if>
+	
+			&lt;!&ndash; 其它彩种 &ndash;&gt;
+			<if test="lotteryIssue != null and lotteryIssue != ''">
+			    and o.lottery_issue = #{lotteryIssue}
+			</if>
+		</if>-->
+		
+		<if test="orderCodes!=null">
+			and o.order_code in
+			<foreach collection="orderCodes" open="(" close=")" item="item" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		UNION ALL
+		select oa.id             id,
+		oa.order_add_code orderCode,
+		oa.lottery_code   lotteryCode,
+		(select lottery_name from LOTTERY_TYPE lt where lt.lottery_code =  oa.lottery_code) lottery_name,
+		oa.create_time    showDate,
+		oa.pre_bonus      preBonus,
+		oa.issue_code     lotteryIssue,
+		4                 buyType,
+		oa.add_amount     orderAmount,
+		oa.add_status     orderStatus,
+		oa.pay_status     payStatus,
+		oa.RED_CODE_USED  redCode,
+		0                 winningStatus,
+		now()    endSaleTime,
+		oa.issue_amount   totalIssue,
+		oa.had_issue      hadIssue
+		from ORDER_ADDED oa
+		where oa.USER_ID = #{userId}
+		and oa.activity_id is null
+		and oa.PAY_STATUS in(1,7)
+		<if test = "lotteryCode != null">
+			and oa.lottery_code = #{lotteryCode}
+		</if>
+		<if test="flag != null">
+			<!-- 其它彩种 -->
+			<if test="lotteryIssue != null and lotteryIssue != ''">
+			    and oa.issue_code = #{lotteryIssue}
+			</if>
+		</if>
+		<if test="orderCodes!=null">
+			and oa.order_add_code in
+			<foreach collection="orderCodes" open="(" close=")" item="item" separator=",">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+	
+	<!--查询未支付的订单数-->
+	<select id="queryNoPayOrderListCount" resultType="Integer">
+		 select count(0) from(
+			select oi.* from (select o.id   id
+			from ORDER_INFO o
+			where o.USER_ID = #{userId}
+		    and o.activity_source is null
+			and o.PAY_STATUS in(1,7)
+		    and o.buy_type in(1,2)
+			<if test = "lotteryCode != null">
+				and o.lottery_code = #{lotteryCode}
+			</if>
+			<if test="orderCodes!=null">
+				and o.order_code in
+				<foreach collection="orderCodes" open="(" close=")" item="item" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			) oi
+			UNION ALL
+			select oad.* from (select oa.id id
+			from ORDER_ADDED oa
+			where oa.USER_ID = #{userId}
+		    and oa.activity_id is null
+			and oa.PAY_STATUS in(1,7)
+			<if test = "lotteryCode != null">
+				and oa.lottery_code = #{lotteryCode}
+			</if>
+			<if test="orderCodes!=null">
+				and oa.order_add_code in
+				<foreach collection="orderCodes" open="(" close=")" item="item" separator=",">
+					#{item}
+				</foreach>
+			</if>
+			) oad
+		  )c
+	</select>
+
+	<!-- 合买未支付订单查询-->
+	<select id="queryNoPayOrderGroupListCount" resultType="Integer">
+		SELECT count(1) FROM ORDER_INFO o
+		WHERE o.USER_ID = #{userId}
+		AND o.activity_source is null
+		AND o.PAY_STATUS in(1,7)
+		AND o.buy_type = 3
+		<if test = "lotteryCode != null">
+			and o.lottery_code = #{lotteryCode}
+		</if>
+	</select>
+
+	<update id="batchCancelOrderList">
+		update  ORDER_INFO
+		set  pay_status = #{payStatus},
+		update_time = now()
+		where order_code in (
+		<foreach collection="orderCodes" item="item" separator=",">
+			#{item}
+		</foreach>
+		)
+	</update>
+
+
+	<select id="queryOrderListForOrderCodes" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderBaseInfoBO">
+		<if test="orderCodeList!=null">
+		select o.id              id,
+		o.order_code      orderCode,
+		o.LOTTERY_CODE    lotteryCode,
+		o.LOTTERY_NAME    lotteryName,
+		o.create_time     showDate,
+		o.PRE_BONUS       preBonus,
+		o.LOTTERY_ISSUE   lotteryIssue,
+		o.BUY_TYPE        buyType,
+		o.ORDER_AMOUNT    orderAmount,
+		o.order_status    orderStatus,
+		o.PAY_STATUS      payStatus,
+		o.RED_CODE_USED   redCode,
+		o.WINNING_STATUS  winningStatus,
+		o.END_SYS_TIME    endSaleTime,
+		o.END_TICKET_TIME endTicketTime,
+		o.channel_id      channelId,
+		0                 totalIssue,
+		0                 hadIssue
+		from ORDER_INFO o
+		where o.USER_ID = #{userId}
+			and o.order_code in
+			<foreach collection="orderCodeList" open="(" close=")" item="item" separator=",">
+				#{item}
+			</foreach>
+		</if>
+		<if test="orderCodeList!=null and addCodeList!=null">
+		UNION ALL
+		</if>
+		<if test="addCodeList!=null">
+		select oa.id             id,
+		oa.order_add_code orderCode,
+		oa.lottery_code   lotteryCode,
+		(select lottery_name from LOTTERY_TYPE lt where lt.lottery_code =  oa.lottery_code) lottery_name,
+		oa.create_time    showDate,
+		oa.pre_bonus      preBonus,
+		oa.issue_code     lotteryIssue,
+		4                 buyType,
+		oa.add_amount     orderAmount,
+		oa.add_status     orderStatus,
+		oa.pay_status     payStatus,
+		oa.RED_CODE_USED  redCode,
+		0                 winningStatus,
+		oa.PAY_END_TIME    endSaleTime,
+		now() endTicketTime,
+		oa.channel_id      channelId,
+		oa.issue_amount   totalIssue,
+		oa.had_issue      hadIssue
+		from ORDER_ADDED oa
+		where oa.USER_ID = #{userId}
+			and oa.order_add_code in
+			<foreach collection="addCodeList" open="(" close=")" item="item" separator=",">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+
+	<!--根据类型查询竟足活动订单数量-->
+    <select id="queryJoinActivityOrderCount" parameterType="com.hhly.skeleton.lotto.base.order.vo.ActivityOrderQueryInfoVO" resultType="int">
+          select count(1) from order_info where 1=1
+           <if test="queryType == 1">
+			  and user_id = #{userId} and lottery_code =#{lotteryCode} and pay_status in (2,6) and activity_source is null
+		   </if>
+			<if test="queryType == 2">
+				and user_id in
+				<foreach collection="userIds" open="(" close=")" item="item" separator=",">
+					#{item}
+				</foreach>
+				and lottery_code =#{lotteryCode} and pay_status in (2,6) and activity_source is null
+			</if>
+			<if test="queryType == 3">
+				and user_id = #{userId} and lottery_code =#{lotteryCode} and pay_status in (2,6)	and activity_source = #{activityCode}
+			</if>
+			<if test="queryType == 4">
+				and user_id = #{userId} and lottery_code =#{lotteryCode} and pay_status in (1,7) and activity_source = #{activityCode}
+			</if>
+			<if test="queryType == 5 or queryType == 7">
+				and user_id in
+				<foreach collection="userIds" open="(" close=")" item="item" separator=",">
+					#{item}
+				</foreach>
+				  and lottery_code =#{lotteryCode} and pay_status in (2,6)	and activity_source = #{activityCode}
+			</if>
+			<if test="queryType == 6">
+				and user_id in
+				<foreach collection="userIds" open="(" close=")" item="item" separator=",">
+					#{item}
+				</foreach>
+				  and lottery_code =#{lotteryCode} and pay_status in (1,7) and activity_source = #{activityCode}
+			</if>
+			<if test="queryType == 8">
+				and user_id = #{userId}  and lottery_code =#{lotteryCode} and order_status in (7,8,10)  and activity_source = #{activityCode}
+			</if>
+			<if test="queryType == 9">
+				and user_id in
+				<foreach collection="userIds" open="(" close=")" item="item" separator=",">
+					#{item}
+				</foreach>
+				and lottery_code =#{lotteryCode} and order_status in (7,8,10) and activity_source = #{activityCode}
+			</if>
+
+	</select>
+
+	<!--查询当前用户未支付的活动订单编号-->
+	<select id="queryNoPayActivityOrderNo" parameterType="com.hhly.skeleton.lotto.base.order.vo.ActivityOrderQueryInfoVO" resultType="String">
+		select order_code from order_info where user_id = #{userId} and lottery_code = #{lotteryCode} and pay_status in (1,7) and activity_source = #{activityCode}
+	</select>
+
+	<select id="findWinInfo" resultType="com.hhly.skeleton.lotto.base.order.bo.WinBO" parameterType="com.hhly.skeleton.lotto.base.order.vo.WinVO">
+		select pre_bonus money, nick_name nickName
+		from
+		order_info oi inner join m_user_info mui
+		on oi.user_id = mui.id
+		<where>
+			<if test="lotteryCode != null">
+				and lottery_code = #{lotteryCode}
+			</if>
+			<if test="orderStatus != null">
+				and order_status = #{orderStatus}
+			</if>
+			<if test="winningStatuses != null">
+				and winning_status in
+				<foreach collection="winningStatuses" open="(" close=")" separator="," item="winningStatus">
+					#{winningStatus}
+				</foreach>
+			</if>
+			<if test="orderField != null and orderField !=''">
+				order by ${orderField} ${orderValue}
+			</if>
+		</where>
+		<if test="limit != null">
+			limit #{limit}
+		</if> 
+	</select>
+	
+	<select id="count" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderInfoQueryVO" resultType="int">
+		/*MASTER*/
+		select count(*) from order_info oi
+		<if test="joinUser">
+			left join m_user_info mui on oi.user_id=mui.id
+		</if>
+		<where>
+			<if test="userId != null">
+				and user_id = #{userId}
+			</if>
+			<if test="lotteryCode != null">
+				and lottery_code = #{lotteryCode}
+			</if>
+			<if test="payStatuses != null">
+				and pay_status in
+				<foreach collection="payStatuses" open="(" close=")" separator="," item="payStatus">
+					#{payStatus}
+				</foreach>
+			</if>
+			<if test="joinUser">
+				and (
+				<trim suffixOverrides="or">
+					<if test="true">
+						1=2 or
+					</if>
+					<if test="idCard != null">
+						mui.id_num = #{idCard} or 
+					</if>
+					<if test="mobile != null">
+						mui.cus_mobile = #{mobile} or
+					</if>
+				</trim>
+				)
+			</if>
+		</where>
+	</select>
+	
+	
+  	<update id="updateOrderStatus">
+  	 update  ORDER_INFO 
+  	 set  order_status = #{orderStatus},
+  	  modify_By = #{modifyBy},
+  	  modify_time = now(),
+  	  update_time = now()
+  	 where id in (
+  	   <foreach collection="ids" item="item" separator=",">
+  	      #{item}
+  	   </foreach>
+  	 )
+  	</update>
+
+
+	
+	<select id="getOrderInfo" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderInfoBO">
+		select o.id id, o.order_code orderCode, o.lottery_code lotteryCode, o.lottery_name lotteryName, 
+		o.lottery_issue lotteryIssue, o.buy_time buyTime, o.end_ticket_time endTicketTime, o.end_check_time endCheckTime, o.come_out_time comeOutTime, o.lottery_time lotteryTime, 
+	    o.user_id userId, o.order_amount orderAmount, o.multiple_num multipleNum, o.split_num splitNum, 
+		o.buy_type buyType, o.pay_status payStatus, o.order_status orderStatus, o.winning_status winningStatus, o.channel_id channelId,
+		o.lottery_child_code lotteryChildCode,o.category_id categoryId,o.platform platform,o.max_bonus as maxBonusStr,
+		o.BUY_SCREEN buyScreen,o.END_SYS_TIME endSysTime from ORDER_INFO o where o.order_code = #{orderCode}
+	</select>
+
+
+
+	<resultMap type="com.hhly.skeleton.lotto.base.order.vo.OrderDetailVO" id="OrderDetailMap">
+			<id property="id" column="orderDetailId" /> 
+            <result property="bettingContentUrl" column="bettingContentUrl" /> 
+			<result property="buyScreen" column="orderDetaiBuyScreen" /> 
+			<result property="planContent" column="planContent" /> 
+			<result property="multiple" column="multiple" /> 
+			<result property="amount" column="amount" /> 
+			<result property="playIntro" column="playIntro" /> 
+			<result property="codeWay" column="codeWay" /> 
+			<result property="contentType" column="contentType" /> 
+			<result property="updateTime" column="updateTime" /> 
+			<result property="createTime" column="createTime" /> 
+			<result property="lotteryChildCode" column="lotteryChildCode" />
+			<result property="buyNumber" column="buyNumber" /> 
+	</resultMap>
+
+	<resultMap type="com.hhly.skeleton.lotto.base.order.bo.OrderInfoBO" id="OrderInfoMap">
+		<id property="id" column="id" />
+		<result property="orderCode" column="orderCode" />
+		<result property="lotteryCode" column="lotteryCode" />
+		<result property="lotteryName" column="lotteryName" />
+		<result property="lotteryIssue" column="lotteryIssue" /> 
+		<result property="buyTime" column="buyTime" />
+		<result property="endTicketTime" column="endTicketTime" />
+		<result property="endCheckTime" column="endCheckTime" />
+		<result property="comeOutTime" column="comeOutTime" />
+		<result property="lotteryTime" column="lotteryTime" /> 
+		<result property="sendTime" column="sendTime" /> 
+		<result property="userId" column="userId" /> 
+		<result property="orderAmount" column="orderAmount" /> 
+		<result property="multipleNum" column="multipleNum" /> 
+		<result property="splitNum" column="splitNum" />
+		<result property="winningDetail" column="winningDetail" /> 
+		<result property="preBonus" column="preBonus" /> 
+		<result property="aftBonus" column="aftBonus" /> 
+		<result property="buyType" column="buyType" />
+		<result property="payStatus" column="payStatus" /> 
+		<result property="orderStatus" column="orderStatus" /> 
+		<result property="winningStatus" column="winningStatus" /> 
+		<result property="channelId" column="channelId" /> 
+		<result property="addedBonus" column="addedBonus" /> 
+		<result property="buyScreen" column="buyScreen" /> 
+		<result property="endSysTime" column="endSysTime" /> 
+		<collection property="orderDetailList" ofType ="com.hhly.skeleton.lotto.base.order.vo.OrderDetailVO" resultMap="OrderDetailMap"/>  
+	</resultMap>
+	
+	<select id="getOrderInfoList" resultMap="OrderInfoMap">
+		SELECT a.ID id,a.ORDER_CODE orderCode, a.LOTTERY_CODE lotteryCode,
+		a.LOTTERY_NAME lotteryName, a.LOTTERY_ISSUE lotteryIssue, a.BUY_TIME buyTime,
+		a.END_TICKET_TIME endTicketTime,a.END_CHECK_TIME endCheckTime,
+		a.COME_OUT_TIME comeOutTime, a.LOTTERY_TIME lotteryTime,
+		a.SEND_TIME sendTime, a.USER_ID userId, a.ORDER_AMOUNT orderAmount,
+		a.MULTIPLE_NUM multipleNum, a.SPLIT_NUM splitNum,a.WINNING_DETAIL winningDetail,
+		a.PRE_BONUS preBonus, a.AFT_BONUS aftBonus, a.BUY_TYPE buyType,
+		a.PAY_STATUS payStatus, a.ORDER_STATUS orderStatus, a.WINNING_STATUS winningStatus,
+		a.CHANNEL_ID channelId, a.ADDED_BONUS addedBonus,
+		a.BUY_SCREEN buyScreen, a.END_SYS_TIME endSysTime, b.ID orderDetailId,
+		b.BETTING_CONTENT_URL bettingContentUrl, b.BUY_SCREEN orderDetaiBuyScreen,
+		b.PLAN_CONTENT planContent,b.MULTIPLE multiple, b.AMOUNT amount,
+		b.PLAY_INTRO playIntro, b.CODE_WAY codeWay,b.CONTENT_TYPE contentType,
+		b.UPDATE_TIME updateTime, b.CREATE_TIME createTime,
+		b.LOTTERY_CHILD_CODE lotteryChildCode, b.BUY_NUMBER buyNumber
+		FROM ORDER_INFO a 
+		LEFT JOIN ORDER_DETAIL b on a.ORDER_CODE = b.ORDER_CODE
+		WHERE 1=1 
+		<if test = "orderStatus!=null">
+			AND a.ORDER_STATUS = #{orderStatus}
+		</if>
+		<if test = "payStatus!=null">
+			AND a.PAY_STATUS = #{payStatus}
+		</if>
+		<if test = "lotteryCodes!=null">
+			AND a.LOTTERY_CODE IN
+			<foreach collection="lotteryCodes" item="lotteryCode" index="index"
+	            open="(" close=")" separator=",">
+	            #{lotteryCode}
+	        </foreach>
+		</if>
+	</select>
+	
+	<!-- 修改撤单的订单备注理由 -->
+	<update id="updCancelOrderRemark" parameterType="Map">
+		update order_info set 
+		   remark = if(remark is null, #{remark,jdbcType=VARCHAR},CONCAT(remark,#{remark,jdbcType=VARCHAR}))
+		   where order_code = #{orderCode, jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 前端接口：用户中心-查询用户方案明细列表数量(一个方案对应的明细数量) -->
+  	<select id="findCountUserSportOrderDetail" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserSportOrderDetailQueryVO" resultType="int">
+		select count(*)
+		  from order_detail od
+		 where od.order_code = #{orderCode,jdbcType=VARCHAR}
+		   and exists (select 1
+		          from ORDER_INFO oi
+		         where oi.order_code = od.order_code
+		         <if test = "userId != null">
+		           and oi.user_id = #{userId,jdbcType=INTEGER}
+				</if>
+				)
+	</select>
+	
+	<!-- 前端接口：用户中心-查询用户方案明细列表(分页查询-一个方案对应多个明细) -->
+	<select id="findPagingUserSportOrderDetail" parameterType="com.hhly.skeleton.lotto.base.order.vo.UserSportOrderDetailQueryVO" resultType="com.hhly.skeleton.lotto.base.order.bo.UserSportOrderDetailBO">
+ 
+  		select oi.lottery_code lotteryCode, oi.lottery_issue lotteryIssue, od.plan_content planContent,
+               od.multiple multiple, od.play_intro playIntro, od.lottery_child_code lotteryChildCode,
+               od.pre_bonus preBonus
+          from ORDER_INFO oi left join ORDER_DETAIL od on oi.order_code = od.order_code left join LOTTERY_CHILD lc on od.lottery_child_code = lc.lottery_child_code
+         where od.order_code = #{orderCode,jdbcType=VARCHAR}
+           and exists (select 1
+                  from ORDER_INFO oi
+                 where oi.order_code = od.order_code
+				<if test = "userId != null">
+                   and oi.user_id = #{userId,jdbcType=INTEGER}
+				</if>
+				)
+         order by od.id desc
+  		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</select>
+
+	<!-- 抄单更新订单类别 -->
+	<update id="updOrderType" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderInfoVO">
+		UPDATE ORDER_INFO
+		SET
+			modify_time = now(),
+			update_time = now(),
+			order_type  = #{orderType,jdbcType=INTEGER}
+		WHERE id = #{id}
+	</update>
+
+
+	<!--查询用户中奖信息集合-->
+	<select id="queryUserWinInfo" resultType="com.hhly.skeleton.lotto.base.order.bo.UserWinInfoBO">
+		SELECT
+		oi.lottery_code lotteryCode,
+		oi.lottery_name lotteryName,
+		oi.pre_bonus preBonus,
+		(SELECT nick_name
+		FROM m_user_info m
+		WHERE m.ID = oi.user_id) nickname
+		FROM order_info oi
+		WHERE winning_status IN (3, 4) AND order_status = 6
+		<if test="lotteryCodes != null and lotteryCodes != '' ">
+			AND oi.lottery_code IN
+			<foreach collection="lotteryCodes" open="(" close=")" separator="," item="lotteryCodes">
+				#{lotteryCodes}
+			</foreach>
+
+		</if>
+		ORDER BY create_time DESC
+		LIMIT 100
+	</select>
+
+
+	<sql id="comm_column">
+		oi.id id,
+		oi.order_code orderCode,
+		oi.LOTTERY_CODE lotteryCode,
+		oi.LOTTERY_CHILD_CODE lotteryChildCode,
+		oi.create_time showDate,
+		oi.PRE_BONUS preBonus,
+		oi.LOTTERY_ISSUE lotteryIssue,
+		oi.BUY_TYPE buyType,
+		oi.ORDER_AMOUNT orderAmount,
+		oi.order_status orderStatus,
+		0 addStatus,
+		oi.PAY_STATUS payStatus,
+		oi.RED_CODE_USED redCode,
+		oi.RED_CODE_GET redCodeGet,
+		oi.WINNING_STATUS winningStatus,
+		oi.END_TICKET_TIME endTicketTime,
+		oi.END_SYS_TIME endSaleTime,
+		oi.MAX_BUY_SCREEN maxBuyScreen,
+		oi.buy_screen buyScreen,
+		oi.added_bonus addedBonus,
+		oi.website_bonus getRedAmount,
+		oi.remark remark,
+		oi.order_type orderType,
+		0 totalIssue,
+		0 hadIssue,
+		(
+		CASE
+		WHEN oi.pay_status IN (1, 7) THEN
+		1 /*未支付*/
+		WHEN oi.pay_status = 2
+		AND oi.winning_status IN (1, 3)
+		AND oi.order_status != 8 THEN
+		2 /*进行中*/
+		WHEN oi.pay_status IN (3, 4)
+		OR oi.order_status = 8
+		OR oi.winning_status IN (2, 4) THEN
+		3 /*已完成*/
+		ELSE
+		4
+		END
+		) colSort
+	</sql>
+
+	<sql id="comm_condition">
+		<if test="lotteryCode !=null ">
+			and lottery_code = #{lotteryCode}
+		</if>
+		/*中奖方案,3，已中奖 4已派奖 追号的没有是否中奖*/
+		<if test="type==2">
+			and oi.pay_status=2 and oi.order_status=6 and oi.winning_status in (3,4)
+		</if>
+		<if test="type==3">
+			and oi.pay_status=2 and oi.order_status=6 and oi.winning_status = 1
+		</if>
+		<if test="startDate!=null">
+			and oi.create_time >= #{startDate}
+		</if>
+		<if test="finishDate!=null">
+			and oi.create_time <![CDATA[<=]]> #{finishDate}
+		</if>
+	</sql>
+	<!-- 抄单列表-->
+	<select id="querySingleCopyOrderList" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderBaseInfoBO">
+		SELECT * FROM (
+		SELECT
+		<include refid="comm_column"/>
+		FROM
+		order_info oi
+		WHERE
+		 oi.user_id = #{userId}
+		 and oi.order_type in (2,3)
+		<include refid="comm_condition"/>
+		) tbl
+		WHERE 1=1
+		/*进行中的方案，未支付和进行中两块*/
+		<if test="type==1">
+			tbl.colSort in(1,2)
+		</if>
+		order by concat(tbl.endSaleTime,id)
+		LIMIT #{startRow},#{pageSize}
+	</select>
+	<select id="querySingleCopyOrderListCount" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultType="Integer">
+		SELECT count(*) FROM (
+		SELECT * FROM (
+		SELECT
+		<include refid="comm_column"/>
+		FROM
+		order_info oi
+		WHERE
+		 oi.user_id = #{userId}
+		and oi.order_type in (2,3)
+		<include refid="comm_condition"/>
+		) tbl
+		WHERE 1=1
+		/*进行中的方案，未支付和进行中两块*/
+		<if test="type==1">
+			tbl.colSort in(1,2)
+		</if>
+		) cTab
+	</select>
+	
+	
+	<resultMap id="orderInfoMap" type="com.hhly.skeleton.activity.bo.OrderInfoDetailBo" >
+		<id column="id"/>
+		<result column="user_id" property="userId"/>
+		<result column="buy_type" property="buyType"/>
+		<result column="platform" property="platform"/>
+		<result column="multiple_num" property="multipleNum"/>
+		<result column="lottery_code" property="lotteryCode"/>
+		<result column="lottery_name" property="lotteryName"/>
+		<result column="lottery_issue" property="lotteryIssue"/>
+		<result column="buy_time" property="buyTime"/>
+		<result column="come_out_time" property="comeOutTime"/>
+		<result column="lottery_time" property="lotteryTime"/>
+		<result column="send_time" property="sendTime"/>
+		<result column="order_amount" property="orderAmount"/>
+		<result column="split_num" property="splitNum"/>
+		<result column="winning_detail" property="winningDetail"/>
+		<result column="buy_number" property="buyNumber"/>
+		<result column="lottery_child_code" property="lotteryChildCode"/>
+		<result column="red_code_get" property="redCodeGet"/>
+		<result column="red_code_used" property="redCodeUsed"/>
+		<result column="draw_code" property="drawCode"/>
+		<result column="winning_status" property="winningStatus"/>
+		<result column="order_status" property="orderStatus"/>
+		<result column="pay_status" property="payStatus"/>
+		<result column="pre_bonus" property="preBonus"/>
+		<result column="aft_bonus" property="aftBonus"/>
+		<collection property="details"  column="order_code" select="getDeatils"/>
+	</resultMap>
+		
+	<select id="getDeatils" parameterType="string"  resultMap="detailsMap">
+		select id, plan_content,multiple,content_type,lottery_child_code,winning_detail from `order_detail` where order_code = #{order_code}
+	</select>	
+		
+	<resultMap id="detailsMap" type="com.hhly.skeleton.activity.bo.OrderDetailBO" >
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="plan_content" property="planContent"/>
+		<result column="multiple" property="multiple"/>
+		<result column="content_type" property="contentType"/>
+		<result column="lottery_child_code" property="lotteryChildCode"/>
+		<result column="winning_detail" property="winningDetail"/>
+	</resultMap>
+	
+	<!-- 年会活动中的订单详情 -->
+	<select id="queryYearOrderInfoDetail" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderQueryVo" resultMap="orderInfoMap">		
+		SELECT
+		info.order_code,
+		info.buy_type,
+		info.platform,
+		info.multiple_num,
+		info.lottery_code,
+		info.lottery_name,
+		info.lottery_issue,
+		info.buy_time,
+		info.come_out_time,
+		info.lottery_time,
+		info.send_time,
+		info.order_amount,
+		info.winning_detail,
+		info.buy_number,
+		info.lottery_child_code,
+		info.draw_code,
+		info.winning_status,
+		info.order_status,
+		info.pay_status,
+		info.pre_bonus,
+		info.aft_bonus
+	FROM
+		`ORDER_INFO` info
+	WHERE
+		EXISTS (
+			SELECT
+				1
+			FROM
+				(
+					SELECT
+						oai.`order_add_code`
+					FROM
+						`order_added` oa
+					INNER JOIN `order_added_issue` oai ON oa.`order_add_code` = oai.`order_add_code`
+					WHERE
+						oa.user_id = #{userId}
+					<if test="lotteryIssue!=null">
+						AND oai.issue_code = #{lotteryIssue}
+					</if>	
+					<if test="lotteryCode!=null">
+						AND oai.lottery_code = #{lotteryCode}
+					</if>
+					<if test="activityCode!=null">
+						AND oa.activity_id = #{activityCode}
+					</if>
+		
+				) t
+			WHERE
+				info.`order_add_code` = t.order_add_code
+		) limit 1
+	</select>
+
+	<select id="queryOrderStandingList" parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderSingleQueryVo" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderBaseInfoBO">
+		SELECT
+		    oi.order_code      orderCode,
+			oi.lottery_issue   lotteryIssue,
+			oi.lottery_code     lotteryCode,
+			oi.order_amount     orderAmount,
+			oi.pay_status       payStatus,
+			oi.order_status     orderStatus,
+			oi.winning_status   winningStatus,
+			oi.buy_type         buyType,
+			oi.pre_bonus        preBonus,
+			og.grpbuy_status    grpbuyStatus,
+
+			og.create_time       showDate
+		FROM
+			order_group og
+		INNER JOIN order_info oi ON og.order_code = oi.order_code
+		WHERE og.user_id=#{userId} and oi.lottery_code=#{lotteryCode} and oi.pay_status in (2,6)
+        order by og.create_time desc
+        LIMIT #{startRow},#{pageSize}
+	</select>
+
+	<select id="queryOrderStandingListCount"  parameterType="com.hhly.skeleton.lotto.base.order.vo.OrderSingleQueryVo" resultType="Integer">
+		SELECT
+		count(1)
+		FROM
+		order_group og
+		INNER JOIN order_info oi ON og.order_code = oi.order_code
+		WHERE og.user_id=#{userId} and oi.lottery_code=#{lotteryCode} and oi.pay_status in (2,6)
+	</select>
+
+	<select id="getRcmdDayOrderCount" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdInfoVO" resultType="Integer">
+		SELECT
+			count(1)
+		FROM
+			rcmd_info
+		WHERE
+			user_id = #{userId}
+		AND TO_DAYS(create_time) = TO_DAYS(NOW())
+	</select>
+	
+	<select id="findRcmdRepeatOrder" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdConditionVO" resultType="Integer">
+		SELECT
+			COUNT(1)
+		FROM
+			rcmd_detail
+		WHERE
+			screens = #{screens}
+			AND lottery_child_code = #{lotteryChildCode}
+			AND rcmd_code IN (
+				SELECT
+					rcmd_code
+				FROM
+					rcmd_info
+				WHERE
+					user_id = #{userId}
+				AND lottery_code = #{lotteryCode}
+				AND lottery_issue = #{lotteryIssue}
+)
+	</select>
+
+	<!--                           Used to CMS                           -->
+	<select id="queryChannelOrderList" parameterType="com.hhly.skeleton.task.order.vo.OrderChannelVO"
+			resultType="com.hhly.skeleton.lotto.base.order.bo.OrderChannelBO">
+		(SELECT
+			oi.order_code orderCode,
+			oi.lottery_code lotteryCode,
+			oi.lottery_name lotteryName,
+			oi.lottery_issue lotteryIssue,
+			oi.order_amount orderAmount,
+			oi.order_status orderUnionStatus,
+			oi.winning_status winningStatus,
+			oi.aft_bonus aftBonus,
+			oi.platform platform,
+			oi.lottery_time lotteryTime,
+			oi.send_time sendTime,
+			mui.channel_open_id channelMemberId,
+			oi.create_time createTime
+		FROM order_info oi LEFT JOIN m_user_info mui ON oi.user_id = mui.id
+		WHERE oi.channel_id IN
+		(SELECT channel_id FROM cooperate_agency ca WHERE 1=1
+		<choose>
+			<when test="channelTopId !=null">
+				AND ca.market_channel_id = #{channelTopId}
+			</when>
+			<otherwise>
+				AND ca.market_channel_id = (SELECT * FROM (SELECT market_channel_id FROM cooperate_agency WHERE channel_id = #{channelId}) ch)
+			</otherwise>
+		</choose>
+		)
+		AND oi.buy_type!=3
+		<if test="userId!=null">
+			AND oi.user_id = #{userId}
+		</if>
+		<![CDATA[
+			AND oi.create_time >= #{startTime,jdbcType=TIMESTAMP}
+			AND oi.create_time <= #{endTime,jdbcType=TIMESTAMP}
+		]]>
+		)
+		UNION ALL
+		(SELECT
+			oi.order_code orderCode,
+			oi.lottery_code lotteryCode,
+			oi.lottery_name lotteryName,
+			oi.lottery_issue lotteryIssue,
+			oi.order_amount orderAmount,
+			oi.order_status orderUnionStatus,
+			oi.winning_status winningStatus,
+			oi.aft_bonus aftBonus,
+			oi.platform platform,
+			oi.lottery_time lotteryTime,
+			oi.send_time sendTime,
+			mui.channel_open_id channelMemberId,
+			oi.create_time createTime
+		FROM (SELECT buy_code,user_id,order_code,SUM(buy_amount) AS amount FROM order_group_content GROUP BY order_code) ogc
+		LEFT JOIN m_user_info mui ON ogc.user_id = mui.id
+		LEFT JOIN trans_user tu ON ogc.buy_code = tu.order_code
+		LEFT JOIN order_info oi ON ogc.order_code = oi.order_code WHERE oi.channel_id IN
+		(SELECT channel_id FROM cooperate_agency ca WHERE 1=1
+		<choose>
+			<when test="channelTopId !=null">
+				AND ca.market_channel_id = #{channelTopId}
+			</when>
+			<otherwise>
+				AND ca.market_channel_id = (SELECT * FROM (SELECT market_channel_id FROM cooperate_agency WHERE channel_id = #{channelId}) ch)
+			</otherwise>
+		</choose>
+		)
+		<if test="userId!=null">
+			AND oi.user_id = #{userId}
+		</if>
+		<![CDATA[
+			AND oi.create_time >= #{startTime,jdbcType=TIMESTAMP}
+			AND oi.create_time <= #{endTime,jdbcType=TIMESTAMP}
+		]]>
+		)
+	</select>
+	
+	  	<!-- 分析师推荐方案入库处理 -->
+	<insert id="addRcmdOrder" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdInfoVO">
+		insert into RCMD_INFO
+		(user_id,
+		   rcmd_code,
+		   title,
+		   reason,
+		   type_id,
+		   label,
+		   lottery_code,
+		   lottery_name,
+		   lottery_issue,
+		   lottery_child_code,
+		   pass_way,
+		   sale_end_time,
+		   lottery_time,
+		   plan_amount,
+		   pay_type,
+		   pay_amount,
+		   platform,
+		   channel_id,
+		   create_time,
+		   remark
+        )
+		values(
+		  #{userId,jdbcType=INTEGER},
+		  #{rcmdCode,jdbcType=VARCHAR},
+		  #{title,jdbcType=VARCHAR},
+		  #{reason,jdbcType=VARCHAR},
+		  #{typeId,jdbcType=INTEGER},
+		  #{label,jdbcType=VARCHAR},
+		  #{lotteryCode,jdbcType=INTEGER},
+		  #{lotteryName,jdbcType=VARCHAR},
+		  #{lotteryIssue,jdbcType=VARCHAR},
+		  #{lotteryChildCode,jdbcType=INTEGER},
+		  #{passWay,jdbcType=INTEGER},
+		  #{saleEndTime,jdbcType=TIMESTAMP},
+		  #{lotteryTime,jdbcType=TIMESTAMP},
+		  #{planAmount,jdbcType=DECIMAL},
+		  #{payType,jdbcType=INTEGER},
+		  #{payAmount,jdbcType=DECIMAL},
+		  #{platform,jdbcType=INTEGER},
+		  #{channelId,jdbcType=VARCHAR},
+	      now(),
+		  #{remark,jdbcType=VARCHAR}
+        )
+	</insert>
+	
+	<insert id="addRcmdDetailList" parameterType="java.util.List">
+		insert into RCMD_DETAIL
+		  (rcmd_code,
+		   lottery_child_code,
+		   lottery_child_name,
+		   pass_way,
+		   plan_content,
+		   plan_number,
+		   plan_amount,
+		   screens,
+		   min_screen,
+		   max_screen
+		   )
+		values
+		<foreach collection="list" index="index" item="item" open="" close="" separator=",">
+			 (#{item.rcmdCode,jdbcType=VARCHAR},
+			  #{item.lotteryChildCode,jdbcType=INTEGER},
+			  #{item.lotteryChildName,jdbcType=VARCHAR},
+			  #{item.passWay,jdbcType=INTEGER},
+			  #{item.planContent,jdbcType=VARCHAR},
+			  #{item.planNumber,jdbcType=INTEGER},
+			  #{item.planAmount,jdbcType=DECIMAL},
+			  #{item.screens,jdbcType=VARCHAR},
+			  #{item.minScreen,jdbcType=VARCHAR},
+			  #{item.maxScreen,jdbcType=VARCHAR}
+			  )
+		</foreach>
+	</insert>
+
+</mapper>

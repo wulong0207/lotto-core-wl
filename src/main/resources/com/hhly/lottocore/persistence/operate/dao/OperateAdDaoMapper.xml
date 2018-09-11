@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.operate.dao.OperateAdDaoMapper">
+
+  <resultMap id="OperateAdLottoBO" type="com.hhly.skeleton.lotto.base.operate.bo.OperateAdLottoBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="ADV_TITLE" property="advTitle" jdbcType="VARCHAR" />
+    <result column="POSITION" property="position" jdbcType="SMALLINT" />
+    <result column="POSITION_CODE" property="positionCode" jdbcType="VARCHAR" />
+    <result column="POSITION_INFO" property="positionInfo" jdbcType="VARCHAR" />
+    <result column="TARGET" property="target" jdbcType="SMALLINT" />
+    <result column="URL" property="adUrl" jdbcType="VARCHAR" />
+    <result column="IMG" property="adImgUrl" jdbcType="VARCHAR" />
+    <result column="DISPLAY" property="display" jdbcType="SMALLINT" />
+    <result column="LOTTERY_CODE" property="lotteryCode" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="lotto_Column_List" >
+     oa.ID,ADV_TITLE, POSITION, POSITION_CODE, POSITION_INFO, 
+     TARGET, URL, IMG,DISPLAY,order_id,LOTTERY_CODE
+  </sql>
+	
+    <!-- 查询默认广告数据 -->
+	<select id="findDefaultAd" resultMap="OperateAdLottoBO">
+    	 select <include refid="lotto_Column_List"/> from OPERATE_ADV oa 	
+    	  where PLATFORM = #{platform} and MENU=#{menu}  
+    	  and ISDEFAULT = 1
+    	  and now() between ONLINE_TIME and OFFLINE_TIME and oa.status=1
+    	  order by order_id			
+  	</select>
+</mapper>

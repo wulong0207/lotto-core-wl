@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.hhly.lottocore.persistence.singleupload.dao.SingleUploadLogDaoMapper">
+
+    <sql id="Base_Column_List" >
+	    ID, USERID, LOTTERY_CODE, ORDER_CODE, 
+	    FILE_URL, UPLOAD_RESULT, SESSION_TYPE, 
+	    OPERATION_TYPE, SHIFT_TYPE, SHIFT,
+	    FILE_FORMAT, DESCRIBE, CREATE_TIME
+    </sql>
+    
+     <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.singleupload.bo.SingleUploadLogBO">
+	    <id column="ID" jdbcType="INTEGER" property="id" />
+	    <result column="USERID" jdbcType="INTEGER" property="userId"/>
+	    <result column="LOTTERY_CODE" jdbcType="INTEGER" property="lotteryCode" />
+	    <result column="FILE_URL" jdbcType="VARCHAR" property="fileUrl" />
+	    <result column="UPLOAD_RESULT" jdbcType="INTEGER" property="uploadResult" />
+	    <result column="SESSION_TYPE" jdbcType="INTEGER" property="sessionType" />
+	    <result column="OPERATION_TYPE" jdbcType="INTEGER" property="operationType" />
+	    <result column="SHIFT_TYPE" jdbcType="INTEGER" property="shiftType" />
+	    <result column="SHIFT" jdbcType="VARCHAR" property="shift" />
+	    <result column="FILE_FORMAT" jdbcType="INTEGER" property="fileFormat" />
+	    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+	    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+	</resultMap> 
+    
+    <select id="findSingleUploadLogInfo" parameterType="com.hhly.skeleton.lotto.base.singleupload.vo.SingleUploadLogVO" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from SINGLE_UPLOAD_LOG
+		where LOTTERY_CODE = #{lotteryCode}
+		and  USERID = #{userId}
+	    <if test="orderCode != null" >
+	        and ORDER_CODE = #{orderCode,jdbcType=VARCHAR}
+	    </if>
+		<if test="sessionType != null" >
+			and SESSION_TYPE = #{sessionType,jdbcType=DECIMAL}
+		</if> 
+		<if test="operationType != null" >
+	        and OPERATION_TYPE = #{operationType,jdbcType=DECIMAL}
+	    </if>
+		order by CREATE_TIME asc
+	</select>
+     
+    <insert id="insertOrderFlowInfo" parameterType="com.hhly.lottocore.persistence.singleupload.po.SingleUploadLogPO">
+        insert into SINGLE_UPLOAD_LOG
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+	        <if test="null!=userId">
+	            USERID,
+	        </if>
+	        <if test="null!=lotteryCode">
+	            LOTTERY_CODE,
+	        </if>
+<!-- 	        <if test="null!=lotteryChildCode">
+	            LOTTERY_CHILD_CODE,
+	        </if> -->
+	        <if test="null!=orderCode">
+	            ORDER_CODE,
+	        </if>
+	        <if test="null!=fileUrl">
+	            FILE_URL,
+	        </if>
+	        <if test="null!=uploadResult">
+	            UPLOAD_RESULT,
+	        </if>
+	        <if test="null!=sessionType">
+	            SESSION_TYPE,
+	        </if>
+	        <if test="null!=operationType">
+	            OPERATION_TYPE,
+	        </if>
+	        <if test="null!=shiftType">
+	            SHIFT_TYPE,
+	        </if>
+	        <if test="null!=shift">
+	            SHIFT,
+	        </if>
+	        <if test="null!=fileFormat">
+	            FILE_FORMAT,
+	        </if>
+	        <if test="null!=describe">
+	            DESCRIBE,
+	        </if>
+	        <if test="null!=createTime">
+	            CREATE_TIME,
+	        </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+	        <if test="null!=userId">
+	            #{userId,jdbcType=INTEGER},
+	        </if>
+	        <if test="null!=lotteryCode">
+	            #{lotteryCode,jdbcType=INTEGER},
+	        </if>
+	      <!--   <if test="null!=lotteryChildCode">
+	            #{lotteryChildCode,jdbcType=INTEGER},
+	        </if> -->
+	        <if test="null!=orderCode">
+	            #{orderCode,jdbcType=VARCHAR},
+	        </if>
+	        <if test="null!=fileUrl">
+	            #{fileUrl,jdbcType=VARCHAR},
+	        </if>
+	        <if test="null!=uploadResult">
+	            #{uploadResult,jdbcType=INTEGER},
+	        </if>
+	        <if test="null!=sessionType">
+	            #{sessionType,jdbcType=INTEGER},
+	        </if>
+	        <if test="null!=operationType">
+	            #{operationType,jdbcType=INTEGER},
+	        </if>
+	        <if test="null!=shiftType">
+	            #{shiftType,jdbcType=INTEGER},
+	        </if>
+	        <if test="null!=shift">
+	            #{shift,jdbcType=VARCHAR},
+	        </if>
+	        <if test="null!=fileFormat">
+	            #{shiftFormat,jdbcType=INTEGER},
+	        </if>
+	        <if test="null!=describe">
+	            #{describe,jdbcType=VARCHAR},
+	        </if>
+	        <if test="null!=createTime">
+	            now(),
+	        </if>
+        </trim>
+    </insert>
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.agent.dao.AgentRebateDaoMapper">
+
+	<!-- 排序  -->
+	<sql id="Order_SQL">
+		<if test = "sortField != null and sortOrder !=null">
+			ORDER BY ${sortField} ${sortOrder}
+		</if>
+	</sql>
+
+	<!-- 分页 -->
+	<sql id="Page_SQL">
+		LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+	</sql>
+
+	<resultMap type="com.hhly.skeleton.lotto.base.agent.bo.AgentRebateInfoBO" id="AgentRebateMap">
+		<result property="id" column="id" jdbcType="INTEGER"/>
+		<result property="addTime" column="add_time" jdbcType="TIMESTAMP"/>
+		<result property="remark" column="remark" jdbcType="VARCHAR"/>
+		<!--
+		<collection property="agentRebateConfigs" column="id" ofType="com.hhly.skeleton.lotto.base.agent.bo.AgentRebateConfigInfoBO">
+			<result property="agentMaxMoney" column="agent_max_money" jdbcType="DECIMAL"/>
+			<result property="agentMinMoney" column="agent_min_money" jdbcType="DECIMAL"/>
+			<result property="agentRatio" column="agent_ratio" jdbcType="DECIMAL"/>
+			<result property="directMaxMoney" column="direct_max_money" jdbcType="DECIMAL"/>
+			<result property="directMinMoney" column="direct_min_money" jdbcType="DECIMAL"/>
+			<result property="directRatio" column="direct_ratio" jdbcType="DECIMAL"/>
+		</collection>
+		-->
+		<collection property="agentRebateConfigs" column="id" select="selectAgentRebateByRebateId">
+			<result column="agent_max_money" jdbcType="DECIMAL"/>
+			<result column="agent_min_money" jdbcType="DECIMAL"/>
+			<result column="agent_ratio" jdbcType="DECIMAL"/>
+			<result column="direct_max_money" jdbcType="DECIMAL"/>
+			<result column="direct_min_money" jdbcType="DECIMAL"/>
+			<result column="direct_ratio" jdbcType="DECIMAL"/>
+		</collection>
+	</resultMap>
+
+	<resultMap id="AgentRebateConfigMap" type="com.hhly.skeleton.lotto.base.agent.bo.AgentRebateConfigInfoBO">
+		<result property="agentMaxMoney" column="agent_max_money" jdbcType="DECIMAL"/>
+		<result property="agentMinMoney" column="agent_min_money" jdbcType="DECIMAL"/>
+		<result property="agentRatio" column="agent_ratio" jdbcType="DECIMAL"/>
+		<result property="directMaxMoney" column="direct_max_money" jdbcType="DECIMAL"/>
+		<result property="directMinMoney" column="direct_min_money" jdbcType="DECIMAL"/>
+		<result property="directRatio" column="direct_ratio" jdbcType="DECIMAL"/>
+	</resultMap>
+
+	<select id="selectAgentRebateByRebateId" resultMap="AgentRebateConfigMap">
+		SELECT * FROM(
+		SELECT
+			agent_max_money,
+		    agent_min_money,
+			agent_ratio,
+			direct_max_money,
+			<!-- direct_min_money为空处理 -->
+			IF(IFNULL(direct_min_money,1)=1,99999999999999,direct_min_money) orderBy,
+			direct_min_money,
+			direct_ratio
+		FROM agent_rebate_config WHERE rebate_id = #{rebateId}) a ORDER BY orderBy
+	</select>
+
+	<!-- 根据用户ID，获取对应的代理返佣配置信息 -->
+	<select id="selectAgentRebateByUserId" parameterType="com.hhly.skeleton.lotto.base.agent.vo.AgentQueryVO" resultMap="AgentRebateMap">
+		SELECT
+		a.id,
+		a.add_time,
+		a.remark
+		FROM agent_rebate a
+		INNER JOIN agent_info b ON a.agent_id = b.id
+		WHERE 1=1 AND b.user_id = #{userId}
+		<if test="defaultFlag != null">
+			AND a.default_flag = #{defaultFlag}
+		</if>
+		<include refid="Order_SQL"/>
+		<include refid="Page_SQL"/>
+	</select>
+
+	<!-- 默认配置 -->
+	<select id="selectDefaultAgentRebate" resultMap="AgentRebateMap">
+		SELECT a.id,a.add_time,a.remark FROM agent_rebate a WHERE default_flag = 1
+	</select>
+</mapper>

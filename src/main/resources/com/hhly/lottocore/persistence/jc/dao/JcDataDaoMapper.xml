@@ -1,0 +1,1406 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.jc.dao.JcDataDaoMapper">
+
+    <!-- 排序  -->
+    <sql id="Order_SQL">
+        <if test = "sortField != null and sortOrder !=null">
+            ORDER BY ${sortField} ${sortOrder}
+        </if>
+    </sql>
+
+    <!-- 分页 -->
+    <sql id="Page_SQL">
+        LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </sql>
+
+    <!-- 对阵基列 -->
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.JczqDaoBO">
+        <id column="id" property="id" jdbcType="DECIMAL"></id>
+        <result column="lottery_code" property="lotteryCode" jdbcType="VARCHAR"/>
+        <result column="issue_code" property="issueCode" jdbcType="VARCHAR"/>
+        <result column="sport_match_info_id" property="sportMatchInfoId" jdbcType="DECIMAL"/>
+        <result column="home_team_id" property="homeTeamId" jdbcType="DECIMAL"/>
+        <result column="visiti_team_id" property="visitiTeamId" jdbcType="DECIMAL"/>
+        <result column="match_analysis_url" property="matchAnalysisUrl" jdbcType="VARCHAR"/>
+        <result column="match_info_url" property="matchInfoUrl" jdbcType="VARCHAR"/>
+        <result column="is_recommend" property="isRecommend" jdbcType="DECIMAL"/>
+        <result column="match_label_color" property="matchLabelColor" jdbcType="VARCHAR"/>
+        <result column="official_match_code" property="officialMatchCode" jdbcType="VARCHAR"/>
+        <result column="week" property="week" jdbcType="VARCHAR"/>
+        <result column="num" property="num" jdbcType="VARCHAR"/>
+        <result column="system_code" property="systemCode" jdbcType="VARCHAR"/>
+        <result column="match_status" property="matchStatus" jdbcType="DECIMAL"/>
+        <result column="official_id" property="officialId" jdbcType="VARCHAR"/>
+        <result column="start_time" property="startTimeStamp" jdbcType="TIMESTAMP"/>
+        <result column="date" property="date" jdbcType="VARCHAR"/>
+        <result column="time" property="time" jdbcType="VARCHAR"/>
+        <result column="sale_end_time" property="saleEndTime" jdbcType="TIMESTAMP"/>
+        <result column="sale_end_time" property="saleEndDate" jdbcType="TIMESTAMP"/>
+        <result column="sale_end_time" property="saleEndTimeStamp" jdbcType="TIMESTAMP"/>
+        <result column="is_neutral" property="isNeutral" jdbcType="DECIMAL"/>
+        <result column="is_recommend" property="isRecommend" jdbcType="DECIMAL"/>
+        <result column="stadium" property="stadium" jdbcType="VARCHAR"/>
+        <result column="weather" property="weather" jdbcType="VARCHAR"/>
+        <result column="round" property="round" jdbcType="VARCHAR"/>
+        <result column="gameweek" property="gameweek" jdbcType="VARCHAR"/>
+
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="odds_win" property="oddsWin" jdbcType="DECIMAL"/>
+        <result column="odds_draw" property="oddsDraw" jdbcType="DECIMAL"/>
+        <result column="odds_fail" property="oddsFail" jdbcType="DECIMAL"/>
+        <result column="match_full_name" property="matchFullName" jdbcType="VARCHAR"/>
+        <result column="match_short_name" property="matchShortName" jdbcType="VARCHAR"/>
+        <result column="match_data_url" property="matchDataUrl" jdbcType="VARCHAR"/>
+        <result column="matchLogo" property="matchLogo" jdbcType="VARCHAR"/>
+        <result column="homeFullName" property="homeFullName" jdbcType="VARCHAR"/>
+        <result column="homeShortName" property="homeShortName" jdbcType="VARCHAR"/>
+        <result column="homeDataUrl" property="homeDataUrl" jdbcType="VARCHAR"/>
+        <result column="homeOrder" property="homeOrder" jdbcType="VARCHAR"/>
+        <result column="homeLogo" property="homeLogo" jdbcType="VARCHAR"/>
+        <result column="guestFullName" property="guestFullName" jdbcType="VARCHAR"/>
+        <result column="guestShortName" property="guestShortName" jdbcType="VARCHAR"/>
+        <result column="guestDataUrl" property="guestDataUrl" jdbcType="VARCHAR"/>
+        <result column="guestOrder" property="guestOrder" jdbcType="VARCHAR"/>
+        <result column="guestLogo" property="guestLogo" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 竞彩足球对阵 -->
+    <resultMap id="JczqResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.JczqDaoBO" extends="BaseResultMap">
+        <result column="sale_date" property="saleDate" jdbcType="VARCHAR"/>
+        <result column="five_league" property="fiveLeague" jdbcType="DECIMAL"/>
+        <result column="half_score" property="halfScore" jdbcType="VARCHAR"/>
+        <result column="full_score" property="fullScore" jdbcType="VARCHAR"/>
+        <result column="full_spf" property="fullSpf" jdbcType="VARCHAR"/>
+        <result column="let_spf" property="letSpf" jdbcType="VARCHAR"/>
+        <result column="score" property="scoreResult" jdbcType="VARCHAR"/>
+        <result column="goal_num" property="goalNum" jdbcType="VARCHAR"/>
+        <result column="hf_wdf" property="hfWdf" jdbcType="VARCHAR"/>
+        <result column="status_wdf" property="statusWdf" jdbcType="DECIMAL"/>
+        <result column="status_let_wdf" property="statusLetWdf" jdbcType="DECIMAL"/>
+        <result column="status_goal" property="statusGoal" jdbcType="DECIMAL"/>
+        <result column="status_hf_wdf" property="statusHfWdf" jdbcType="DECIMAL"/>
+        <result column="status_score" property="statusScore" jdbcType="DECIMAL"/>
+        <result column="newest_let_num" property="newestLetNum" jdbcType="DECIMAL"/>
+        <result column="newest_let_sp_win" property="newestLetSpWin" jdbcType="DECIMAL"/>
+        <result column="newest_let_sp_draw" property="newestLetSpDraw" jdbcType="DECIMAL"/>
+        <result column="newest_let_sp_fail" property="newestLetSpFail" jdbcType="DECIMAL"/>
+        <result column="newest_sp_win" property="newestSpWin" jdbcType="DECIMAL"/>
+        <result column="newest_sp_draw" property="newestSpDraw" jdbcType="DECIMAL"/>
+        <result column="newest_sp_fail" property="newestSpFail" jdbcType="DECIMAL"/>
+
+        <result column="newest_sp_0_goal" property="newestSp0Goal" jdbcType="DECIMAL"/>
+        <result column="newest_sp_1_goal" property="newestSp1Goal" jdbcType="DECIMAL"/>
+        <result column="newest_sp_2_goal" property="newestSp2Goal" jdbcType="DECIMAL"/>
+        <result column="newest_sp_3_goal" property="newestSp3Goal" jdbcType="DECIMAL"/>
+        <result column="newest_sp_4_goal" property="newestSp4Goal" jdbcType="DECIMAL"/>
+        <result column="newest_sp_5_goal" property="newestSp5Goal" jdbcType="DECIMAL"/>
+        <result column="newest_sp_6_goal" property="newestSp6Goal" jdbcType="DECIMAL"/>
+        <result column="newest_sp_7_goal" property="newestSp7Goal" jdbcType="DECIMAL"/>
+
+        <result column="newest_sp_w_w" property="newestSpWW" jdbcType="DECIMAL"/>
+        <result column="newest_sp_w_d" property="newestSpWD" jdbcType="DECIMAL"/>
+        <result column="newest_sp_w_f" property="newestSpWF" jdbcType="DECIMAL"/>
+        <result column="newest_sp_d_w" property="newestSpDW" jdbcType="DECIMAL"/>
+        <result column="newest_sp_d_d" property="newestSpDD" jdbcType="DECIMAL"/>
+        <result column="newest_sp_d_f" property="newestSpDF" jdbcType="DECIMAL"/>
+        <result column="newest_sp_f_w" property="newestSpFW" jdbcType="DECIMAL"/>
+        <result column="newest_sp_f_d" property="newestSpFD" jdbcType="DECIMAL"/>
+        <result column="newest_sp_f_f" property="newestSpFF" jdbcType="DECIMAL"/>
+
+        <result column="newest_sp_1_0" property="newestSp10" jdbcType="DECIMAL"/>
+        <result column="newest_sp_2_0" property="newestSp20" jdbcType="DECIMAL"/>
+        <result column="newest_sp_2_1" property="newestSp21" jdbcType="DECIMAL"/>
+        <result column="newest_sp_3_0" property="newestSp30" jdbcType="DECIMAL"/>
+        <result column="newest_sp_3_1" property="newestSp31" jdbcType="DECIMAL"/>
+        <result column="newest_sp_3_2" property="newestSp32" jdbcType="DECIMAL"/>
+        <result column="newest_sp_4_0" property="newestSp40" jdbcType="DECIMAL"/>
+        <result column="newest_sp_4_1" property="newestSp41" jdbcType="DECIMAL"/>
+        <result column="newest_sp_4_2" property="newestSp42" jdbcType="DECIMAL"/>
+        <result column="newest_sp_5_0" property="newestSp50" jdbcType="DECIMAL"/>
+        <result column="newest_sp_5_1" property="newestSp51" jdbcType="DECIMAL"/>
+        <result column="newest_sp_5_2" property="newestSp52" jdbcType="DECIMAL"/>
+        <result column="newest_sp_w_other" property="newestSpWOther" jdbcType="DECIMAL"/>
+
+        <result column="newest_sp_0_0" property="newestSp00" jdbcType="DECIMAL"/>
+        <result column="newest_sp_1_1" property="newestSp11" jdbcType="DECIMAL"/>
+        <result column="newest_sp_2_2" property="newestSp22" jdbcType="DECIMAL"/>
+        <result column="newest_sp_3_3" property="newestSp33" jdbcType="DECIMAL"/>
+        <result column="newest_sp_d_other" property="newestSpDOther" jdbcType="DECIMAL"/>
+
+        <result column="newest_sp_0_1" property="newestSp01" jdbcType="DECIMAL"/>
+        <result column="newest_sp_0_2" property="newestSp02" jdbcType="DECIMAL"/>
+        <result column="newest_sp_1_2" property="newestSp12" jdbcType="DECIMAL"/>
+        <result column="newest_sp_0_3" property="newestSp03" jdbcType="DECIMAL"/>
+        <result column="newest_sp_1_3" property="newestSp13" jdbcType="DECIMAL"/>
+        <result column="newest_sp_2_3" property="newestSp23" jdbcType="DECIMAL"/>
+        <result column="newest_sp_0_4" property="newestSp04" jdbcType="DECIMAL"/>
+        <result column="newest_sp_1_4" property="newestSp14" jdbcType="DECIMAL"/>
+        <result column="newest_sp_2_4" property="newestSp24" jdbcType="DECIMAL"/>
+        <result column="newest_sp_0_5" property="newestSp05" jdbcType="DECIMAL"/>
+        <result column="newest_sp_1_5" property="newestSp15" jdbcType="DECIMAL"/>
+        <result column="newest_sp_2_5" property="newestSp25" jdbcType="DECIMAL"/>
+        <result column="newest_sp_f_other" property="newestSpFOther" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <!-- 竞彩足球订单详情对阵 -->
+    <resultMap id="JczqOrderResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.JczqOrderBO" extends="BaseResultMap">
+        <result column="half_score" property="halfScore" jdbcType="VARCHAR"/>
+        <result column="full_score" property="fullScore" jdbcType="VARCHAR"/>
+        <result column="let_num" property="letNum" jdbcType="VARCHAR"/>
+        <result column="full_spf" property="fullSpf" jdbcType="VARCHAR"/>
+        <result column="let_spf" property="letSpf" jdbcType="VARCHAR"/>
+        <result column="score" property="score" jdbcType="VARCHAR"/>
+        <result column="goal_num" property="goalNum" jdbcType="VARCHAR"/>
+        <result column="hf_wdf" property="hfWdf" jdbcType="VARCHAR"/>
+        <result column="status_wdf" property="statusWdf" jdbcType="DECIMAL"/>
+        <result column="status_let_wdf" property="statusLetWdf" jdbcType="DECIMAL"/>
+        <result column="status_goal" property="statusGoal" jdbcType="DECIMAL"/>
+        <result column="status_hf_wdf" property="statusHfWdf" jdbcType="DECIMAL"/>
+        <result column="status_score" property="statusScore" jdbcType="DECIMAL"/>
+        <result column="newest_let_num" property="newestLetNum" jdbcType="DECIMAL"/>
+        <result column="newest_let_sp_win" property="newestLetSpWin" jdbcType="DECIMAL"/>
+        <result column="newest_let_sp_draw" property="newestLetSpDraw" jdbcType="DECIMAL"/>
+        <result column="newest_let_sp_fail" property="newestLetSpFail" jdbcType="DECIMAL"/>
+        <result column="newest_sp_win" property="newestSpWin" jdbcType="DECIMAL"/>
+        <result column="newest_sp_draw" property="newestSpDraw" jdbcType="DECIMAL"/>
+        <result column="newest_sp_fail" property="newestSpFail" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <!-- 获取让球胜平负历史SP值 -->
+    <resultMap id="JczqWdfSPResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.SportDataFbWDFBO">
+        <result column="sport_against_info_id" property="sportAgainstInfoId"/>
+        <result column="let_num" property="letNum" jdbcType="DECIMAL"/>
+        <result column="sp_win" property="spWin" jdbcType="DECIMAL"/>
+        <result column="sp_draw" property="spDraw" jdbcType="DECIMAL"/>
+        <result column="sp_fail" property="spFail" jdbcType="DECIMAL"/>
+        <result column="sp_type" property="spType" jdbcType="DECIMAL"/>
+        <result column="release_time" property="releaseTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <!-- 竞彩篮球对阵数据 -->
+    <resultMap id="JclqResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.JclqDaoBO" extends="BaseResultMap">
+        <result column="sale_date" property="saleDate" jdbcType="VARCHAR"/>
+        <result column="full_score" property="fullScore" jdbcType="VARCHAR"/>
+        <result column="full_wf" property="fullWf" jdbcType="VARCHAR"/>
+        <result column="let_wf" property="letWf" jdbcType="VARCHAR"/>
+        <result column="size_score" property="sizeScore" jdbcType="VARCHAR"/>
+        <result column="win_score" property="winScore" jdbcType="VARCHAR"/>
+
+        <result column="first_score" property="firstScore" jdbcType="VARCHAR"/>
+        <result column="second_score" property="secondScore" jdbcType="VARCHAR"/>
+        <result column="third_score" property="thirdScore" jdbcType="VARCHAR"/>
+        <result column="fourth_score" property="fourthScore" jdbcType="VARCHAR"/>
+        <result column="out_time_score" property="outTimeScore" jdbcType="VARCHAR"/>
+        <result column="status_wf" property="statusWf" jdbcType="DECIMAL"/>
+        <result column="status_let_wf" property="statusLetWf" jdbcType="DECIMAL"/>
+        <result column="status_big_small" property="statusBigSmall" jdbcType="DECIMAL"/>
+        <result column="status_score_wf" property="statusScoreWf" jdbcType="DECIMAL"/>
+        <result column="newest_let_score" jdbcType="DECIMAL" property="newestLetScore"/>
+        <result column="newest_let_sp_win" jdbcType="DECIMAL" property="newestLetSpWin"/>
+        <result column="newest_let_sp_fail" jdbcType="DECIMAL" property="newestLetSpFail"/>
+        <result column="newest_sp_win" jdbcType="DECIMAL" property="newestSpWin"/>
+        <result column="newest_sp_fail" jdbcType="DECIMAL" property="newestSpFail"/>
+        <result column="newest_preset_score" jdbcType="DECIMAL" property="newestPresetScore"/>
+        <result column="newest_sp_big" jdbcType="DECIMAL" property="newestSpBig"/>
+        <result column="newest_sp_small" jdbcType="DECIMAL" property="newestSpSmall"/>
+        <result column="newest_sp_win_1_5" jdbcType="DECIMAL" property="newestSpWin15"/>
+        <result column="newest_sp_win_6_10" jdbcType="DECIMAL" property="newestSpWin610"/>
+        <result column="newest_sp_win_11_15" jdbcType="DECIMAL" property="newestSpWin1115"/>
+        <result column="newest_sp_win_16_20" jdbcType="DECIMAL" property="newestSpWin1620"/>
+        <result column="newest_sp_win_21_25" jdbcType="DECIMAL" property="newestSpWin2125"/>
+        <result column="newest_sp_win_26" jdbcType="DECIMAL" property="newestSpWin26"/>
+        <result column="newest_sp_fail_1_5" jdbcType="DECIMAL" property="newestSpFail15"/>
+        <result column="newest_sp_fail_6_10" jdbcType="DECIMAL" property="newestSpFail610"/>
+        <result column="newest_sp_fail_11_15" jdbcType="DECIMAL" property="newestSpFail1115"/>
+        <result column="newest_sp_fail_16_20" jdbcType="DECIMAL" property="newestSpFail1620"/>
+        <result column="newest_sp_fail_21_25" jdbcType="DECIMAL" property="newestSpFail2125"/>
+        <result column="newest_sp_fail_26" jdbcType="DECIMAL" property="newestSpFail26"/>
+    </resultMap>
+
+    <!-- 竞彩足球订单详情对阵 -->
+    <resultMap id="JclqOrderResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.JclqOrderBO" extends="BaseResultMap">
+        <result column="first_score" property="firstScore" jdbcType="VARCHAR"/>
+        <result column="second_score" property="secondScore" jdbcType="VARCHAR"/>
+        <result column="third_score" property="thirdScore" jdbcType="VARCHAR"/>
+        <result column="fourth_score" property="fourthScore" jdbcType="VARCHAR"/>
+        <result column="out_time_score" property="outTimeScore" jdbcType="VARCHAR"/>
+        <result column="full_score" property="fullScore" jdbcType="VARCHAR"/>
+        <result column="full_wf" property="fullWf" jdbcType="VARCHAR"/>
+        <result column="let_wf" property="letWf" jdbcType="VARCHAR"/>
+        <result column="size_score" property="sizeScore" jdbcType="VARCHAR"/>
+        <result column="win_score" property="winScore" jdbcType="VARCHAR"/>
+        <result column="status_wf" property="statusWf" jdbcType="DECIMAL"/>
+        <result column="status_let_wf" property="statusLetWf" jdbcType="DECIMAL"/>
+        <result column="status_big_small" property="statusBigSmall" jdbcType="DECIMAL"/>
+        <result column="status_score_wf" property="statusScoreWf" jdbcType="DECIMAL"/>
+        <result column="newest_let_score" jdbcType="DECIMAL" property="newestLetScore"/>
+        <result column="newest_let_sp_win" jdbcType="DECIMAL" property="newestLetSpWin"/>
+        <result column="newest_let_sp_fail" jdbcType="DECIMAL" property="newestLetSpFail"/>
+        <result column="newest_sp_win" jdbcType="DECIMAL" property="newestSpWin"/>
+        <result column="newest_sp_fail" jdbcType="DECIMAL" property="newestSpFail"/>
+        <result column="newest_preset_score" jdbcType="DECIMAL" property="newestPresetScore"/>
+        <result column="newest_sp_big" jdbcType="DECIMAL" property="newestSpBig"/>
+        <result column="newest_sp_small" jdbcType="DECIMAL" property="newestSpSmall"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <!-- 赛事所拥有的对阵数量 -->
+    <resultMap id="matchTotalResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.MatchDataBO">
+        <id column="id" property="id" jdbcType="DECIMAL"/>
+        <result column="total" property="total" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <!-- 对阵列名 -->
+    <sql id="SELECT_COLUMN">
+        a.id,
+        a.lottery_code,
+        a.issue_code,
+        a.sport_match_info_id,
+        a.home_team_id,
+        a.visiti_team_id,
+        a.match_analysis_url,
+        a.match_info_url,
+        a.is_recommend,
+        d.match_color as match_label_color,
+        a.official_match_code,
+        substring(a.official_match_code,1,2) as week,
+        substring(a.official_match_code,3,3) as num,
+        a.system_code,
+        a.match_status,
+        a.official_id,
+        a.start_time,
+        date_format(a.start_time, '%Y-%m-%d') as date,
+        date_format(a.start_time, '%H:%i') as time,
+        a.sale_end_time,
+        a.is_neutral,
+        a.is_recommend,
+        a.stadium,
+        a.weather,
+        a.remark,
+        a.odds_win,
+        a.odds_draw,
+        a.odds_fail,
+        d.match_full_name,
+        d.match_short_name,
+        d.match_data_url,
+        d.five_league,
+        d.logo_url as matchLogo,
+        a.home_name as homeFullName,
+        e.team_short_name as homeShortName,
+        e.team_data_url as homeDataUrl,
+        e.team_order as homeOrder,
+        e.logo_url as homeLogo,
+        a.visiti_name as guestFullName,
+        f.team_short_name as guestShortName,
+        f.team_data_url as guestDataUrl,
+        f.team_order as guestOrder,
+        f.logo_url as guestLogo,
+    </sql>
+
+    <!--  世界杯：冠军、冠亚军查询-->
+    <resultMap id="gjDataResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.GjDataBO">
+        <id column="id" property="id" jdbcType="DECIMAL"/>
+        <result column="issue_code" property="issueCode" jdbcType="VARCHAR"/>
+        <result column="system_code" property="systemCode" jdbcType="VARCHAR"/>
+        <result column="match_name" property="matchName" jdbcType="VARCHAR"/>
+        <result column="match_status" property="matchStatus" jdbcType="DECIMAL"/>
+        <result column="home_name" property="homeName" jdbcType="VARCHAR"/>
+        <result column="visiti_name" property="visitiName" jdbcType="VARCHAR"/>
+        <result column="gl" property="gl" jdbcType="VARCHAR"/>
+        <result column="sp" property="sp" jdbcType="VARCHAR"/>
+        <result column="home_team_id" property="homeTeamId" jdbcType="DECIMAL"/>
+        <result column="visiti_team_id" property="visitiTeamId" jdbcType="DECIMAL"/>
+        <result column="home_team_logo" property="homeLogo" jdbcType="VARCHAR"/>
+        <result column="visiti_team_logo" property="visitiLogo" jdbcType="VARCHAR"/>
+        <result column="home_id" property="homeId" jdbcType="DECIMAL"/>
+        <result column="guest_id" property="guestId" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <!-- 查询投注竞彩足球对阵以及SP值数据 -->
+    <select id="findJczqData" resultMap="JczqResultMap" parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select
+        <include refid="SELECT_COLUMN"/>
+        date_format(a.sale_date,'%Y-%m-%d') as sale_date,
+        g.full_score,
+        half_score,
+        let_num,
+        full_spf,
+        let_spf,
+        score,
+        goal_num,
+        hf_wdf,
+        status_wdf,
+        status_let_wdf,
+        status_goal,
+        status_hf_wdf,
+        status_score,
+        newest_let_num,
+        newest_let_sp_win,
+        newest_let_sp_draw,
+        newest_let_sp_fail,
+        newest_sp_win,
+        newest_sp_draw,
+        newest_sp_fail,
+
+        newest_sp_0_goal,
+        newest_sp_1_goal,
+        newest_sp_2_goal,
+        newest_sp_3_goal,
+        newest_sp_4_goal,
+        newest_sp_5_goal,
+        newest_sp_6_goal,
+        newest_sp_7_goal,
+
+        newest_sp_w_w, newest_sp_w_d, newest_sp_w_f,
+        newest_sp_d_w, newest_sp_d_d, newest_sp_d_f,
+        newest_sp_f_w, newest_sp_f_d, newest_sp_f_f,
+        newest_sp_1_0, newest_sp_2_0, newest_sp_2_1,
+        newest_sp_3_0, newest_sp_3_1, newest_sp_3_2,
+        newest_sp_4_0, newest_sp_4_1, newest_sp_4_2,
+        newest_sp_5_0, newest_sp_5_1, newest_sp_5_2,
+        newest_sp_w_other,
+        newest_sp_0_0, newest_sp_1_1, newest_sp_2_2,
+        newest_sp_3_3, newest_sp_d_other,
+        newest_sp_0_1, newest_sp_0_2, newest_sp_1_2,
+        newest_sp_0_3, newest_sp_1_3, newest_sp_2_3,
+        newest_sp_0_4, newest_sp_1_4, newest_sp_2_4,
+        newest_sp_0_5, newest_sp_1_5, newest_sp_2_5,
+        newest_sp_f_other
+        from sport_against_info a
+        inner join sport_status_fb b on a.id=b.sport_against_info_id
+        inner join sport_data_fb_sp c on a.id=c.sport_against_info_id
+        inner join sport_match_info d on a.sport_match_info_id=d.id and d.match_type=${matchType}
+        inner join sport_team_info e on a.home_team_id=e.id and e.team_type=${matchType}
+        inner join sport_team_info f on a.visiti_team_id=f.id and f.team_type=${matchType}
+        left join sport_draw_fb g on a.id=g.sport_against_info_id
+        where a.lottery_code=#{lotteryCode}
+        <include refid="jcWhere"/>
+
+        order by start_time ASC ,system_code asc
+    </select>
+
+    <!-- 查询当前彩期竞彩足球投注页已经截止的赛事数量 -->
+    <select id="findJcSaleEndDataTotal" resultType="java.lang.Integer"
+            parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select count(1) from sport_against_info
+        where lottery_code=#{lotteryCode}
+        and issue_code=(select issue_code from lottery_issue where lottery_code=#{lotteryCode} and current_issue=1)
+        <![CDATA[ and sale_end_time <= now()
+        ]]>
+    </select>
+
+    <!-- 查询当前彩期竞彩足球投注页已经截止的赛事 -->
+    <select id="findJczqSaleEndData" resultMap="JczqResultMap"
+            parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select
+        <include refid="SELECT_COLUMN"/>
+        date_format(a.sale_date,'%Y-%m-%d') as sale_date,
+        g.full_score,
+        half_score,
+        let_num,
+        full_spf,
+        let_spf,
+        score,
+        goal_num,
+        hf_wdf,
+        status_wdf,
+        status_let_wdf,
+        status_goal,
+        status_hf_wdf,
+        status_score,
+        newest_let_num,
+        newest_let_sp_win,
+        newest_let_sp_draw,
+        newest_let_sp_fail,
+        newest_sp_win,
+        newest_sp_draw,
+        newest_sp_fail,
+
+        newest_sp_0_goal,
+        newest_sp_1_goal,
+        newest_sp_2_goal,
+        newest_sp_3_goal,
+        newest_sp_4_goal,
+        newest_sp_5_goal,
+        newest_sp_6_goal,
+        newest_sp_7_goal,
+
+        newest_sp_w_w, newest_sp_w_d, newest_sp_w_f,
+        newest_sp_d_w, newest_sp_d_d, newest_sp_d_f,
+        newest_sp_f_w, newest_sp_f_d, newest_sp_f_f,
+        newest_sp_1_0, newest_sp_2_0, newest_sp_2_1,
+        newest_sp_3_0, newest_sp_3_1, newest_sp_3_2,
+        newest_sp_4_0, newest_sp_4_1, newest_sp_4_2,
+        newest_sp_5_0, newest_sp_5_1, newest_sp_5_2,
+        newest_sp_w_other,
+        newest_sp_0_0, newest_sp_1_1, newest_sp_2_2,
+        newest_sp_3_3, newest_sp_d_other,
+        newest_sp_0_1, newest_sp_0_2, newest_sp_1_2,
+        newest_sp_0_3, newest_sp_1_3, newest_sp_2_3,
+        newest_sp_0_4, newest_sp_1_4, newest_sp_2_4,
+        newest_sp_0_5, newest_sp_1_5, newest_sp_2_5,
+        newest_sp_f_other
+        from sport_against_info a
+        inner join sport_status_fb b on a.id=b.sport_against_info_id
+        inner join sport_data_fb_sp c on a.id=c.sport_against_info_id
+        inner join sport_match_info d on a.sport_match_info_id=d.id and d.match_type=${matchType}
+        inner join sport_team_info e on a.home_team_id=e.id and e.team_type=${matchType}
+        inner join sport_team_info f on a.visiti_team_id=f.id and f.team_type=${matchType}
+        left join sport_draw_fb g on a.id=g.sport_against_info_iD
+        where a.lottery_code=#{lotteryCode}
+        and a.issue_code=(select issue_code from lottery_issue where lottery_code=#{lotteryCode} and current_issue=1)
+        <![CDATA[ and sale_end_time <= now()  ]]>
+        order by start_time ASC ,system_code asc
+    </select>
+
+    <!-- 查询竞彩足球订单详细 -->
+    <select id="findJczqOrderDataBySystemCode" resultMap="JczqOrderResultMap"
+            parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select
+        <include refid="SELECT_COLUMN"/>
+        half_score,
+        full_score,
+        let_num,
+        full_spf,
+        let_spf,
+        score,
+        goal_num,
+        hf_wdf,
+        status_wdf,
+        status_let_wdf,
+        status_goal,
+        status_hf_wdf,
+        status_score,
+        newest_let_num,
+        newest_let_sp_win,
+        newest_let_sp_draw,
+        newest_let_sp_fail,
+        newest_sp_win,
+        newest_sp_draw,
+        newest_sp_fail
+        from sport_against_info a
+        inner join sport_status_fb b on a.id=b.sport_against_info_id
+        left join sport_draw_fb c on a.id=c.sport_against_info_id
+        inner join sport_match_info d on a.sport_match_info_id=d.id and d.match_type=${matchType}
+        inner join sport_team_info e on a.home_team_id=e.id and e.team_type=${matchType}
+        inner join sport_team_info f on a.visiti_team_id=f.id and f.team_type=${matchType}
+        inner join sport_data_fb_sp g on a.id=g.sport_against_info_id
+        where a.lottery_code=#{lotteryCode} and a.system_code=#{systemCode}
+        limit 1
+    </select>
+
+    <sql id="jcWhere">
+        <if test="issueCode == null or issueCode == ''">
+            and a.match_status=#{matchStatus}
+            and match_status!=10
+            <![CDATA[ and sale_end_time >= now()  ]]>
+        </if>
+        <if test="issueCode != null and issueCode != ''">
+            and a.issue_code=#{issueCode}
+        </if>
+    </sql>
+
+    <!-- 查询比赛场次 -->
+    <select id="findMatchTotal" resultMap="matchTotalResultMap" parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select a.sport_match_info_id as id,count(1) as total
+        from sport_against_info a
+        where a.lottery_code=#{lotteryCode}
+        <include refid="jcWhere"/>
+        group by sport_match_info_id
+    </select>
+
+    <!-- 查询竞彩胜平负历史SP -->
+    <select id="findJczqWdfSpData" resultMap="JczqWdfSPResultMap">
+        select sport_against_info_id,let_num, sp_win, sp_draw, sp_fail, sp_type, release_time
+        from sport_data_fb_wdf
+        where sport_against_info_id = #{sportAgainstInfoId}
+        order by release_time desc
+    </select>
+
+    <!-- 查询竞彩篮球历史SP值Where 语句 -->
+    <sql id="Jclq_Where_History_Sp">
+        where sport_against_info_id = #{sportAgainstInfoId}
+        order by release_time desc
+    </sql>
+
+    <!-- 竞彩篮球对阵列 -->
+    <sql id="jclq_column">
+        date_format(a.sale_date,'%Y-%m-%d') as sale_date,
+        g.full_score,
+        g.full_wf,
+        g.let_wf,
+        g.size_score,
+        g.win_score,
+        g.first_score,
+        g.second_score,
+        g.third_score,
+        g.fourth_score,
+        g.out_time_score,
+        status_wf,
+        status_let_wf,
+        status_big_small,
+        status_score_wf,
+        newest_let_score,
+        newest_let_sp_win,
+        newest_let_sp_fail,
+        newest_sp_win,
+        newest_sp_fail,
+        newest_preset_score,
+        newest_sp_big,
+        newest_sp_small,
+        newest_sp_win_1_5,
+        newest_sp_win_6_10,
+        newest_sp_win_11_15,
+        newest_sp_win_16_20,
+        newest_sp_win_21_25,
+        newest_sp_win_26,
+        newest_sp_fail_1_5,
+        newest_sp_fail_6_10,
+        newest_sp_fail_11_15,
+        newest_sp_fail_16_20,
+        newest_sp_fail_21_25,
+        newest_sp_fail_26
+    </sql>
+
+
+    <!-- 查询竞彩篮球对阵数据 -->
+    <select id="findJclqData" resultMap="JclqResultMap" parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select
+        <include refid="SELECT_COLUMN"/>
+        <include refid="jclq_column"/>
+        from sport_against_info a
+        inner join sport_status_bb b on a.id=b.sport_against_info_id
+        inner join sport_data_bb_sp c on a.id=c.sport_against_info_id
+        inner join sport_match_info d on a.sport_match_info_id=d.id and d.match_type = ${matchType}
+        inner join sport_team_info e on a.home_team_id=e.id and e.team_type = ${matchType}
+        inner join sport_team_info f on a.visiti_team_id=f.id and f.team_type = ${matchType}
+        left join sport_draw_bb g on a.id=g.sport_against_info_id
+        where a.lottery_code = #{lotteryCode}
+
+        <include refid="jcWhere"/>
+        order by start_time ASC ,system_code asc
+    </select>
+
+
+    <!-- 查询竞彩篮球销售截止对阵数据 -->
+    <select id="findJclqSaleEndData" resultMap="JclqResultMap" parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select
+        <include refid="SELECT_COLUMN"/>
+        <include refid="jclq_column"/>
+        from sport_against_info a
+        inner join sport_status_bb b on a.id=b.sport_against_info_id
+        inner join sport_data_bb_sp c on a.id=c.sport_against_info_id
+        inner join sport_match_info d on a.sport_match_info_id=d.id and d.match_type = ${matchType}
+        inner join sport_team_info e on a.home_team_id=e.id and e.team_type = ${matchType}
+        inner join sport_team_info f on a.visiti_team_id=f.id and f.team_type = ${matchType}
+        left join sport_draw_bb g on a.id=g.sport_against_info_id
+        where a.lottery_code=#{lotteryCode}
+        and a.issue_code=(select issue_code from lottery_issue where lottery_code=#{lotteryCode} and current_issue=1)
+        <![CDATA[ and sale_end_time <= now()  ]]>
+        order by a.system_code
+    </select>
+
+    <!-- 查询竞彩篮球订单详细 -->
+    <select id="findJclqOrderDataBySystemCode" resultMap="JclqOrderResultMap"
+            parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select
+        <include refid="SELECT_COLUMN"/>
+        first_score,
+        second_score,
+        third_score,
+        fourth_score,
+        out_time_score,
+        full_score,
+        full_wf,
+        let_wf,
+        size_score,
+        win_score,
+        status_wf,
+        status_let_wf,
+        status_big_small,
+        status_score_wf,
+        g.newest_let_score,
+        g.newest_let_sp_win,
+        g.newest_let_sp_fail,
+        g.newest_sp_win,
+        g.newest_sp_fail,
+        g.newest_preset_score,
+        g.newest_sp_big,
+        g.newest_sp_small,
+        g.update_time
+        from sport_against_info a
+        inner join sport_status_bb b on a.id=b.sport_against_info_id
+        left join sport_draw_bb c on a.id=c.sport_against_info_id
+        inner join sport_match_info d on a.sport_match_info_id=d.id and d.match_type=${matchType}
+        inner join sport_team_info e on a.home_team_id=e.id and e.team_type=${matchType}
+        inner join sport_team_info f on a.visiti_team_id=f.id and f.team_type=${matchType}
+        inner join sport_data_bb_sp g on a.id=g.sport_against_info_id
+        where a.lottery_code=#{lotteryCode} and a.system_code=#{systemCode}
+        limit 1
+    </select>
+
+    <!-- 竞彩篮球胜负历史SP值ResultMap -->
+    <resultMap id="JclqWfSpResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.SportDataBbWFBO">
+        <result column="sport_against_info_id" property="sportAgainstInfoId" jdbcType="DECIMAL"/>
+        <result column="let_score" property="letScore" jdbcType="DECIMAL"/>
+        <result column="sp_fail" property="spFail" jdbcType="DECIMAL"/>
+        <result column="sp_win" property="spWin" jdbcType="DECIMAL"/>
+        <result column="sp_type" property="spType" jdbcType="DECIMAL"/>
+        <result column="release_time" property="releaseTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 查询竞彩篮球胜负历史SP值 -->
+    <select id="findJclqWfSpData" resultMap="JclqWfSpResultMap">
+        select
+        sport_against_info_id, let_score,
+        sp_fail, sp_win, sp_type,
+        release_time
+        from sport_data_bb_wf
+        <include refid="Jclq_Where_History_Sp"/>
+    </select>
+
+    <!-- 竞彩篮球比分差历史SP值ResultMap -->
+    <resultMap id="JclqWSSpResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.SportDataBbWSBO">
+        <result column="sport_against_info_id" property="sportAgainstInfoId" jdbcType="DECIMAL"/>
+        <result column="sp_fail_1_5" property="spFail15" jdbcType="DECIMAL"/>
+        <result column="sp_fail_6_10" property="spFail610" jdbcType="DECIMAL"/>
+        <result column="sp_fail_11_15" property="spFail1115" jdbcType="DECIMAL"/>
+        <result column="sp_fail_16_20" property="spFail1620" jdbcType="DECIMAL"/>
+        <result column="sp_fail_21_25" property="spFail2125" jdbcType="DECIMAL"/>
+        <result column="sp_fail_26" property="spFail26" jdbcType="DECIMAL"/>
+        <result column="sp_win_1_5" property="spWin15" jdbcType="DECIMAL"/>
+        <result column="sp_win_6_10" property="spWin610" jdbcType="DECIMAL"/>
+        <result column="sp_win_11_15" property="spWin1115" jdbcType="DECIMAL"/>
+        <result column="sp_win_16_20" property="spWin1620" jdbcType="DECIMAL"/>
+        <result column="sp_win_21_25" property="spWin2125" jdbcType="DECIMAL"/>
+        <result column="sp_win_26" property="spWin26" jdbcType="DECIMAL"/>
+        <result column="release_time" property="releaseTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <!-- 查询竞彩篮球比分差历史SP值 -->
+    <select id="findJclqWSSpData" resultMap="JclqWSSpResultMap">
+        select
+        sport_against_info_id, sp_fail_1_5, sp_fail_6_10, sp_fail_11_15,
+        sp_fail_16_20, sp_fail_21_25, sp_fail_26, sp_win_1_5, sp_win_6_10, sp_win_11_15,
+        sp_win_16_20, sp_win_21_25, sp_win_26, release_time
+        from sport_data_bb_ws
+        <include refid="Jclq_Where_History_Sp"/>
+    </select>
+
+
+    <!-- 查看竞彩篮球大小分历史SP值ResultMap -->
+    <resultMap id="JclqWsbSpResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.SportDataBbSSSBO">
+        <result column="sport_against_info_id" property="sportAgainstInfoId" jdbcType="DECIMAL"/>
+        <result column="preset_score" property="presetScore" jdbcType="DECIMAL"/>
+        <result column="sp_big" property="spBig" jdbcType="DECIMAL"/>
+        <result column="sp_small" property="spSmall" jdbcType="DECIMAL"/>
+        <result column="release_time" property="releaseTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 查询竞彩篮球大小分历史SP值 -->
+    <select id="findJclqSssSpData" resultMap="JclqWsbSpResultMap">
+        select
+        sport_against_info_id, preset_score, sp_big, sp_small, release_time
+        from sport_data_bb_bss
+        <include refid="Jclq_Where_History_Sp"/>
+    </select>
+
+    <!-- 竞彩老足彩查询受注赛程数据 -->
+    <resultMap id="JcOldDataResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.JcOldDataBO" extends="BaseResultMap">
+        <result column="half_score" property="halfScore" jdbcType="VARCHAR"></result>
+        <result column="full_score" property="fullScore" jdbcType="VARCHAR"></result>
+        <result column="four_goal" property="fourGoal" jdbcType="VARCHAR"></result>
+        <result column="six_hf_wdf" property="sixHfWdf" jdbcType="VARCHAR"></result>
+        <result column="fourteen_wdf" property="fourteenWdf" jdbcType="VARCHAR"></result>
+    </resultMap>
+
+    <!-- 查询竞彩老足彩查询受注赛程数据 -->
+    <select id="findJcOldData" resultMap="JcOldDataResultMap">
+        select
+        a.id,
+        a.lottery_code,
+        a.issue_code,
+        a.sport_match_info_id,
+        a.home_team_id,
+        a.visiti_team_id,
+        a.match_analysis_url,
+        a.match_info_url,
+        a.is_recommend,
+        d.match_color as match_label_color,
+        a.official_match_code,
+        a.system_code,
+        a.match_status,
+        substring(a.official_match_code,1,2) as week,
+        substring(a.official_match_code,3,3) as num,
+        a.official_id,
+        a.start_time,
+        date_format(a.start_time,'%Y-%m-%d') as date,
+        date_format(a.start_time,'%H:%i') as time,
+        a.sale_end_time,
+        a.is_neutral,
+        a.is_recommend,
+        a.stadium,
+        a.weather,
+        a.remark,
+        a.odds_win,
+        a.odds_draw,
+        a.odds_fail,
+        a.match_name as match_full_name,
+        d.match_short_name,
+        d.match_data_url,
+        d.five_league,
+        d.logo_url as matchLogo,
+        a.home_name as homeFullName,
+        e.team_short_name as homeShortName,
+        e.team_data_url as homeDataUrl,
+        e.team_order as homeOrder,
+        e.logo_url as homeLogo,
+        a.visiti_name as guestFullName,
+        f.team_short_name as guestShortName,
+        f.team_data_url as guestDataUrl,
+        f.team_order as guestOrder,
+        f.logo_url as guestLogo,
+        b.half_score,
+        b.full_score,
+        b.four_goal,
+        b.six_hf_wdf,
+        b.fourteen_wdf
+        from sport_against_info a
+        left join sport_draw_old_info b on a.id = b.sport_against_info_id
+        left join sport_match_info d on a.sport_match_info_id=d.id and d.match_type = 1
+        left join sport_team_info e on a.home_team_id=e.id and e.team_type = 1
+        left join sport_team_info f on a.visiti_team_id=f.id and f.team_type = 1
+        where a.lottery_code = #{lotteryCode} and issue_code=#{issueCode}
+        order by a.old_match_index asc
+    </select>
+
+    <!-- 查询老足彩对阵对应竞彩足球的SP值 -->
+    <select id="findJcOldDataSp" resultType="com.hhly.skeleton.lotto.base.sport.bo.JcOldDataSpBO">
+        SELECT
+            if(c.newest_sp_win is not null, c.newest_sp_win, b.odds_win)
+                                                                            AS spWin,
+            if(c.newest_sp_draw is not null, c.newest_sp_draw, b.odds_draw) AS spDraw,
+            if(c.newest_sp_fail is not null, c.newest_sp_fail, b.odds_fail) AS spFail,
+            official_id                                                     AS officialId
+        FROM
+            sport_data_fb_sp c
+            INNER JOIN (
+                           SELECT
+                               id,
+                               official_id,
+                               odds_win,
+                               odds_draw,
+                               odds_fail
+                           from sport_against_info
+                           where lottery_code = 300 and
+        official_id in (select official_id from sport_against_info a
+        where lottery_code=#{lotteryCode} and issue_code=#{issueCode})) b on c.sport_against_info_id=b.id
+    </select>
+
+    <!-- 查询竞彩足球彩期对阵 -->
+    <select id="findJczqOrderDataByIssueCode" resultMap="JczqOrderResultMap"
+            parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select
+        <include refid="SELECT_COLUMN"/>
+        half_score,
+        full_score,
+        let_num,
+        full_spf,
+        let_spf,
+        score,
+        goal_num,
+        hf_wdf
+        from sport_against_info a
+        inner join sport_status_fb b on a.id=b.sport_against_info_id
+        left join sport_draw_fb c on a.id=c.sport_against_info_id
+        inner join sport_match_info d on a.sport_match_info_id=d.id and d.match_type=${matchType}
+        inner join sport_team_info e on a.home_team_id=e.id and e.team_type=${matchType}
+        inner join sport_team_info f on a.visiti_team_id=f.id and f.team_type=${matchType}
+        where a.lottery_code=#{lotteryCode} and a.issue_code=#{issueCode} and is_recommend=1
+    </select>
+
+    <!--  北京单场返回resultMap  -->
+    <resultMap id="BjDataResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.BjDaoBO" extends="BaseResultMap">
+        <result column="bj_num" jdbcType="VARCHAR" property="bjNum"/>
+        <result column="sale_date" jdbcType="VARCHAR" property="saleDate"/>
+        <result column="match_type" jdbcType="DECIMAL" property="matchType"/>
+        <result column="five_league" jdbcType="INTEGER" property="fiveLeague"/>
+        <result column="half_score" jdbcType="VARCHAR" property="halfScore"/>
+        <result column="full_score" jdbcType="VARCHAR" property="fullScore"/>
+        <result column="let_num" jdbcType="TINYINT" property="letNum"/>
+        <result column="let_wdf" jdbcType="VARCHAR" property="letWdf"/>
+        <result column="goal_num" jdbcType="VARCHAR" property="goalNum"/>
+        <result column="hf_wdf" jdbcType="VARCHAR" property="hfWdf"/>
+        <result column="ud_sd" jdbcType="VARCHAR" property="udSd"/>
+        <result column="score" jdbcType="VARCHAR" property="score"/>
+        <result column="sp_let_wdf" jdbcType="DECIMAL" property="spLetWdf"/>
+        <result column="sp_goal_num" jdbcType="DECIMAL" property="spGoalNum"/>
+        <result column="sp_hf_wdf" jdbcType="DECIMAL" property="spHfWdf"/>
+        <result column="status_let_wf" jdbcType="DECIMAL" property="statusLetWf"/>
+
+        <result column="sp_ud_sd" jdbcType="DECIMAL" property="spUdSd"/>
+        <result column="sp_score" jdbcType="DECIMAL" property="spScore"/>
+        <result column="draw_time" jdbcType="TIMESTAMP" property="drawTime"/>
+
+        <!-- 胜负过关 -->
+        <result column="let_sf" jdbcType="DECIMAL" property="letSf"/>
+        <result column="sp_let_wf" jdbcType="DECIMAL" property="spLetSf"/>
+
+
+        <result column="status_let_wdf" jdbcType="INTEGER" property="statusLetWdf"/>
+        <result column="status_goal" jdbcType="INTEGER" property="statusGoal"/>
+        <result column="status_hf_wdf" jdbcType="INTEGER" property="statusHfWdf"/>
+        <result column="status_ud_sd" jdbcType="INTEGER" property="statusUdSd"/>
+        <result column="status_score" jdbcType="INTEGER" property="statusScore"/>
+
+        <result column="sp_0_goal" jdbcType="DECIMAL" property="sp0Goal"/>
+        <result column="sp_1_goal" jdbcType="DECIMAL" property="sp1Goal"/>
+        <result column="sp_2_goal" jdbcType="DECIMAL" property="sp2Goal"/>
+        <result column="sp_3_goal" jdbcType="DECIMAL" property="sp3Goal"/>
+        <result column="sp_4_goal" jdbcType="DECIMAL" property="sp4Goal"/>
+        <result column="sp_5_goal" jdbcType="DECIMAL" property="sp5Goal"/>
+        <result column="sp_6_goal" jdbcType="DECIMAL" property="sp6Goal"/>
+        <result column="sp_7_goal" jdbcType="DECIMAL" property="sp7Goal"/>
+
+        <result column="sp_w_w" jdbcType="DECIMAL" property="spWW"/>
+        <result column="sp_w_d" jdbcType="DECIMAL" property="spWD"/>
+        <result column="sp_w_f" jdbcType="DECIMAL" property="spWF"/>
+        <result column="sp_d_w" jdbcType="DECIMAL" property="spDW"/>
+        <result column="sp_d_d" jdbcType="DECIMAL" property="spDD"/>
+        <result column="sp_d_f" jdbcType="DECIMAL" property="spDF"/>
+        <result column="sp_f_w" jdbcType="DECIMAL" property="spFW"/>
+        <result column="sp_f_d" jdbcType="DECIMAL" property="spFD"/>
+        <result column="sp_f_f" jdbcType="DECIMAL" property="spFF"/>
+
+        <result column="sp_1_0" jdbcType="DECIMAL" property="sp10"/>
+        <result column="sp_2_0" jdbcType="DECIMAL" property="sp20"/>
+        <result column="sp_2_1" jdbcType="DECIMAL" property="sp21"/>
+        <result column="sp_3_0" jdbcType="DECIMAL" property="sp30"/>
+        <result column="sp_3_1" jdbcType="DECIMAL" property="sp31"/>
+        <result column="sp_3_2" jdbcType="DECIMAL" property="sp32"/>
+        <result column="sp_4_0" jdbcType="DECIMAL" property="sp40"/>
+        <result column="sp_4_1" jdbcType="DECIMAL" property="sp41"/>
+        <result column="sp_4_2" jdbcType="DECIMAL" property="sp42"/>
+        <result column="sp_w_other" jdbcType="DECIMAL" property="spWOther"/>
+        <result column="sp_0_0" jdbcType="DECIMAL" property="sp00"/>
+        <result column="sp_1_1" jdbcType="DECIMAL" property="sp11"/>
+        <result column="sp_2_2" jdbcType="DECIMAL" property="sp22"/>
+        <result column="sp_3_3" jdbcType="DECIMAL" property="sp33"/>
+        <result column="sp_d_other" jdbcType="DECIMAL" property="spDOther"/>
+        <result column="sp_0_1" jdbcType="DECIMAL" property="sp01"/>
+        <result column="sp_0_2" jdbcType="DECIMAL" property="sp02"/>
+        <result column="sp_1_2" jdbcType="DECIMAL" property="sp12"/>
+        <result column="sp_0_3" jdbcType="DECIMAL" property="sp03"/>
+        <result column="sp_1_3" jdbcType="DECIMAL" property="sp13"/>
+        <result column="sp_2_3" jdbcType="DECIMAL" property="sp23"/>
+        <result column="sp_0_4" jdbcType="DECIMAL" property="sp04"/>
+        <result column="sp_1_4" jdbcType="DECIMAL" property="sp14"/>
+        <result column="sp_2_4" jdbcType="DECIMAL" property="sp24"/>
+        <result column="sp_f_other" jdbcType="DECIMAL" property="spFOther"/>
+
+        <result column="sp_up_single" jdbcType="DECIMAL" property="spUpSingle"/>
+        <result column="sp_up_double" jdbcType="DECIMAL" property="spUpDouble"/>
+        <result column="sp_down_single" jdbcType="DECIMAL" property="spDownSingle"/>
+        <result column="sp_down_double" jdbcType="DECIMAL" property="spDownDouble"/>
+
+        <result column="let_num" jdbcType="DECIMAL" property="letNum"/>
+        <result column="sp_win" jdbcType="DECIMAL" property="spWin"/>
+        <result column="sp_draw" jdbcType="DECIMAL" property="spDraw"/>
+        <result column="sp_fail" jdbcType="DECIMAL" property="spFail"/>
+
+        <result column="let_score" jdbcType="DECIMAL" property="letScore"/>
+        <result column="sp_win_wf" jdbcType="DECIMAL" property="spWinWf"/>
+        <result column="sp_fail_wf" jdbcType="DECIMAL" property="spFailWf"/>
+    </resultMap>
+
+    <!-- 查询北京单场对阵数据 -->
+    <sql id="find_bj_data_sql">
+        select
+        a.id,
+        a.bj_num,
+        a.lottery_code,
+        a.issue_code,
+        a.sport_match_info_id,
+        a.home_team_id,
+        a.visiti_team_id,
+        a.match_analysis_url,
+        a.match_info_url,
+        a.is_recommend,
+        d.match_color as match_label_color,
+        a.system_code,
+        a.match_status,
+        a.official_id,
+        a.start_time,
+        date_format(a.start_time, '%Y-%m-%d') as date,
+        date_format(a.start_time, '%H:%i') as time,
+        date_format(a.sale_date,'%Y-%m-%d') as sale_date,
+        a.sale_end_time,
+        a.is_neutral,
+        a.is_recommend,
+        a.stadium,
+        a.weather,
+        a.remark,
+        a.odds_win,
+        a.odds_draw,
+        a.odds_fail,
+        a.match_name as match_full_name,
+        d.match_short_name,
+        d.match_data_url,
+        d.match_type,
+        d.five_league,
+        d.logo_url as matchLogo,
+        a.home_name as homeFullName,
+        b.team_short_name as homeShortName,
+        b.team_data_url as homeDataUrl,
+        b.team_order as homeOrder,
+        b.logo_url as homeLogo,
+        a.visiti_name as guestFullName,
+
+
+        <if test='lotteryCode == "306"'>
+        	g.half_score,
+            g.full_score,
+            g.goal_num,
+            g.hf_wdf,
+			
+            g.let_wdf,
+            g.score,
+            g.ud_sd,
+            
+            g.sp_goal_num,
+            g.sp_let_wdf,
+            g.sp_hf_wdf,
+            g.sp_ud_sd,
+            g.sp_score,
+
+            e.sp_0_goal,
+            e.sp_1_goal,
+            e.sp_2_goal,
+            e.sp_3_goal,
+            e.sp_4_goal,
+            e.sp_5_goal,
+            e.sp_6_goal,
+            e.sp_7_goal,
+            e.sp_w_w,
+            e.sp_w_d,
+            e.sp_w_f,
+            e.sp_d_w,
+            e.sp_d_d,
+            e.sp_d_f,
+            e.sp_f_w,
+            e.sp_f_d,
+            e.sp_f_f,
+            e.sp_1_0,
+            e.sp_2_0,
+            e.sp_2_1,
+            e.sp_3_0,
+            e.sp_3_1,
+            e.sp_3_2,
+            e.sp_4_0,
+            e.sp_4_1,
+            e.sp_4_2,
+            e.sp_w_other,
+            e.sp_0_0,
+            e.sp_1_1,
+            e.sp_2_2,
+            e.sp_3_3,
+            e.sp_d_other,
+            e.sp_0_1,
+            e.sp_0_2,
+            e.sp_1_2,
+            e.sp_0_3,
+            e.sp_1_3,
+            e.sp_2_3,
+            e.sp_0_4,
+            e.sp_1_4,
+            e.sp_2_4,
+            e.sp_f_other,
+            e.sp_up_single,
+            e.sp_up_double,
+            e.sp_down_single,
+            e.sp_down_double,
+            e.let_num,
+            e.sp_win,
+            e.sp_draw,
+            e.sp_fail,
+            f.status_goal,
+            f.status_hf_wdf,
+            f.status_let_wdf,
+            f.status_score,
+            f.status_ud_sd,
+        </if>
+        <if test='lotteryCode == "307"'>
+            g.full_score,
+			g.let_num,
+            g.let_sf,
+            g.sp_let_wf,
+            g.draw_time,
+            e.let_score,
+            e.sp_win_wf,
+            e.sp_fail_wf,
+            f.status_let_wf,
+        </if>
+        c.team_short_name as guestShortName,
+        c.team_data_url as guestDataUrl,
+        c.team_order as guestOrder,
+        c.logo_url as guestLogo
+
+        from
+        sport_against_info a
+        inner join
+        sport_team_info b on a.home_team_id = b.id
+        inner join
+        sport_team_info c on a.visiti_team_id = c.id
+        inner join
+        sport_match_info d on a.sport_match_info_id = d.id
+        inner join
+        sport_data_bj_sp e on a.id = e.sport_against_info_id
+        inner join
+        sport_status_bj f on a.id = f.sport_against_info_id
+        <if test='lotteryCode == "306"'>
+            left join
+            sport_draw_bj g on a.id = g.sport_against_info_id
+        </if>
+        <if test='lotteryCode == "307"'>
+            left join
+            sport_draw_wf g on a.id = g.sport_against_info_id
+        </if>
+    </sql>
+
+    <!-- 北京单场查询条件 -->
+    <sql id="find_bj_data_where">
+        <where>
+            1 = 1
+            <if test="lotteryCode != null">
+                and lottery_code = #{lotteryCode}
+            </if>
+            <if test="systemCode != null">
+                and system_code = #{systemCode}
+            </if>
+            <if test="issueCode != null">
+                and issue_code = #{issueCode}
+            </if>
+            <if test="issueCode == null">
+                and match_status != 10
+                and match_status = 9
+                <![CDATA[ and sale_end_time >= now()  ]]>
+            </if>
+        </where>
+    </sql>
+
+
+    <!-- 北京单场对阵数据 -->
+    <select id="findBjData" resultMap="BjDataResultMap" parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        <include refid="find_bj_data_sql"/>
+        <include refid="find_bj_data_where"/>
+
+        order by start_time asc,bj_num asc
+    </select>
+
+    <!-- 北京单场对阵数据 -->
+    <select id="findSaleEndTimeBjData" resultMap="BjDataResultMap"
+            parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        <include refid="find_bj_data_sql"/>
+        <![CDATA[
+          where DATE_FORMAT(sale_date,'%Y-%m-%d')=DATE_FORMAT(NOW(),'%Y-%m-%d') and sale_end_time < now()
+         ]]>
+        <if test="lotteryCode != null">
+            and lottery_code = #{lotteryCode}
+        </if>
+          order by start_time asc,bj_num asc
+
+    </select>
+
+    <!-- 根据系统编号查询北京单场对阵数据 -->
+    <select id="findBjDataBySystemCode" parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO" resultMap="BjDataResultMap">
+        <include refid="find_bj_data_sql"/>
+        <where>
+            1 = 1
+            <if test="lotteryCode != null">
+                and lottery_code = #{lotteryCode}
+            </if>
+            <if test="systemCode != null">
+                and system_code = #{systemCode}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+
+    <!-- 根据官方编号查询北京单场对阵可以购买的对阵 -->
+    <select id="findBjDataByBjNum" resultMap="BjDataResultMap">
+        <include refid="find_bj_data_sql"/>
+        where
+        lottery_code = #{lotteryCode}
+        and bj_num = #{bjNum}
+        <![CDATA[ and sale_end_time >= now()  ]]>
+        limit 1
+    </select>
+
+
+    <!-- 查询北京单场赛事筛选框数据 -->
+    <select id="findBjMatch" resultType="com.hhly.skeleton.lotto.base.sport.bo.MatchDataBO"
+            parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select m.id,b.total,if(m.match_short_name is not null and
+        m.match_short_name!='',m.match_short_name,m.match_full_name) as matchName,
+        m.match_type as matchType,m.five_league as fiveLeague,b.is_recommend as hot
+        from sport_match_info m
+        inner join (select a.sport_match_info_id as id,count(1) as total,a.is_recommend
+        from sport_against_info a
+
+        <include refid="find_bj_data_where"/>
+        group by sport_match_info_id) b
+        on m.id=b.id
+    </select>
+
+    <!-- 查询一个对阵半全场，总进球，比分玩法最新SP值 -->
+    <select id="findFootBallSpById" parameterType="java.lang.Long" resultMap="JczqResultMap">
+        SELECT
+            id,
+            sport_against_info_id,
+            newest_sp_0_goal,
+            newest_sp_1_goal,
+            newest_sp_2_goal,
+            newest_sp_3_goal,
+            newest_sp_4_goal,
+            newest_sp_5_goal,
+            newest_sp_6_goal,
+            newest_sp_7_goal,
+            newest_sp_w_w,
+            newest_sp_w_d,
+            newest_sp_w_f,
+            newest_sp_d_w,
+            newest_sp_d_d,
+            newest_sp_d_f,
+            newest_sp_f_w,
+            newest_sp_f_d,
+            newest_sp_f_f,
+            newest_sp_1_0,
+            newest_sp_2_0,
+            newest_sp_2_1,
+            newest_sp_3_0,
+            newest_sp_3_1,
+            newest_sp_3_2,
+            newest_sp_4_0,
+            newest_sp_4_1,
+            newest_sp_4_2,
+            newest_sp_5_0,
+            newest_sp_5_1,
+            newest_sp_5_2,
+            newest_sp_w_other,
+            newest_sp_0_0,
+            newest_sp_1_1,
+            newest_sp_2_2,
+            newest_sp_d_other,
+            newest_sp_0_1,
+            newest_sp_0_2,
+            newest_sp_1_2,
+            newest_sp_0_3,
+            newest_sp_1_3,
+            newest_sp_2_3,
+            newest_sp_0_4,
+            newest_sp_1_4,
+            newest_sp_2_4,
+            newest_sp_0_5,
+            newest_sp_1_5,
+            newest_sp_2_5,
+            newest_sp_f_other,
+            update_time,
+            create_time,
+            newest_sp_3_3
+        FROM sport_data_fb_sp
+        WHERE sport_against_info_id = #{id}
+    </select>
+
+    <!-- 根据查询平均欧赔 -->
+    <select id="findAvgOddsBySourceId" resultType="com.hhly.skeleton.lotto.base.database.bo.OddsFbEuropeOddsMeanBO"
+            parameterType="com.hhly.skeleton.lotto.base.database.vo.OddsFbEuropeOddsMeanVO">
+        SELECT
+            id              AS id,
+            schedule_id     AS scheduleId,
+            homewin_f       AS homewinF,
+            draw_f          AS drawF,
+            guestwin_f      AS guestwinF,
+            homewin_n       AS homewinN,
+            draw_n          AS drawN,
+            guestwin_n      AS guestwinN,
+            probability_h_f AS probabilityHF,
+            probability_d_f AS probabilityDF,
+            probability_g_f AS probabilityGF,
+            probability_t_f AS probabilityTF,
+            probability_h_n AS probabilityHN,
+            probability_d_n AS probabilityDN,
+            probability_g_n AS probabilityGN,
+            probability_t_n AS probabilityTN,
+            type,
+            let_ball        AS letBall,
+            source_id       AS sourceId,
+            source_type     AS sourceType,
+            update_time     AS updateTime
+        FROM odds_fb_europeodds_mean
+        WHERE source_id = #{sourceId}
+              AND source_type = #{sourceType}
+              AND type = #{type}
+        ORDER BY update_time DESC
+    </select>
+
+
+    <!-- 冠军、冠亚军查询展示数据 -->
+    <select id="findGjData" parameterType="com.hhly.skeleton.lotto.base.sport.vo.GjParamVO" resultMap="gjDataResultMap">
+        SELECT * FROM (
+        SELECT
+            id,
+            issue_code,
+            match_name,
+            home_name,
+            visiti_name,
+            official_match_code,
+            system_code,
+            IF(match_status = 18,1,0)status,
+            match_status,
+            home_team_id,
+            visiti_team_id,
+            (SELECT logo_url FROM sport_team_info b WHERE a.home_team_id = b.id) home_team_logo,
+            (SELECT team_data_url FROM sport_team_info b WHERE a.home_team_id = b.id) home_id,
+            (SELECT logo_url FROM sport_team_info b WHERE a.visiti_team_id = b.id) visiti_team_logo,
+            (SELECT team_data_url FROM sport_team_info b WHERE a.visiti_team_id = b.id) guest_id,
+            odds_win AS sp,
+            win_prob AS gl
+        FROM sport_against_info a
+        WHERE 1=1
+        <if test="lotteryCode != null">
+            AND lottery_code = #{lotteryCode}
+        </if>
+        <include refid="Order_SQL"/>
+        <include refid="Page_SQL"/>
+        )a ORDER BY status ASC, id ASC
+    </select>
+
+    <select id="findGjDataCount" parameterType="com.hhly.skeleton.lotto.base.sport.vo.GjParamVO" resultType="int">
+        SELECT
+           COUNT(1)
+        FROM sport_against_info a
+        WHERE 1=1
+        <if test="lotteryCode != null">
+            AND lottery_code = #{lotteryCode}
+        </if>
+    </select>
+
+    <resultMap id="SelectTeamMap" type="java.util.HashMap">
+        <result column="team_id" property="teamId"/>
+        <result column="team_name" property="teamName"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <!-- 世界杯刷选数据：球队选择-->
+    <select id="getSelectTeam" resultMap="SelectTeamMap">
+        SELECT team_name,team_id,status
+        FROM(
+            SELECT
+                id,
+                home_name team_name,
+                home_team_id team_id,
+                IF(match_status = 18,1,0)status,
+                CASE WHEN system_code = '01' THEN 'b'
+                    WHEN system_code = '02' THEN 'a'
+                    WHEN system_code = '03' THEN 'e'
+                    WHEN system_code = '04' THEN 'c'
+                    WHEN system_code = '05' THEN 'd'
+                    WHEN system_code = '06' THEN 'h'
+                    WHEN system_code = '07' THEN 'g'
+                    WHEN system_code = '08' THEN 'f'
+                    WHEN system_code = '09' THEN 'j'
+                    WHEN system_code = '10' THEN 'k'
+                    WHEN system_code = '11' THEN 'l'
+                    WHEN system_code = '12' THEN 'i'
+                ELSE 'm' END orderBy
+            FROM sport_against_info
+            WHERE lottery_code = 308
+            LIMIT 0,12)a ORDER BY status ASC, orderBy ASC
+    </select>
+
+
+    <!-- 查询一个对阵最新SP值 -->
+    <select id="findFootBallSpBySystemCode"  resultMap="JczqResultMap">
+		SELECT
+			 t.id,
+			t.sport_against_info_id,
+			t.newest_let_sp_win,
+			t.newest_let_sp_draw,
+			t.newest_let_sp_fail,
+			t.newest_sp_win,
+			t.newest_sp_draw,
+			t.newest_sp_fail,
+			t.newest_sp_0_goal,
+			t.newest_sp_1_goal,
+			t.newest_sp_2_goal,
+			t.newest_sp_3_goal,
+			t.newest_sp_4_goal,
+			t.newest_sp_5_goal,
+			t.newest_sp_6_goal,
+			t.newest_sp_7_goal,
+			t.newest_sp_w_w,
+			t.newest_sp_w_d,
+			t.newest_sp_w_f,
+			t.newest_sp_d_w,
+			t.newest_sp_d_d,
+			t.newest_sp_d_f,
+			t.newest_sp_f_w,
+			t.newest_sp_f_d,
+			t.newest_sp_f_f,
+			t.newest_sp_1_0,
+			t.newest_sp_2_0,
+			t.newest_sp_2_1,
+			t.newest_sp_3_0,
+			t.newest_sp_3_1,
+			t.newest_sp_3_2,
+			t.newest_sp_4_0,
+			t.newest_sp_4_1,
+			t.newest_sp_4_2,
+			t.newest_sp_5_0,
+			t.newest_sp_5_1,
+			t.newest_sp_5_2,
+			t.newest_sp_w_other,
+			t.newest_sp_0_0,
+			t.newest_sp_1_1,
+			t.newest_sp_2_2,
+			t.newest_sp_d_other,
+			t.newest_sp_0_1,
+			t.newest_sp_0_2,
+			t.newest_sp_1_2,
+			t.newest_sp_0_3,
+			t.newest_sp_1_3,
+			t.newest_sp_2_3,
+			t.newest_sp_0_4,
+			t.newest_sp_1_4,
+			t.newest_sp_2_4,
+			t.newest_sp_0_5,
+			t.newest_sp_1_5,
+			t.newest_sp_2_5,
+			t.newest_sp_f_other,
+			t.update_time,
+			t.create_time,
+			t.newest_sp_3_3,
+			s.system_code
+		FROM
+			sport_data_fb_sp t,(
+				SELECT
+					id,
+				  system_code
+				FROM
+					sport_against_info a
+				WHERE
+					lottery_code = #{lotteryCode}
+				AND system_code IN 
+				<foreach collection="matchs" item="item" separator="," open="(" close=")">
+		            #{item.matchId}
+		        </foreach>
+			) s
+		WHERE
+			sport_against_info_id = s.id
+        
+    </select>
+</mapper>

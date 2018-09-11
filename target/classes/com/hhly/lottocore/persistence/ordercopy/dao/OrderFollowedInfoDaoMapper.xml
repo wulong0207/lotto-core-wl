@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.ordercopy.dao.OrderFollowedInfoDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.OrderFollowedInfoBO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="order_issue_id" jdbcType="INTEGER" property="orderIssueId"/>
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount"/>
+        <result column="data_status" jdbcType="BIT" property="dataStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="modify_by" jdbcType="VARCHAR" property="modifyBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, nick_name, order_issue_id, order_code, commission_amount, data_status,
+        create_time, modify_time, modify_by, update_time
+    </sql>
+    
+    <!-- 排序  -->
+    <sql id="Order_SQL">
+        <if test = "sortField != null and sortOrder !=null">
+          ORDER BY ${sortField} ${sortOrder}
+        </if>
+    </sql>
+    
+    <!-- 分页 -->
+    <sql id="Page_SQL">
+        LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from order_followed_info
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    
+    <!-- 查询抄单明细 -->
+    <select id="queryFollowedDetails" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultType="com.hhly.skeleton.lotto.base.ordercopy.bo.FollowedDetailsBO">
+        SELECT 
+	      a.create_time followedTime,<!-- 跟单时间 -->
+	      a.nick_name nickName,       <!-- 用户昵称 -->
+	      c.order_amount orderAmount, <!-- 跟单金额 -->
+          c.winning_status winStatus, <!-- 中奖状态 -->
+	      a.commission_amount commissionAmount <!-- 提成 -->
+	   FROM  order_followed_info a 
+	   INNER JOIN order_issue_info b ON a.order_issue_id = b.id 
+	   INNER JOIN order_info c ON a.order_code = c.order_code
+	   WHERE 1=1
+	   AND c.pay_status = 2
+	   AND c.order_status = 6
+	   <if test = "orderCode != null">
+			and b.order_code = #{orderCode}
+	   </if>
+       <include refid="Order_SQL"/> 
+       <include refid="Page_SQL"/> 
+    </select>
+    
+    <!-- 抄单明细 总记录数 -->
+    <select id="queryFollowedDetailsCount" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO" resultType="int">
+        SELECT 
+	      count(1)
+	   FROM  order_followed_info a 
+	   INNER JOIN order_issue_info b ON a.order_issue_id = b.id 
+	   INNER JOIN order_info c ON a.order_code = c.order_code
+	   WHERE 1=1
+	   AND c.pay_status = 2
+	   AND c.order_status = 6
+	   <if test = "orderCode != null">
+			and b.order_code = #{orderCode}
+	   </if>
+    </select>
+    
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM order_followed_info
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.hhly.lottocore.persistence.ordercopy.po.OrderFollowedInfoPO">
+        INSERT INTO order_followed_info (id, user_id, nick_name,
+                                         order_issue_id, order_code, commission_amount,
+                                         data_status, create_time, modify_time,
+                                         modify_by, update_time)
+        VALUES (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{nickName,jdbcType=VARCHAR},
+                                        #{orderIssueId,jdbcType=INTEGER}, #{orderCode,jdbcType=VARCHAR},
+                                        #{commissionAmount,jdbcType=DECIMAL},
+                                        #{dataStatus,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP},
+                                        #{modifyTime,jdbcType=TIMESTAMP},
+                                        #{modifyBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.hhly.lottocore.persistence.ordercopy.po.OrderFollowedInfoPO">
+        insert into order_followed_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="nickName != null">
+                nick_name,
+            </if>
+            <if test="orderIssueId != null">
+                order_issue_id,
+            </if>
+            <if test="orderCode != null">
+                order_code,
+            </if>
+            <if test="commissionAmount != null">
+                commission_amount,
+            </if>
+            <if test="dataStatus != null">
+                data_status,
+            </if>
+                create_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="nickName != null">
+                #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="orderIssueId != null">
+                #{orderIssueId,jdbcType=INTEGER},
+            </if>
+            <if test="orderCode != null">
+                #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="commissionAmount != null">
+                #{commissionAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="dataStatus != null">
+                #{dataStatus,jdbcType=BIT},
+            </if>
+            now(),
+            now()
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.hhly.lottocore.persistence.ordercopy.po.OrderFollowedInfoPO">
+        update order_followed_info
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="nickName != null">
+                nick_name = #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="orderIssueId != null">
+                order_issue_id = #{orderIssueId,jdbcType=INTEGER},
+            </if>
+            <if test="orderCode != null">
+                order_code = #{orderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="commissionAmount != null">
+                commission_amount = #{commissionAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="dataStatus != null">
+                data_status = #{dataStatus,jdbcType=BIT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyBy != null">
+                modify_by = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.ordercopy.po.OrderFollowedInfoPO">
+        UPDATE order_followed_info
+        SET user_id           = #{userId,jdbcType=INTEGER},
+            nick_name         = #{nickName,jdbcType=VARCHAR},
+            order_issue_id    = #{orderIssueId,jdbcType=INTEGER},
+            order_code        = #{orderCode,jdbcType=VARCHAR},
+            commission_amount = #{commissionAmount,jdbcType=DECIMAL},
+            data_status       = #{dataStatus,jdbcType=BIT},
+            create_time       = #{createTime,jdbcType=TIMESTAMP},
+            modify_time       = #{modifyTime,jdbcType=TIMESTAMP},
+            modify_by         = #{modifyBy,jdbcType=VARCHAR},
+            update_time       = #{updateTime,jdbcType=TIMESTAMP}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!-- 根据订单编号查询订单是否存在数量 -->
+    <select id="selectCountByOrderCode" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM order_followed_info
+        WHERE order_code = #{orderCode}
+    </select>
+
+    <!-- 查询用户是否跟单 -->
+    <select id="selectCountByUserIdAndOrderIssueId" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM order_followed_info
+        WHERE user_id = #{userId} AND order_issue_id = #{orderIssueId}
+    </select>
+
+
+    <select id="queryFollowedDetail" parameterType="String" resultType="com.hhly.skeleton.lotto.base.ordercopy.bo.OrderFollowedInfoBO">
+        SELECT
+        a.commission_amount commissionAmount,
+        b.commission_rate commissionRate,
+        b.user_issue_id userIssueId,
+        b.order_visible_type orderVisibleType,
+        mii.user_id userId,
+        ui.nick_name copyNickName,
+        ui.head_url copyHeadUrl
+        FROM  order_followed_info a
+        INNER JOIN order_issue_info b ON a.order_issue_id = b.id
+        INNER JOIN m_user_issue_info mii ON mii.id=b.user_issue_id
+        INNER JOIN m_user_info ui ON ui.id=mii.user_id
+        WHERE a.order_code = #{orderCode}
+
+    </select>
+
+    <select id="queryIssueDetail" parameterType="String" resultType="com.hhly.skeleton.lotto.base.ordercopy.bo.OrderFollowedInfoBO">
+        SELECT
+        b.commission_amount commissionAmount,
+        b.commission_rate commissionRate,
+        b.user_issue_id userIssueId,
+        b.order_visible_type orderVisibleType,
+        mii.user_id userId,
+        ui.nick_name copyNickName,
+        ui.head_url copyHeadUrl
+        FROM  order_issue_info b
+        INNER JOIN m_user_issue_info mii ON mii.id=b.user_issue_id
+        INNER JOIN m_user_info ui ON ui.id=mii.user_id
+        WHERE b.order_code = #{orderCode}
+
+    </select>
+
+</mapper>

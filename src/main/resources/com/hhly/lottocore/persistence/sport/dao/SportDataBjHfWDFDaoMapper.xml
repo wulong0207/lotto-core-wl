@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.sport.dao.SportDataBjHfWDFDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportDataBjHfWDFBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="SPORT_AGAINST_INFO_ID" property="sportAgainstInfoId" jdbcType="DECIMAL" />
+    <result column="SP_W_W" property="spWW" jdbcType="DECIMAL" />
+    <result column="SP_W_D" property="spWD" jdbcType="DECIMAL" />
+    <result column="SP_W_F" property="spWF" jdbcType="DECIMAL" />
+    <result column="SP_D_W" property="spDW" jdbcType="DECIMAL" />
+    <result column="SP_D_D" property="spDD" jdbcType="DECIMAL" />
+    <result column="SP_D_F" property="spDF" jdbcType="DECIMAL" />
+    <result column="SP_F_W" property="spFW" jdbcType="DECIMAL" />
+    <result column="SP_F_D" property="spFD" jdbcType="DECIMAL" />
+    <result column="SP_F_F" property="spFF" jdbcType="DECIMAL" />
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    ID, SPORT_AGAINST_INFO_ID, SP_W_W, SP_W_D, SP_W_F, SP_D_W, SP_D_D, 
+    SP_D_F, SP_F_W, SP_F_D, SP_F_F, RELEASE_TIME, UPDATE_TIME, CREATE_TIME
+  </sql>
+
+  <select id="findByAgainstInfoId" resultMap="BaseResultMap" parameterType="long" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM SPORT_DATA_BJ_HF_WDF
+    WHERE SPORT_AGAINST_INFO_ID=#{sportAgainstInfoId,jdbcType=DECIMAL}
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id"  parameterType="com.hhly.lottocore.persistence.sport.po.SportDataBjHfWDFPO" >
+    insert into SPORT_DATA_BJ_HF_WDF (SPORT_AGAINST_INFO_ID, 
+      SP_W_W, SP_W_D, SP_W_F, SP_D_W, 
+      SP_D_D, SP_D_F, SP_F_W, SP_F_D, 
+      SP_F_F, RELEASE_TIME, UPDATE_TIME, 
+      CREATE_TIME)
+    values (#{sportAgainstInfoId,jdbcType=DECIMAL}, 
+      #{spWW,jdbcType=DECIMAL}, #{spWD,jdbcType=DECIMAL}, #{spWF,jdbcType=DECIMAL}, #{spDW,jdbcType=DECIMAL}, 
+      #{spDD,jdbcType=DECIMAL}, #{spDF,jdbcType=DECIMAL}, #{spFW,jdbcType=DECIMAL}, #{spFD,jdbcType=DECIMAL}, 
+      #{spFF,jdbcType=DECIMAL}, #{releaseTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.sport.po.SportDataBjHfWDFPO" >
+    update SPORT_DATA_BJ_HF_WDF
+    <set >
+      <if test="sportAgainstInfoId != null" >
+        SPORT_AGAINST_INFO_ID = #{sportAgainstInfoId,jdbcType=DECIMAL},
+      </if>
+      <if test="spWW != null" >
+        SP_W_W = #{spWW,jdbcType=DECIMAL},
+      </if>
+      <if test="spWD != null" >
+        SP_W_D = #{spWD,jdbcType=DECIMAL},
+      </if>
+      <if test="spWF != null" >
+        SP_W_F = #{spWF,jdbcType=DECIMAL},
+      </if>
+      <if test="spDW != null" >
+        SP_D_W = #{spDW,jdbcType=DECIMAL},
+      </if>
+      <if test="spDD != null" >
+        SP_D_D = #{spDD,jdbcType=DECIMAL},
+      </if>
+      <if test="spDF != null" >
+        SP_D_F = #{spDF,jdbcType=DECIMAL},
+      </if>
+      <if test="spFW != null" >
+        SP_F_W = #{spFW,jdbcType=DECIMAL},
+      </if>
+      <if test="spFD != null" >
+        SP_F_D = #{spFD,jdbcType=DECIMAL},
+      </if>
+      <if test="spFF != null" >
+        SP_F_F = #{spFF,jdbcType=DECIMAL},
+      </if>
+      <if test="releaseTime != null" >
+        RELEASE_TIME = #{releaseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+
+</mapper>

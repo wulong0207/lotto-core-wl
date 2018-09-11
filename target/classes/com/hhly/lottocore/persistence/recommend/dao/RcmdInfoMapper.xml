@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.recommend.dao.RcmdInfoMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.recommend.bo.RcmdInfoBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="rcmd_code" jdbcType="VARCHAR" property="rcmdCode" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="type_id" jdbcType="INTEGER" property="typeId" />
+    <result column="label" jdbcType="VARCHAR" property="label" />
+    <result column="click" jdbcType="INTEGER" property="click" />
+    <result column="lottery_code" jdbcType="SMALLINT" property="lotteryCode" />
+    <result column="lottery_name" jdbcType="VARCHAR" property="lotteryName" />
+    <result column="lottery_issue" jdbcType="VARCHAR" property="lotteryIssue" />
+    <result column="lottery_child_code" jdbcType="INTEGER" property="lotteryChildCode" />
+    <result column="pass_way" jdbcType="TINYINT" property="passWay" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="sale_end_time" jdbcType="TIMESTAMP" property="saleEndTime" />
+    <result column="lottery_time" jdbcType="TIMESTAMP" property="lotteryTime" />
+    <result column="winning_status" jdbcType="BIT" property="winningStatus" />
+    <result column="pay_type" jdbcType="BIT" property="payType" />
+    <result column="pay_amount" jdbcType="DECIMAL" property="payAmount" />
+    <result column="pay_count" jdbcType="INTEGER" property="payCount" />
+    <result column="refund_enabled" jdbcType="BIT" property="refundEnabled" />
+    <result column="is_refunded" jdbcType="BIT" property="isRefunded" />
+    <result column="platform" jdbcType="BIT" property="platform" />
+    <result column="channel_id" jdbcType="VARCHAR" property="channelId" />
+    <result column="is_top" jdbcType="BIT" property="isTop" />
+    <result column="is_recommend" jdbcType="BIT" property="isRecommend" />
+    <result column="is_lock" jdbcType="BIT" property="isLock" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+
+  <resultMap id="RcmdQueryDetailMap" type="com.hhly.skeleton.lotto.base.recommend.bo.RcmdQueryDetailBO">
+    <result column="id" jdbcType="DECIMAL" property="id"/>
+    <result column="rcmd_code" jdbcType="VARCHAR" property="rcmdCode"/>
+    <result column="head_url" jdbcType="VARCHAR" property="headUrl"/>
+    <result column="account_name" jdbcType="VARCHAR" property="nickName"/>
+    <result column="reason" jdbcType="VARCHAR" property="title"/>
+    <result column="pay_amount" jdbcType="DECIMAL" property="payAmount"/>
+    <result column="plan_content" jdbcType="VARCHAR" property="planContent"/>
+    <result column="pass_way" jdbcType="VARCHAR" property="passway"/>
+    <result column="screens" jdbcType="VARCHAR" property="screens"/>
+    <result column="level_type" jdbcType="VARCHAR" property="levelType"/>
+    <result column="continue_hit" jdbcType="VARCHAR" property="continutHit"/>
+    <result column="return_rate" jdbcType="VARCHAR" property="returnRate"/>
+    <result column="recent_record" jdbcType="VARCHAR" property="recentRecord"/>
+
+
+    <result column="user_id" jdbcType="INTEGER" property="userId"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="rcmdTime"/>
+    <result column="pay_count" jdbcType="INTEGER" property="payCount"/>
+    <result column="click" jdbcType="INTEGER" property="click"/>
+    <result column="winning_status" jdbcType="INTEGER" property="winningStatus"/>
+    <result column="sale_end_time" jdbcType="TIMESTAMP" property="saleEndTime"/>
+  </resultMap>
+
+  <resultMap id="RcmdUserMap" type="com.hhly.skeleton.lotto.base.recommend.bo.RcmdAttentionBO">
+    <result column="user_id" jdbcType="DECIMAL" property="rcmdUserId"/>
+    <result column="head_url" jdbcType="VARCHAR" property="headUrl"/>
+    <result column="account_name" jdbcType="VARCHAR" property="accountName"/>
+    <result column="level" jdbcType="INTEGER" property="type"/>
+    <result column="recent_record" jdbcType="DECIMAL" property="recentRecord"/>
+    <result column="continue_hit" jdbcType="VARCHAR" property="continueHit"/>
+    <result column="focus_num" jdbcType="VARCHAR" property="focusNum"/>
+    <result column="summary" jdbcType="VARCHAR" property="summary"/>
+    <result column="running_rcmd_count" jdbcType="VARCHAR" property="runningRcmdCount"/>
+    <result column="focus" jdbcType="VARCHAR" property="focus"/>
+
+    <result column="user_issue_info_id" jdbcType="DECIMAL" property="userIssueInfoId"/>
+
+  </resultMap>
+
+  <!-- 分页 -->
+  <sql id="Page_SQL">
+    LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </sql>
+
+  <!-- 排序 -->
+  <sql id="Order_SQL">
+    <if test="sortField != null and sortOrder !=null">
+      ORDER BY ${sortField} ${sortOrder}
+    </if>
+  </sql>
+
+  <sql id="Base_Column_List">
+    id, user_id, rcmd_code, title, type_id, label, click, lottery_code, lottery_name, 
+    lottery_issue, lottery_child_code, pass_way, status, sale_end_time, lottery_time, 
+    winning_status, pay_type, pay_amount, pay_count, refund_enabled, is_refunded, platform, 
+    channel_id, is_top, is_recommend, is_lock, create_time, update_time, modify_by, remark
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdInfoBO">
+    insert into rcmd_info (id, user_id, rcmd_code, 
+      title, type_id, label, 
+      click, lottery_code, lottery_name, 
+      lottery_issue, lottery_child_code, pass_way, 
+      status, sale_end_time, lottery_time, 
+      winning_status, pay_type, pay_amount, 
+      pay_count, refund_enabled, is_refunded, 
+      platform, channel_id, is_top, 
+      is_recommend, is_lock, create_time, 
+      update_time, modify_by, remark, 
+      reason)
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{rcmdCode,jdbcType=VARCHAR}, 
+      #{title,jdbcType=VARCHAR}, #{typeId,jdbcType=INTEGER}, #{label,jdbcType=VARCHAR}, 
+      #{click,jdbcType=INTEGER}, #{lotteryCode,jdbcType=SMALLINT}, #{lotteryName,jdbcType=VARCHAR}, 
+      #{lotteryIssue,jdbcType=VARCHAR}, #{lotteryChildCode,jdbcType=INTEGER}, #{passWay,jdbcType=TINYINT}, 
+      #{status,jdbcType=BIT}, #{saleEndTime,jdbcType=TIMESTAMP}, #{lotteryTime,jdbcType=TIMESTAMP}, 
+      #{winningStatus,jdbcType=BIT}, #{payType,jdbcType=BIT}, #{payAmount,jdbcType=DECIMAL}, 
+      #{payCount,jdbcType=INTEGER}, #{refundEnabled,jdbcType=BIT}, #{isRefunded,jdbcType=BIT}, 
+      #{platform,jdbcType=BIT}, #{channelId,jdbcType=VARCHAR}, #{isTop,jdbcType=BIT}, 
+      #{isRecommend,jdbcType=BIT}, #{isLock,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{modifyBy,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{reason,jdbcType=LONGVARCHAR})
+  </insert>
+
+  <!-- 更新浏览量 -->
+  <update id="updateClick" parameterType="com.hhly.lottocore.persistence.recommend.po.RcmdInfoPO">
+    update rcmd_info
+      set click = click + 1
+    where rcmd_code = #{rcmdCode}
+  </update>
+
+  <!-- 根据id查询推单信息 -->
+  <select id="findRcmdInfoBOById" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List"/>
+    from rcmd_info a
+    where rcmd_code = #{rcmdCode}
+  </select>
+
+  <!-- 推单列表查询 -->
+  <select id="queryRcmdQueryDetailList" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdQueryVO" resultMap="RcmdQueryDetailMap">
+    SELECT
+      a.id,
+      a.rcmd_code,
+      e.head_url,<!-- 用户头像-->
+      e.account_name ,<!-- 用户昵称-->
+      a.reason,<!-- 推文标题-->
+      a.pay_amount,<!-- 推文价格-->
+      a.sale_end_time,
+      b.plan_content,<!-- 推荐内容-->
+      b.pass_way,<!-- 过关方式 -->
+      b.screens,<!-- 场次编号 -->
+      d.level level_type,<!-- 级别-->
+      c.continue_hit,<!-- 连红-->
+      c.return_rate,<!-- 返奖率-->
+      c.recent_record<!-- 近期战绩-->
+    FROM rcmd_info a
+    INNER JOIN rcmd_detail b ON a.rcmd_code = b.rcmd_code
+    LEFT JOIN (SELECT * FROM rcmd_user_detail WHERE type = 2) c ON a.user_id = c.user_id AND a.lottery_code = c.lottery_code
+    AND a.lottery_child_code = c.lottery_child_code AND a.pass_way = c.pass_way
+    LEFT JOIN (SELECT c.level,a.user_id,b.lottery_code,a.return_rate
+                  FROM m_user_issue_info a
+                  LEFT JOIN m_user_issue_level b ON a.id = b.user_issue_info_id
+                  LEFT JOIN rcmd_user_type c ON b.`level` = c.id WHERE c.status = 1)d ON a.user_id = d.user_id AND a.lottery_code = d.lottery_code
+    LEFT JOIN m_user_info e ON a.user_id = e.id
+    WHERE 1=1
+    <if test="lotteryCode != null">
+      AND a.lottery_code = #{lotteryCode}
+    </if>
+    <if test="passway != null">
+      AND a.pass_way = #{passway}
+    </if>
+    <if test="status!=null and status==1">
+      and  a.status=1
+    </if>
+    <if test="status!=null and status==2">
+      and  a.status in(2,4)
+    </if>
+    <if test="payType != null">
+      AND a.pay_type = #{payType}
+    </if>
+    <if test="refund != null">
+      AND a.refund_enabled = #{refund}
+    </if>
+    <include refid="Order_SQL"/>
+    <include refid="Page_SQL"/>
+  </select>
+
+  <select id="queryRcmdQueryDetailListCount" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdQueryVO" resultType="int">
+    SELECT
+      COUNT(0)
+    FROM rcmd_info a
+    INNER JOIN rcmd_detail b ON a.rcmd_code = b.rcmd_code
+    LEFT JOIN (SELECT * FROM rcmd_user_detail WHERE type = 2) c ON a.user_id = c.user_id AND a.lottery_code = c.lottery_code
+                                      AND a.lottery_child_code = c.lottery_child_code AND a.pass_way = c.pass_way
+    LEFT JOIN (SELECT c.type,a.user_id,b.lottery_code,a.return_rate
+                  FROM m_user_issue_info a
+                  LEFT JOIN m_user_issue_level b ON a.id = b.user_issue_info_id
+                  LEFT JOIN rcmd_user_type c ON b.`level` = c.id WHERE c.status = 1)d ON a.user_id = d.user_id AND a.lottery_code = d.lottery_code
+    LEFT JOIN m_user_info e ON a.user_id = e.id
+    WHERE 1=1
+    <if test="lotteryCode != null">
+      AND a.lottery_code = #{lotteryCode}
+    </if>
+    <if test="passway != null">
+      AND a.pass_way = #{passway}
+    </if>
+    <if test="status!=null and status==1">
+      and  a.status=1
+    </if>
+    <if test="status!=null and status==2">
+      and  a.status in(2,4)
+    </if>
+    <if test="payType != null">
+      AND a.pay_type = #{payType}
+    </if>
+    <if test="refund != null">
+      AND a.refund_enabled = #{refund}
+    </if>
+  </select>
+
+  <!-- 查询订单详情-->
+  <select id="findRcmdInfoByRcmdCode" resultType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdInfoDetailBO">
+    SELECT
+      a.title,
+      a.create_time AS createTime,
+      (SELECT c.lottery_name FROM lottery_type c WHERE a.lottery_code = c.lottery_code) AS lotteryName,
+      a.reason,
+      IF(c.num>0,0,1)locker,
+      a.status,
+      a.winning_status AS winningStatus,
+      a.lottery_code AS lotteryCode,
+      a.lottery_child_code AS lotteryChildCode,
+      b.screens,
+      b.plan_content AS  planContent
+    FROM rcmd_info a
+    INNER JOIN rcmd_detail b ON a.rcmd_code = b.rcmd_code
+    LEFT JOIN (SELECT rcmd_code,count(0)num FROM rcmd_user_pay WHERE user_id = #{userId} group by rcmd_code )c ON a.rcmd_code = c.rcmd_code
+    WHERE a.rcmd_code = #{rcmdCode}
+  </select>
+
+  <!-- 根据rcmdCode 和 userId查询记录-->
+  <select id="findRcmdInfoByRcmdCodeAndUserId" resultType="int">
+    SELECT COUNT(0) FROM rcmd_info WHERE rcmd_code = #{rcmdCode} AND user_id = #{userId}
+  </select>
+
+  <!-- 搜索推单用户 -->
+  <select id="queryRcmdUserLikeAccountName" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdQueryVO" resultMap="RcmdUserMap">
+    SELECT
+      a.id user_issue_info_id,
+      a.user_id,<!-- 用户ID -->
+      f.account_name, <!-- 账号名称 -->
+      f.head_url, <!-- 头像 -->
+      a.focus_num, <!-- 关注人数 -->
+      a.recent_record, <!-- 最近战绩 -->
+      a.continue_hit, <!-- 连红数 -->
+      b.summary, <!-- 个人简介 -->
+      IFNULL(e.num,0)running_rcmd_count, <!-- 进行中的 -->
+      IF(g.num>0,1,0)focus, <!-- 是否已关注 -->
+      d.level <!-- 分析师级别 -->
+    FROM m_user_issue_info a
+      LEFT JOIN rcmd_user_check b ON a.user_id = b.user_id
+      LEFT JOIN m_user_issue_level c ON c.user_issue_info_id = a.id
+      LEFT JOIN rcmd_user_type d ON c.`level` = d.type AND c.lottery_code = d.lottery_code
+      LEFT JOIN (SELECT user_id, count(0)num FROM rcmd_info WHERE status = 1 AND user_id = #{userId}  )e ON e.user_id = a.user_id
+      LEFT JOIN m_user_info f ON f.id = a.user_id
+      LEFT JOIN (SELECT user_issue_id,count(0)num FROM m_user_issue_link WHERE data_status = 1 AND user_id = #{userId} )g ON g.user_issue_id = a.id
+    WHERE 1=1
+      AND f.account_name LIKE concat('%',#{accountName},'%') and b.lottery_code=300 and  b.status=3  GROUP BY a.id
+    <include refid="Order_SQL"/>
+    <include refid="Page_SQL"/>
+
+  </select>
+
+  <select id="queryRcmdUserLikeAccountNameCount" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdQueryVO" resultType="int">
+    SELECT
+       COUNT(0)
+    FROM m_user_issue_info a
+    LEFT JOIN m_user_info f ON f.id = a.user_id
+    WHERE 1=1
+    AND f.account_name LIKE concat('%',#{accountName},'%')
+  </select>
+
+  <select id="queryRunningRcmdCount" parameterType="Integer" resultType="Integer">
+    select count(0) from rcmd_info where user_id=#{userId} and status=1
+  </select>
+
+
+
+  <select id="queryPersonRcmdCount" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdSingleVO" resultType="Integer">
+    SELECT
+    COUNT(0)
+    FROM
+    rcmd_info ri
+    where ri.user_id=#{userId}
+    <if test="status!=null and status==1">
+      and  ri.status in(1,4)
+    </if>
+    <if test="status!=null and status==2">
+      and  ri.status = 2
+    </if>
+    <if test="type!=null and type==1">
+      and  ri.pass_way=1
+    </if>
+    <if test="type!=null and type==2">
+      and  ri.pass_way=2
+    </if>
+
+
+  </select>
+  <select id="queryPersonRcmdList" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdSingleVO" resultMap="RcmdQueryDetailMap">
+        SELECT
+          ri.rcmd_code,
+          ri.reason,
+          ri.create_time,
+          ri.pass_way,
+          ri.pay_amount,
+          ri.pay_count,
+          ri.click,
+          ri.winning_status,
+          ri.sale_end_time,
+          rd.screens,
+          rd.plan_content
+        FROM
+            rcmd_info ri
+        INNER JOIN rcmd_detail rd ON ri.rcmd_code = rd.rcmd_code
+        where ri.user_id=#{userId}
+        <if test="status!=null and status==1">
+          and  ri.status in(1,4)
+        </if>
+        <if test="status!=null and status==2">
+          and  ri.status = 2
+        </if>
+        <if test="type!=null and type==1">
+          and  ri.pass_way=1
+        </if>
+        <if test="type!=null and type==2">
+          and  ri.pass_way=2
+        </if>
+        order by ri.create_time desc
+    LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+
+
+  <select id="queryPayRcmdCount" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdSingleVO" resultType="Integer">
+    SELECT
+      count(0)
+    FROM
+    rcmd_user_pay rup
+    INNER JOIN rcmd_info ri on rup.rcmd_code=ri.rcmd_code
+    where rup.user_id=#{userId}
+    <if test="status!=null and status==1">
+      and  ri.status in(1,4)
+    </if>
+    <if test="status!=null and status==2">
+      and  ri.status = 2
+    </if>
+
+  </select>
+  <select id="queryPayRcmdList" parameterType="com.hhly.skeleton.lotto.base.recommend.vo.RcmdSingleVO" resultMap="RcmdQueryDetailMap">
+      SELECT
+       mui.head_url,
+       mui.account_name,
+      mui.id user_id,
+      ri.rcmd_code,
+      ri.reason,
+      ri.create_time,
+      ri.pass_way,
+      ri.pay_amount,
+      ri.pay_count,
+      ri.click,
+      ri.winning_status,
+      ri.sale_end_time,
+      rd.screens,
+      rd.plan_content
+      FROM
+      rcmd_user_pay rup
+      INNER JOIN rcmd_info ri on rup.rcmd_code=ri.rcmd_code
+      INNER JOIN rcmd_detail rd ON ri.rcmd_code = rd.rcmd_code
+      INNER JOIN m_user_info mui on ri.user_id= mui.id
+      where rup.user_id=#{userId}
+      <if test="status!=null and status==1">
+        and  ri.status in(1,4)
+      </if>
+      <if test="status!=null and status==2">
+        and  ri.status = 2
+      </if>
+      order by rup.create_time desc
+    LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+  </select>
+
+  <select id="queryIsRcmdMatch" resultType="int">
+      SELECT
+          count(0)
+      FROM
+          rcmd_detail rd
+      INNER JOIN rcmd_info ri ON rd.rcmd_code = ri.rcmd_code
+      AND ri.user_id = #{userId}
+      AND rd.screens = #{screens}
+  </select>
+
+  <select id="queryTodayRcmdCount"  resultType="Integer">
+    select count(0) from rcmd_info where user_id=#{userId} and date_format(create_time, '%Y-%m-%d') = date_format(curdate(), '%Y-%m-%d') and pass_way=#{passWay}
+  </select>
+
+</mapper>

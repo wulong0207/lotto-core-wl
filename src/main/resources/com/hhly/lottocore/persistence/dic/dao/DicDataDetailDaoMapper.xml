@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.dic.dao.DicDataDetailDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.lottocore.persistence.dic.po.DicDataDetailPO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="DIC_CODE" property="dicCode" jdbcType="VARCHAR" />
+    <result column="DIC_DATA_NAME" property="dicDataName" jdbcType="VARCHAR" />
+    <result column="DIC_DATA_VALUE" property="dicDataValue" jdbcType="VARCHAR" />
+    <result column="IS_FIXED" property="isFixed" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="ORDER_BY" property="orderBy" jdbcType="DECIMAL" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>  
+  
+  <select id="findByCode" resultType="com.hhly.skeleton.cms.dicmgr.bo.DicDataDetailBO">
+	   select
+	     ID id, 
+	     DIC_CODE dicCode, 
+	     DIC_DATA_NAME dicDataName, 
+	     DIC_DATA_VALUE dicDataValue, 
+	     IS_FIXED isFixed, 
+	     `STATUS` `status`, 
+	     ORDER_BY orderBy, 
+	     UPDATE_TIME updateTime, 
+	     CREATE_TIME createTime
+	   from 
+	   DIC_DATA_DETAIL
+	   where DIC_CODE = #{code,jdbcType=VARCHAR}
+	   order by ORDER_BY
+  </select>
+
+	<select id="findDicDatail" resultType="com.hhly.skeleton.cms.dicmgr.bo.DicDataDetailBO">
+		select
+		ID id,
+		DIC_CODE dicCode,
+		DIC_DATA_NAME dicDataName,
+		DIC_DATA_VALUE dicDataValue,
+		IS_FIXED isFixed,
+		`STATUS` `status`,
+		ORDER_BY orderBy,
+		UPDATE_TIME updateTime,
+		CREATE_TIME createTime
+		from
+		DIC_DATA_DETAIL
+		where DIC_CODE = #{dicCode,jdbcType=VARCHAR}
+		order by ORDER_BY
+		<if test="startRow != null and pageSize != null">
+			limit #{startRow}, #{pageSize}
+		</if>
+	</select>
+
+	<select id="findTotal" resultType="java.lang.Integer">
+		select count(1)
+		from DIC_DATA_DETAIL WHERE DIC_CODE = #{dicCode,jdbcType=VARCHAR}
+	</select>
+
+  <delete id="delByPrimaryKey">
+   	delete from DIC_DATA_DETAIL
+    where ID = #{id,jdbcType=DECIMAL}
+  </delete>
+  <update id="updByPrimaryKey" parameterType="com.hhly.lottocore.persistence.dic.po.DicDataDetailPO">
+	 	update DIC_DATA_DETAIL
+	    set DIC_CODE = #{dicCode,jdbcType=VARCHAR},
+	      DIC_DATA_NAME = #{dicDataName,jdbcType=VARCHAR},
+	      DIC_DATA_VALUE = #{dicDataValue,jdbcType=VARCHAR},
+	      IS_FIXED = #{isFixed,jdbcType=DECIMAL},
+	      `STATUS` = #{status,jdbcType=DECIMAL},
+	      ORDER_BY = #{orderBy,jdbcType=DECIMAL},
+	      UPDATE_TIME = now()
+	    where ID = #{id,jdbcType=DECIMAL} 
+  </update>
+  <insert id="add" useGeneratedKeys="true" keyProperty="id"  parameterType="com.hhly.lottocore.persistence.dic.po.DicDataDetailPO">
+    insert into DIC_DATA_DETAIL (DIC_CODE, DIC_DATA_NAME, 
+      DIC_DATA_VALUE, IS_FIXED, `STATUS`, 
+      ORDER_BY, UPDATE_TIME, CREATE_TIME
+      )
+    values (#{dicCode,jdbcType=VARCHAR}, #{dicDataName,jdbcType=VARCHAR}, 
+      #{dicDataValue,jdbcType=VARCHAR}, #{isFixed,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
+      #{orderBy,jdbcType=DECIMAL}, now(),now()
+      )
+  </insert>
+  <delete id="delByPrimaryKeyList">
+    delete from DIC_DATA_DETAIL
+    where ID in 
+    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+       #{item}
+    </foreach>
+  </delete>
+  <select id="findSimple" resultType="com.hhly.skeleton.cms.dicmgr.bo.DicDataDetailBO">
+  	 select
+  	     DIC_CODE dicCode,
+	     DIC_DATA_NAME dicDataName, 
+	     DIC_DATA_VALUE dicDataValue
+	   from 
+	   DIC_DATA_DETAIL
+	   where DIC_CODE = #{code}
+       and `STATUS` = 1
+	   order by ORDER_BY
+  </select>
+  
+  <sql id="sql_statement_all">
+	  	select ID             id,
+		       DIC_CODE       dicCode,
+		       DIC_DATA_NAME  dicDataName,
+		       DIC_DATA_VALUE dicDataValue,
+		       IS_FIXED       isFixed,
+		       `STATUS`         `status`,
+		       ORDER_BY       orderBy,
+		       UPDATE_TIME    updateTime,
+		       CREATE_TIME    createTime
+		  from DIC_DATA_DETAIL
+  </sql>
+  <sql id="sql_condition_all">
+  		where 1 = 1
+  		<if test="id != null">
+  			and ID = #{id,jdbcType=INTEGER}
+  		</if>
+  		<if test="dicCode != null and dicCode !=''">
+  			and DIC_CODE = #{dicCode,jdbcType=VARCHAR}
+  		</if>
+  		<if test="dicDataValue != null and dicDataValue != ''">
+  			and DIC_DATA_VALUE = #{dicDataValue,jdbcType=VARCHAR}
+  		</if>
+  </sql>
+  <!-- 查询单条 -->
+  <select id="findSingle" parameterType="com.hhly.skeleton.cms.dicmgr.vo.DicDataDetailVO" resultType="com.hhly.skeleton.cms.dicmgr.bo.DicDataDetailBO">
+		<include refid="sql_statement_all" />
+		<include refid="sql_condition_all" />
+		limit 1
+  </select>
+  <!-- 查询多条 -->
+  <select id="findMultiple" parameterType="com.hhly.skeleton.cms.dicmgr.vo.DicDataDetailVO" resultType="com.hhly.skeleton.cms.dicmgr.bo.DicDataDetailBO">
+  		<include refid="sql_statement_all" />
+  		<include refid="sql_condition_all" />
+  		order by DIC_CODE,ORDER_BY,DIC_DATA_VALUE
+  </select>
+	<select id="getdataDetailCode" resultType="String">
+		select
+		DIC_CODE
+		from DIC_DATA_DETAIL
+		where id = #{id}
+	</select>
+
+	<select id="findMobileNumLimitList" resultType="java.lang.String">
+		SELECT
+		ddd.DIC_DATA_NAME
+		FROM DIC_DATA_DETAIL ddd WHERE ddd.DIC_CODE = 9997 AND ddd.STATUS = 1
+	</select>
+</mapper>

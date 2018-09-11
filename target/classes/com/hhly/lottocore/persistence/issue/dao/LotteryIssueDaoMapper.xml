@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.issue.dao.LotteryIssueDaoMapper">
+  
+  	<!--                           Used to CMS                           -->
+  
+  
+ 	<!--                           Used to LOTTO                           -->
+ 	
+ 	<resultMap id="HomeResultDetailMap" type="com.hhly.skeleton.lotto.base.issue.bo.IssueLottBO" >	
+		<result property="lotteryCategory" column="lottery_Category" jdbcType="INTEGER"/>
+	    <result property="lotteryCode" column="lottery_code" jdbcType="INTEGER"/>
+	    <result property="lotteryName" column="LOTTERY_NAME" jdbcType="VARCHAR"/>    
+  	  	<result property="issueCode" column="issue_code" jdbcType="VARCHAR"/>
+  	  	<result property="lotteryTime" column="LOTTERY_TIME" jdbcType="TIMESTAMP"/>
+  	  	<result property="jackpotAmount" column="jackpot_amount" jdbcType="DECIMAL"/>
+  	  	<result property="drawCode" column="draw_code" jdbcType="VARCHAR"/>
+  	  	<result property="drawDetail" column="draw_detail" jdbcType="VARCHAR"/>
+	</resultMap>
+ 
+ 	<!-- sql结果集：前端接口：彩期开奖（最新开奖、最近开奖）  -->
+	<resultMap id="IssueDrawFrontResultMap" type="com.hhly.skeleton.lotto.base.issue.bo.IssueDrawBO">
+  	  	<result property="issueCode" column="issue_code" jdbcType="VARCHAR"/>
+  	  	<result property="jackpotAmount" column="jackpot_amount" jdbcType="DECIMAL"/>
+  	  	<result property="drawCode" column="draw_code" jdbcType="VARCHAR"/>
+  	  	<result property="drawDetail" column="draw_detail" jdbcType="VARCHAR"/>
+  	  	<result property="officialEndTime" column="official_end_time" jdbcType="TIMESTAMP"/>
+  	  	<result property="drawCodeTest" column="draw_code_test" jdbcType="VARCHAR"/>
+  	  	<result property="lotteryTime" column="lottery_time" jdbcType="TIMESTAMP"/>
+  	  	<result property="salesAmount" column="sales_amount" jdbcType="DECIMAL"/>
+	</resultMap>
+	<!-- sql结果集：前端接口：彩期  -->
+	<resultMap id="IssueFrontResultMap" type="com.hhly.skeleton.lotto.base.issue.bo.IssueBO">
+		<result property="lotteryCode" column="lottery_code" jdbcType="INTEGER"/>
+  	  	<result property="issueCode" column="issue_code" jdbcType="VARCHAR"/>
+		<result property="saleStatus" column="sale_status" jdbcType="SMALLINT"/>
+  	  	<result property="officialEndTime" column="official_end_time" jdbcType="TIMESTAMP"/>
+        <result property="officialStartTime" column="official_start_time" jdbcType="TIMESTAMP"/>
+  	  	<result property="saleEndTime" column="sale_end_time" jdbcType="TIMESTAMP"/>
+  	  	<result property="jackpotAmount" column="jackpot_amount" jdbcType="DECIMAL"/>
+  	  	<result property="drawCode" column="draw_code" jdbcType="VARCHAR"/>
+  	  	<result property="drawDetail" column="draw_detail" jdbcType="VARCHAR"/>
+        <result property="lotteryTime" column="lottery_time" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	<!-- 前端：sql语句块：彩期查询 -->
+  	<sql id="front_sql_statement_issue">
+	  	select lottery_code,
+		       issue_code,
+		       sale_status,
+		       official_end_time,
+            official_start_time,
+		       sale_end_time,
+		       jackpot_amount,
+		       draw_code,
+		       lottery_time,
+		       draw_detail
+        from lottery_issue li
+	</sql>
+	<!-- 前端：sql语句块：彩期查询条件 -->
+	<sql id="front_sql_condition_issue">
+  		where 1 = 1
+  		<if test="lotteryCode != null">
+          	and li.lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+        </if>
+        <if test="issueCode != null and issueCode != ''">
+          	and li.issue_code = #{issueCode,jdbcType=VARCHAR}
+        </if>
+        <if test="currentIssue != null">
+          	and li.current_issue = #{currentIssue,jdbcType=SMALLINT}
+        </if>
+	</sql>
+	<!-- 前端接口：查询单个彩期 -->
+	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="IssueFrontResultMap">
+		/*MASTER*/
+		<include refid="front_sql_statement_issue"/>
+		<include refid="front_sql_condition_issue"/>
+		limit 1
+	</select>
+	<!-- 前端接口：查询所有符合条件的彩期 -->
+	<select id="findMultipleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="IssueFrontResultMap">
+	    <include refid="front_sql_statement_issue"/>
+		<include refid="front_sql_condition_issue"/>
+	</select>
+	<!-- 前端：sql语句块：查询最新开奖彩期或最近开奖彩期 -->
+  	<sql id="front_sql_statement_drawIssue">
+        select li.issue_code,
+               li.jackpot_amount,
+               li.draw_code,
+               li.draw_detail,
+               li.official_end_time,
+	     	   li.draw_code_test,
+			   li.lottery_time,
+		       li.sales_amount
+        from lottery_issue li
+         where li.lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+           and li.issue_code <![CDATA[<]]> (select li.issue_code
+        									  from lottery_issue li
+                                 			 where lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+                                   			   and current_issue = 1
+                                   			 limit 1)
+        order by li.issue_code desc 
+	</sql>
+	<!-- 前端接口：查询最新开奖彩期，即当前期的上一期 -->
+  	<select id="findLatestDrawIssue" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="IssueDrawFrontResultMap">
+		/*MASTER*/
+		<include refid="front_sql_statement_drawIssue"/>
+        limit 1
+  	</select>
+  	<!-- 前端接口：查询最近几期的开奖彩期,当前期的上几期-->
+  	<select id="findRecentDrawIssue" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="IssueDrawFrontResultMap">
+		<include refid="front_sql_statement_drawIssue"/>
+		limit #{qryCount}
+  	</select>
+  	
+  	<select id="findLotteryIssue" resultType="com.hhly.skeleton.base.issue.entity.NewIssueBO">
+  	   select 
+		   issue_code issuecode, 
+		   OFFICIAL_END_TIME OFFICIALENDTIME,
+		   SALE_END_TIME SALEENDTIME,
+		   LOTTERY_TIME LOTTERYTIME,
+		   SALE_TIME SALETIME
+        from lottery_issue
+	   where lottery_code = #{lotteryCode}
+	   and issue_code = #{issueCode} 
+  	</select>
+
+    <!-- 前端接口：查询最新开奖彩期，即下一期期的上一期 -->
+    <select id="findNextIssue" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO"
+            resultMap="IssueFrontResultMap">
+        SELECT
+            lottery_code,
+            issue_code,
+            sale_status,
+            official_end_time,
+            official_start_time,
+            sale_end_time,
+            jackpot_amount,
+            draw_code,
+            draw_detail
+        FROM lottery_issue li
+        WHERE li.lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+              AND li.issue_code <![CDATA[>]]> (SELECT li.issue_code
+                                   FROM lottery_issue li
+                                   WHERE lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+                                         AND current_issue = 1
+                                   LIMIT 1)
+        ORDER BY li.issue_code asc
+        LIMIT 1
+    </select>
+
+	<!-- 通过下单彩种编号和彩期编号，查询下一期彩期信息（用于订单入库校验查询）-->
+	<select id="findNextIssueByLotteryCodeAndIssueCode" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO"
+			resultMap="IssueFrontResultMap">
+		SELECT
+			lottery_code,
+			issue_code,
+			sale_status,
+			official_end_time,
+			official_start_time,
+			sale_end_time,
+			jackpot_amount,
+			draw_code,
+			draw_detail
+		FROM lottery_issue li
+		WHERE li.lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+			  AND li.issue_code > (SELECT li.issue_code
+								   FROM lottery_issue li
+								   WHERE lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+										 AND issue_code = #{issueCode,jdbcType=VARCHAR})
+		ORDER BY li.issue_code ASC
+		LIMIT 1
+	</select>
+
+    <!-- 查询当天有开奖的彩种 -->
+     <select id="findDrawNameToday"    resultMap="HomeResultDetailMap">  		
+	    select li.LOTTERY_CODE,li.LOTTERY_NAME from
+         lottery_issue li left join lottery_type on li.LOTTERY_CODE =lottery_type.LOTTERY_CODE
+		where DATE_FORMAT(LOTTERY_TIME, '%Y-%m-%d 00:00:00') = DATE_FORMAT(now(), '%Y-%m-%d 00:00:00') and LOTTERY_CATEGORY =1
+    </select> 
+     <!-- 查询当前期和之后的预售期组成列表 -->
+     <select id="findIssueByCode"  parameterType="int"  resultType="com.hhly.skeleton.lotto.base.issue.bo.IssueLottJCBO">
+         select
+             t.sale_end_time as saleEndTime,
+             t.sale_end_time as saleEndTimeStamp,
+             t.issue_code    as issueCode,
+             t.sale_status   as saleStatus,
+             t.current_issue
+                             as currentIssue
+         from (select li.sale_end_time , li.issue_code ,li.sale_status ,li.current_issue
+         from lottery_issue li
+ 				where li.lottery_code = #{lotteryCode}
+   				and li.issue_code <![CDATA[<=]]>(
+   				           select issue_code
+         from lottery_issue
+                           where lottery_code = #{lotteryCode}
+                           and current_issue = 1)
+                 order by li.issue_code desc  
+                  limit 3    
+               ) t
+         union
+         select
+             sale_end_time as saleEndTime,
+             sale_end_time as saleEndTimeStamp,
+             issue_code    as issueCode,
+             sale_status   as saleStatus,
+             current_issue as
+                              currentIssue from lottery_issue where lottery_code =#{lotteryCode} and (sale_status = 2 or sale_status = 3)
+         order by issueCode desc
+	 </select>
+
+	<!-- 根据彩种查询彩期列表记录条数 -->
+	<select id="findIssueListByCodeTotal" resultType="int"
+			parameterType="com.hhly.skeleton.lotto.base.issue.vo.LottoIssueVO">
+		select count(1)
+        from lottery_issue li
+		where li.lottery_code = #{lotteryCode}
+		and li.issue_code <![CDATA[ <= ]]>(
+		select issue_code
+        from lottery_issue
+		where lottery_code =  #{lotteryCode}
+		and current_issue = 1)
+		ORDER BY li.issue_code DESC
+	</select>
+
+	<!-- 根据彩种查询彩期列表，支持分页查询 -->
+	<select id="findIssueListByCode" resultType="com.hhly.skeleton.lotto.base.issue.bo.IssueLottJCBO"
+			parameterType="com.hhly.skeleton.lotto.base.issue.vo.LottoIssueVO">
+        select issue_code as issueCode ,sale_end_time as saleEndTimeStamp, sale_status as saleStatus ,current_issue as
+        currentIssue,
+		sale_end_time as saleEndTime,official_end_time as officialEndTime,
+        sales_amount as salesAmount,jackpot_amount as jackpotAmount,draw_code as drawCode,draw_detail as drawDetail
+        from (
+                 select li.issue_code,li.sale_status,li.current_issue,li.sale_end_time,li.official_end_time,
+        sales_amount,jackpot_amount,draw_code,draw_detail
+                 from lottery_issue li
+		where li.lottery_code = #{lotteryCode}
+              and li.issue_code <![CDATA[ <= ]]>(
+		select issue_code
+        from lottery_issue
+		where lottery_code =  #{lotteryCode}
+		and current_issue = 1)
+                 order by li.issue_code desc
+		) Z
+		limit #{startRow}, #{pageSize}
+	</select>
+
+	<!-- 根据彩种查询彩期列表，支持分页查询 -->
+	<select id="findAfterFiveIssueListByCode" resultType="com.hhly.skeleton.lotto.base.issue.bo.IssueLottJCBO"
+			parameterType="com.hhly.skeleton.lotto.base.issue.vo.LottoIssueVO">
+        SELECT
+            issue_code     as issueCode,
+            sale_end_time  as saleEndTimeStamp,
+            sale_status    as saleStatus,
+            current_issue  as currentIssue,
+            sale_end_time  as saleEndTime, official_end_time as officialEndTime,
+            sales_amount   as salesAmount,
+            jackpot_amount as jackpotAmount,
+            draw_code      as drawCode,
+            draw_detail    as drawDetail
+        FROM (
+                 select
+                     li.issue_code,
+                     li.sale_status,
+                     li.current_issue,
+                     li.sale_end_time,
+                     li.official_end_time,
+                     sales_amount,
+                     jackpot_amount,
+                     draw_code,
+                     draw_detail
+                 from lottery_issue li
+		where li.lottery_code = #{lotteryCode}
+		and li.issue_code <![CDATA[ >= ]]>(
+		select issue_code
+        from lottery_issue
+		where lottery_code =  #{lotteryCode}
+		and current_issue = 1)
+                 ORDER BY li.issue_code ASC
+		) Z
+        limit #{startRow}, #{pageSize}
+	</select>
+	
+	<!-- 前端接口：用户中心-查询低频彩等待出票的官方出票时间段-->
+	<select id="findNumOfficialTime" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.issue.bo.IssueOfficialTimeBO">
+  		select date_format(li.official_start_time, '%H:%i') officialStartTimeStr,
+		       date_format(li.official_end_time, '%H:%i') officialEndTimeStr
+        from lottery_issue li
+		 where lottery_code = #{lotteryCode,jdbcType=INTEGER}
+		   and current_issue = 1
+		   limit 1
+	</select>
+	<!-- 前端接口：用户中心-查询高频彩等待出票的官方出票时间段-->
+	<select id="findHighOfficialTime" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.issue.bo.IssueOfficialTimeBO">
+  		select date_format(min(li.official_start_time), '%H:%i') officialStartTimeStr,
+		       date_format(max(li.official_end_time), '%H:%i') officialEndTimeStr
+        from lottery_issue li
+		 where lottery_code = #{lotteryCode,jdbcType=INTEGER}
+		   and DATE_FORMAT(li.official_start_time, '%Y-%m-%d 00:00:00') = DATE_FORMAT(date_sub(now(), interval 1 day), '%Y-%m-%d 00:00:00')
+	</select>
+	<!-- 前端接口：用户中心-查询竞技彩等待出票的官方出票时间段-->
+	<select id="findSportOfficialTime" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.issue.bo.IssueOfficialTimeBO">
+  		select officialStartTime, officialEndTime
+		  from (select li.official_start_time officialStartTime,
+		               li.official_end_time officialEndTime
+        from lottery_issue li
+		         where li.lottery_code = #{lotteryCode,jdbcType=INTEGER}
+		           and li.issue_code <![CDATA[ < ]]> (select li.issue_code
+        from lottery_issue li
+		                                 where lottery_code = #{lotteryCode,jdbcType=INTEGER}
+		                                   and current_issue = 1 limit 1)
+		                                   order by li.issue_code desc limit 1) t
+		union all
+		
+		select officialStartTime, officialEndTime
+	      from (select li.official_start_time officialStartTime,
+				       li.official_end_time   officialEndTime
+        from lottery_issue li
+				 where lottery_code = #{lotteryCode,jdbcType=INTEGER}
+				   and current_issue = 1
+				  	limit 1) t1
+	</select>
+	<!--根据彩种 查询当前期和上一期彩种信息  -->
+	<select id="findIssueAndPreIssueByCode"  resultType="com.hhly.skeleton.lotto.base.issue.bo.CurrentAndPreIssueBO">	
+	select t.*,lt.lottery_logo_url as lotteryLogoUrl,lt.lottery_category as lotteryCategory from (
+        select li.lottery_time as lotteryTime, li.lottery_code as lotteryCode ,ISSUE_CODE issueCode,SALE_END_TIME
+        saleEndTime,lottery_name lotteryName, hs.* from lottery_issue li
+		left join
+		(
+            select ISSUE_CODE preIssue , LOTTERY_TIME preLotteryTime,DRAW_CODE preDrawCode ,JACKPOT_AMOUNT preJackpot , DRAW_DETAIL preDrawDetail ,lottery_code from
+        lottery_issue
+            where lottery_code = #{lotteryCode}  and ISSUE_LASTEST =1
+         ) hs 		
+         on li.lottery_code  = hs. lottery_code
+         where li.lottery_code = #{lotteryCode}  and CURRENT_ISSUE =1
+	) t LEFT JOIN	lottery_type lt on lt.lottery_code	= t.lotteryCode	
+	</select>
+	<!--根据彩种查询所有当前期和上一期彩种信息  -->
+	<select id="findAllIssueAndPreIssue"  resultType="com.hhly.skeleton.lotto.base.issue.bo.CurrentAndPreIssueBO">	
+		select t.*,lt.lottery_logo_url as lotteryLogoUrl,lt.lottery_category as lotteryCategory from (
+        select li.lottery_time as lotteryTime, li.lottery_code as lotteryCode,ISSUE_CODE issueCode,SALE_END_TIME
+        saleEndTime,lottery_name lotteryName, hs.* from lottery_issue li
+			left join
+			(
+	            select ISSUE_CODE preIssue , LOTTERY_TIME preLotteryTime,DRAW_CODE preDrawCode ,draw_code_test drawCodeTest,JACKPOT_AMOUNT preJackpot , DRAW_DETAIL preDrawDetail ,lottery_code from
+        lottery_issue
+	            where ISSUE_LASTEST =1
+	         ) hs 		
+	         on li.lottery_code  = hs. lottery_code
+	         where CURRENT_ISSUE =1
+	      ) t LEFT JOIN	lottery_type lt on lt.lottery_code	= t.lotteryCode
+	      	order by lt.order_id,lt.id
+	</select>	
+	
+  <select id="isCurrentIssue" resultType="boolean">
+  	select (case when li.current_issue=1 then 1 else 0 end) from lottery_issue li where li.lottery_code=#{lotteryCode} and li.issue_code=#{issueCode}
+  </select>
+  
+ <select id="queryIssueByLottery" resultType="java.lang.String" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO">
+	select
+	<choose>
+		<when test="qryFlag != null and qryFlag == 2">
+			distinct date(ifnull(li.official_start_time,li.lottery_time)) issue_date
+		</when>
+		<otherwise>
+			distinct li.issue_code
+		</otherwise>
+	</choose>
+	from lottery_issue li
+	<if test="lotteryCode==300 or lotteryCode==301 or lotteryCode==306 or lotteryCode==307">
+		join sport_against_info sai on li.lottery_code=sai.lottery_code and li.issue_code=sai.issue_code
+	</if>
+	 where li.lottery_code = #{lotteryCode, jdbcType=INTEGER}
+	<choose>
+		<when test="currentIssue != null and currentIssue == 2">
+			and li.issue_code <![CDATA[<=]]> (select max(li1.issue_code) from lottery_issue li1 where li1.CURRENT_ISSUE = 2 and li1.lottery_code = #{lotteryCode, jdbcType=INTEGER})
+		</when>
+		<otherwise>
+			and li.issue_code <![CDATA[<=]]> (select max(li1.issue_code) from lottery_issue li1 where li1.CURRENT_ISSUE = 1 and li1.lottery_code = #{lotteryCode, jdbcType=INTEGER})
+		</otherwise>
+	</choose>
+	<if test="qryFlag != null and qryFlag == 2">
+		and (li.official_start_time is not null or li.lottery_time is not null)
+	</if>
+	order by li.issue_code desc
+ 	<if test="qryCount != null and qryCount > 0">
+ 		limit #{qryCount}
+ 	</if>
+ </select>
+   
+</mapper>

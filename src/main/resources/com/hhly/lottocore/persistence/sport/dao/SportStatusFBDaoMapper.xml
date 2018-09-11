@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.sport.dao.SportStatusFBDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportStatusFBBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="SPORT_AGAINST_INFO_ID" property="sportAgainstInfoId" jdbcType="DECIMAL" />
+    <result column="STATUS_WDF" property="statusWdf" jdbcType="DECIMAL" />
+    <result column="STATUS_LET_WDF" property="statusLetWdf" jdbcType="DECIMAL" />
+    <result column="STATUS_GOAL" property="statusGoal" jdbcType="DECIMAL" />
+    <result column="STATUS_HF_WDF" property="statusHfWdf" jdbcType="DECIMAL" />
+    <result column="STATUS_SCORE" property="statusScore" jdbcType="DECIMAL" />
+    <result column="MODIFY_BY" property="modifyBy" jdbcType="OTHER" />
+    <result column="MODIFY_TIME" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    ID, SPORT_AGAINST_INFO_ID, STATUS_WDF, STATUS_LET_WDF, STATUS_GOAL, 
+    STATUS_HF_WDF, STATUS_SCORE, MODIFY_BY, MODIFY_TIME, UPDATE_TIME, CREATE_TIME
+  </sql>
+
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.hhly.lottocore.persistence.sport.po.SportStatusFBPO" >
+    insert into SPORT_STATUS_FB (SPORT_AGAINST_INFO_ID, 
+      STATUS_WDF, STATUS_LET_WDF, STATUS_GOAL, 
+      STATUS_HF_WDF, STATUS_SCORE, MODIFY_BY, 
+      MODIFY_TIME, UPDATE_TIME, CREATE_TIME
+      )
+    values (#{sportAgainstInfoId,jdbcType=DECIMAL}, 
+      #{statusWdf,jdbcType=DECIMAL}, #{statusLetWdf,jdbcType=DECIMAL}, #{statusGoal,jdbcType=DECIMAL}, 
+      #{statusHfWdf,jdbcType=DECIMAL}, #{statusScore,jdbcType=DECIMAL}, #{modifyBy,jdbcType=VARCHAR},
+      #{modifyTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.sport.po.SportStatusFBPO" >
+    update SPORT_STATUS_FB
+    <set >
+      <if test="sportAgainstInfoId != null" >
+        SPORT_AGAINST_INFO_ID = #{sportAgainstInfoId,jdbcType=DECIMAL},
+      </if>
+      <if test="statusWdf != null" >
+        STATUS_WDF = #{statusWdf,jdbcType=DECIMAL},
+      </if>
+      <if test="statusLetWdf != null" >
+        STATUS_LET_WDF = #{statusLetWdf,jdbcType=DECIMAL},
+      </if>
+      <if test="statusGoal != null" >
+        STATUS_GOAL = #{statusGoal,jdbcType=DECIMAL},
+      </if>
+      <if test="statusHfWdf != null" >
+        STATUS_HF_WDF = #{statusHfWdf,jdbcType=DECIMAL},
+      </if>
+      <if test="statusScore != null" >
+        STATUS_SCORE = #{statusScore,jdbcType=DECIMAL},
+      </if>
+      <if test="modifyBy != null" >
+        MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null" >
+        MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  
+  <select id="getBysSportAgainstInfoIds" resultMap="BaseResultMap">
+  		SELECT 
+  		<include refid="Base_Column_List" />
+  		FROM SPORT_STATUS_FB
+  		WHERE SPORT_AGAINST_INFO_ID IN 
+  		<foreach item="sportAgainstInfoId" index="index" collection="sportAgainstInfoIds"
+			open="(" separator="," close=")">
+			#{sportAgainstInfoId}
+		</foreach>
+  </select>
+</mapper>

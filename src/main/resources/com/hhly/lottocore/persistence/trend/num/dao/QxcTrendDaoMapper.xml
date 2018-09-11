@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.trend.num.dao.QxcTrendDaoMapper">
+  <sql id="Base_Column_List" >
+    <!-- issue, drawcode, --> 
+    bw0, bw1, bw2, bw3, bw4, bw5, bw6, bw7, bw8, bw9, sw0, sw1, sw2, 
+    sw3, sw4, sw5, sw6, sw7, sw8, sw9, w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, q0, q1, 
+    q2, q3, q4, q5, q6, q7, q8, q9, b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, s0, s1, s2, 
+    s3, s4, s5, s6, s7, s8, s9, g0, g1, g2, g3, g4, g5, g6, g7, g8, g9
+  </sql>
+	
+	<sql id="base_column_oe">
+		issue,drawcode,bwo,bwe,swo,swe,wo,we,qo,qe,bo,be,so,se,go,ge,oe
+	</sql>
+	
+	<sql id="base_column_bs">
+		issue,drawcode,bwb,bws,swb,sws,wb,ws,qb,qs,bb,bs,sb,ss,gb,gs,than
+	</sql>
+	
+	<sql id="Table">
+		trend_qxc_base
+	</sql>
+	
+	<!-- 前端接口：查询目前最大的遗漏期数数据 -->
+	<select id="findMaxTrendFront" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.QxcTrendBO">
+		select
+		<include refid="Base_Column_List" />
+		from <include refid="Table" />
+		order by issue desc
+		LIMIT 1
+	</select>
+	
+	<!-- 前端接口：查询单条子玩法配置 -->
+	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.num.bo.QxcTrendBO">
+		select
+		<include refid="Base_Column_List" />
+		from <include refid="Table" />
+		where issue = #{issueCode,jdbcType=VARCHAR}
+		LIMIT 1
+	</select>
+	
+	<!-- 前端接口：查询多条子玩法配置 -->
+	<select id="findTrendRangeFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.num.bo.QxcTrendBO">
+		select
+		<include refid="Base_Column_List" />
+		from <include refid="Table" />
+		<where>
+			<if test="issueCode != null and issueCode != ''">
+				and issue  <![CDATA[<=]]>
+				#{issueCode,jdbcType=VARCHAR}
+			</if>
+		</where>
+		order by issue desc
+		LIMIT 0,#{qryCount}
+	</select>
+	
+	<!-- 最近开奖详情 -->
+	<select id="findRecentDrawIssue" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.num.bo.QxcTrendBO">
+		select
+		<trim suffixOverrides=",">
+			li.issue_code issue,
+			li.draw_code drawCode,
+			than bs,
+			oe,
+		</trim>
+		from lottery_issue li
+        left outer join trend_qxc_bs tqb on li.issue_code = tqb.issue
+        left outer join trend_qxc_oe tqo on li.issue_code = tqo.issue
+		where li.lottery_code = #{lotteryCode}
+		and li.issue_code <![CDATA[<]]>
+		(select li.issue_code
+		from lottery_issue li
+		where lottery_code = #{lotteryCode}
+		and current_issue = 1
+		limit 1)
+		order by li.issue_code desc
+		limit #{qryCount}
+	</select>
+	
+	
+  	<select id="findLatestDrawOtherFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.QxcDrawOtherBO">
+		select
+		  	than bs,
+			oe
+		from trend_qxc_bs tqb
+		inner join trend_qxc_oe tqo on tqb.issue = tqo.issue
+		WHERE
+			tqb.issue = #{issueCode}
+		LIMIT 1
+  	</select>
+  	
+  	<select id="findBaseTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.QxcTrendBO">
+  		SELECT <include refid="Base_Column_List"/> from `trend_qxc_base`
+ 		where issue >=#{startIssue}  and issue <![CDATA[ <= ]]>#{endIssue} 
+		ORDER BY issue 
+  	</select>	
+  	
+  
+  	<select id="findOETrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.qxc.QxcOeTrendBo">
+  		SELECT <include refid="base_column_oe"/> from `trend_qxc_oe`
+ 		where issue >=#{startIssue}  and issue <![CDATA[ <= ]]>#{endIssue} 
+		ORDER BY issue 
+  	</select>
+  
+    <select id="findBSTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.qxc.QxcBsTrendBo">
+  		SELECT <include refid="base_column_bs"/> from `trend_qxc_bs`
+  		where issue >=#{startIssue}  and issue <![CDATA[ <= ]]>#{endIssue} 
+		ORDER BY issue  
+  	</select>	
+  	
+</mapper>

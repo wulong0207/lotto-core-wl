@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.trend.area.dao.YydjDaoMapper">
+	<sql id="Base_Table">
+		TREND_YYDJ_BASE 
+	</sql>
+
+	
+	<sql id="Base_Column">
+		issue,drawcode drawCode,
+		b1,b2,b3,b4,b5,b6,b7,b8
+	</sql>
+	
+	<select id="findBaseTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.high.bo.YydjTrendBaseBO">
+		select <include refid="Base_Column"/>
+		from <include refid="Base_Table"/>
+		where LOTTERY_CODE = #{lotteryCode}
+		<if test="startIssue!=null">
+			and issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		order by issue desc
+		<if test="qryCount!=null">
+			limit #{qryCount}
+		</if>
+	</select>
+
+</mapper>

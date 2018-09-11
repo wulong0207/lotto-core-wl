@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.recommend.dao.RcmdUserCheckMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.recommend.bo.RcmdUserCheckBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="apply_source" jdbcType="INTEGER" property="applySource" />
+    <result column="apply_type" jdbcType="INTEGER" property="applyType" />
+    <result column="lottery_code" jdbcType="SMALLINT" property="lotteryCode" />
+    <result column="adept_match" jdbcType="VARCHAR" property="adeptMatch" />
+    <result column="summary" jdbcType="VARCHAR" property="summary" />
+    <result column="apply_time" jdbcType="TIMESTAMP" property="applyTime" />
+    <result column="check_time" jdbcType="TIMESTAMP" property="checkTime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="is_show_record" jdbcType="INTEGER" property="isShowRecord" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="modify_by" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, user_id, apply_source, apply_type, lottery_code, adept_match, summary, apply_time, 
+    check_time, status, is_show_record, create_time, update_time, modify_by, remark
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.lottocore.persistence.recommend.po.RcmdUserCheckPO">
+    insert into rcmd_user_check (id, user_id, apply_source, 
+      apply_type, lottery_code, adept_match, 
+      summary, apply_time, check_time, 
+      status, create_time,
+      update_time, modify_by, remark
+      )
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{applySource,jdbcType=BIT}, 
+      #{applyType,jdbcType=INTEGER}, #{lotteryCode,jdbcType=SMALLINT}, #{adeptMatch,jdbcType=VARCHAR}, 
+      #{summary,jdbcType=VARCHAR}, now(), #{checkTime,jdbcType=TIMESTAMP},
+      #{status,jdbcType=BIT}, now(),
+      now(), #{modifyBy,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+
+
+  <update id="update" parameterType="com.hhly.lottocore.persistence.recommend.po.RcmdUserCheckPO">
+    update rcmd_user_check
+    <set>
+      <if test="applySource != null">
+        apply_source = #{applySource,jdbcType=BIT},
+      </if>
+      <if test="applyType != null">
+        apply_type = #{applyType,jdbcType=INTEGER},
+      </if>
+
+      <if test="lotteryCode != null">
+        lottery_code = #{lotteryCode,jdbcType=SMALLINT},
+      </if>
+      <if test="adeptMatch != null">
+        adept_match = #{adeptMatch,jdbcType=VARCHAR},
+      </if>
+      <if test="summary != null">
+        summary = #{summary,jdbcType=VARCHAR},
+      </if>
+        apply_time = now(),
+
+      <if test="status != null">
+        status = #{status,jdbcType=BIT},
+      </if>
+      <if test="isShowRecord != null">
+        is_show_record = #{isShowRecord,jdbcType=BIT},
+      </if>
+
+        update_time = now(),
+
+      <if test="modifyBy != null">
+        modify_by = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+
+  <select id="queryUserCheckInfo" parameterType="Integer" resultMap="BaseResultMap">
+     select
+     <include refid="Base_Column_List"></include>
+    from rcmd_user_check where user_id=#{userId} and lottery_code=300  limit 1
+  </select>
+
+  <select id="queryUserCheckInfoNoFilterStatus" parameterType="Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from rcmd_user_check where user_id=#{userId} and lottery_code=300 order by create_time desc limit 1
+  </select>
+
+</mapper>

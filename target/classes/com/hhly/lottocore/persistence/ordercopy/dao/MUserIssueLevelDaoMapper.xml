@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.ordercopy.dao.MUserIssueLevelDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.MUserIssueLevelBO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_issue_info_id" jdbcType="INTEGER" property="userIssueInfoId"/>
+        <result column="lottery_code" jdbcType="SMALLINT" property="lotteryCode"/>
+        <result column="level" jdbcType="BIT" property="level"/>
+        <result column="is_automatic" jdbcType="BIT" property="isAutomatic"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_by" jdbcType="VARCHAR" property="modifyBy"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_issue_info_id, lottery_code, level, is_automatic, create_time, modify_by,
+        modify_time, update_time
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from m_user_issue_level
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM m_user_issue_level
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueLevelPO">
+        INSERT INTO m_user_issue_level (id, user_issue_info_id, lottery_code,
+                                        level, is_automatic, create_time,
+                                        modify_by, modify_time, update_time
+        )
+        VALUES (#{id,jdbcType=INTEGER}, #{userIssueInfoId,jdbcType=INTEGER}, #{lotteryCode,jdbcType=SMALLINT},
+                #{level,jdbcType=BIT}, #{isAutomatic,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP},
+                #{modifyBy,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueLevelPO">
+        insert into m_user_issue_level
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userIssueInfoId != null">
+                user_issue_info_id,
+            </if>
+            <if test="lotteryCode != null">
+                lottery_code,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="isAutomatic != null">
+                is_automatic,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="modifyBy != null">
+                modify_by,
+            </if>
+            <if test="modifyTime != null">
+                modify_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userIssueInfoId != null">
+                #{userIssueInfoId,jdbcType=INTEGER},
+            </if>
+            <if test="lotteryCode != null">
+                #{lotteryCode,jdbcType=SMALLINT},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=BIT},
+            </if>
+            <if test="isAutomatic != null">
+                #{isAutomatic,jdbcType=BIT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyBy != null">
+                #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueLevelPO">
+        update m_user_issue_level
+        <set>
+            <if test="userIssueInfoId != null">
+                user_issue_info_id = #{userIssueInfoId,jdbcType=INTEGER},
+            </if>
+            <if test="lotteryCode != null">
+                lottery_code = #{lotteryCode,jdbcType=SMALLINT},
+            </if>
+            <if test="level != null">
+                level = #{level,jdbcType=BIT},
+            </if>
+            <if test="isAutomatic != null">
+                is_automatic = #{isAutomatic,jdbcType=BIT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyBy != null">
+                modify_by = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueLevelPO">
+        UPDATE m_user_issue_level
+        SET user_issue_info_id = #{userIssueInfoId,jdbcType=INTEGER},
+            lottery_code       = #{lotteryCode,jdbcType=SMALLINT},
+            level              = #{level,jdbcType=BIT},
+            is_automatic       = #{isAutomatic,jdbcType=BIT},
+            create_time        = #{createTime,jdbcType=TIMESTAMP},
+            modify_by          = #{modifyBy,jdbcType=VARCHAR},
+            modify_time        = #{modifyTime,jdbcType=TIMESTAMP},
+            update_time        = #{updateTime,jdbcType=TIMESTAMP}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+    
+    <resultMap id="UserIssueLevelMap" type="java.util.HashMap">
+        <result column="user_issue_id" property="issueUserId"/>
+        <result column="user_level" property="userLevel"/>
+    </resultMap>
+    
+    <!-- 获取发单用户用户级别 -->
+    <select id="getUserLevel" resultMap="UserIssueLevelMap">
+        SELECT
+			CASE
+		WHEN sum(LEVEL) = 0 THEN
+			0
+		ELSE
+			1
+		END user_level,
+		 user_issue_info_id user_issue_id
+		FROM
+			m_user_issue_level
+		WHERE
+			user_issue_info_id = #{userIssueId}
+		GROUP BY
+			user_issue_info_id
+    </select>
+</mapper>

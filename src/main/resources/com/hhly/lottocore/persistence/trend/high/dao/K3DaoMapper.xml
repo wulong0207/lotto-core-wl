@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.trend.high.dao.K3DaoMapper">
+	
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.trend.high.bo.K3OmitBO" >
+    <result column="ISSUE" property="issue" jdbcType="VARCHAR" javaType="string"/>
+    <result column="DRAWCODE" property="drawCode" jdbcType="VARCHAR" javaType="string"/>
+    <result column="FLAG" property="omitType" jdbcType="VARCHAR" />
+    <result column="B1" property="b1" jdbcType="INTEGER" />
+    <result column="B2" property="b2" jdbcType="INTEGER" />
+    <result column="B3" property="b3" jdbcType="INTEGER" />
+    <result column="B4" property="b4" jdbcType="INTEGER" />
+    <result column="B5" property="b5" jdbcType="INTEGER" />
+    <result column="B6" property="b6" jdbcType="INTEGER" />
+    <result column="S" property="s" jdbcType="INTEGER" />
+    <result column="S3" property="s3" jdbcType="INTEGER" />
+    <result column="S4" property="s4" jdbcType="INTEGER" />
+    <result column="S5" property="s5" jdbcType="INTEGER" />
+    <result column="S6" property="s6" jdbcType="INTEGER" />
+    <result column="S7" property="s7" jdbcType="INTEGER" />
+    <result column="S8" property="s8" jdbcType="INTEGER" />
+    <result column="S9" property="s9" jdbcType="INTEGER" />
+    <result column="S10" property="s10" jdbcType="INTEGER" />
+    <result column="S11" property="s11" jdbcType="INTEGER" />
+    <result column="S12" property="s12" jdbcType="INTEGER" />
+    <result column="S13" property="s13" jdbcType="INTEGER" />
+    <result column="S14" property="s14" jdbcType="INTEGER" />
+    <result column="S15" property="s15" jdbcType="INTEGER" />
+    <result column="S16" property="s16" jdbcType="INTEGER" />
+    <result column="S17" property="s17" jdbcType="INTEGER" />
+    <result column="S18" property="s18" jdbcType="INTEGER" />
+    <result column="T3" property="t3" jdbcType="INTEGER" />
+    <result column="BT3" property="bt3" jdbcType="INTEGER" />
+    <result column="L3" property="l3" jdbcType="INTEGER" />
+    <result column="TF2" property="tf2" jdbcType="INTEGER" />
+    <result column="TD2" property="td2" jdbcType="INTEGER" />
+    <result column="BT2" property="bt2" jdbcType="INTEGER" />
+    <result column="KD" property="kd" jdbcType="INTEGER" />
+    <result column="T11" property="t11" jdbcType="INTEGER" />
+    <result column="T22" property="t22" jdbcType="INTEGER" />
+    <result column="T33" property="t33" jdbcType="INTEGER" />
+    <result column="T44" property="t44" jdbcType="INTEGER" />
+    <result column="T55" property="t55" jdbcType="INTEGER" />
+    <result column="T66" property="t66" jdbcType="INTEGER" />
+    <result column="T111" property="t111" jdbcType="INTEGER" />
+    <result column="T222" property="t222" jdbcType="INTEGER" />
+    <result column="T333" property="t333" jdbcType="INTEGER" />
+    <result column="T444" property="t444" jdbcType="INTEGER" />
+    <result column="T555" property="t555" jdbcType="INTEGER" />
+    <result column="T666" property="t666" jdbcType="INTEGER" />
+    <result column="TDB1" property="tdb1" jdbcType="INTEGER" />
+    <result column="TDB2" property="tdb2" jdbcType="INTEGER" />
+    <result column="TDB3" property="tdb3" jdbcType="INTEGER" />
+    <result column="TDB4" property="tdb4" jdbcType="INTEGER" />
+    <result column="TDB5" property="tdb5" jdbcType="INTEGER" />
+    <result column="TDB6" property="tdb6" jdbcType="INTEGER" />
+    <result column="tf11" property="tf11" typeHandler="com.hhly.lottocore.base.typeHandler.K3tfTypeHandler" />
+    <result column="tf22" property="tf22" typeHandler="com.hhly.lottocore.base.typeHandler.K3tfTypeHandler" />
+    <result column="tf33" property="tf33" typeHandler="com.hhly.lottocore.base.typeHandler.K3tfTypeHandler" />
+    <result column="tf44" property="tf44" typeHandler="com.hhly.lottocore.base.typeHandler.K3tfTypeHandler" />
+    <result column="tf55" property="tf55" typeHandler="com.hhly.lottocore.base.typeHandler.K3tfTypeHandler" />
+    <result column="tf66" property="tf66" typeHandler="com.hhly.lottocore.base.typeHandler.K3tfTypeHandler" />
+  </resultMap>
+  
+   <sql id="Base_Column_List" >
+   	<trim suffixOverrides="," >
+      <if test="true" >
+        flag,
+      </if>
+      <if test="showB1" >
+        b1,
+      </if>
+      <if test="showB2" >
+        b2,
+      </if>
+      <if test="showB3" >
+        b3,
+      </if>
+      <if test="showB4" >
+        b4,
+      </if>
+      <if test="showB5" >
+        b5,
+      </if>
+      <if test="showB6" >
+        b6,
+      </if>
+      <if test="showS3" >
+        s3,
+      </if>
+      <if test="showS4" >
+        s4,
+      </if>
+      <if test="showS5" >
+        s5,
+      </if>
+      <if test="showS6" >
+        s6,
+      </if>
+      <if test="showS7" >
+        s7,
+      </if>
+      <if test="showS8" >
+        s8,
+      </if>
+      <if test="showS9" >
+        s9,
+      </if>
+      <if test="showS10" >
+        s10,
+      </if>
+      <if test="showS11" >
+        s11,
+      </if>
+      <if test="showS12" >
+        s12,
+      </if>
+      <if test="showS13" >
+        s13,
+      </if>
+      <if test="showS14" >
+        s14,
+      </if>
+      <if test="showS15" >
+        s15,
+      </if>
+      <if test="showS16" >
+        s16,
+      </if>
+      <if test="showS17" >
+        s17,
+      </if>
+      <if test="showS18" >
+        s18,
+      </if>
+      <if test="showT3" >
+        t3,
+      </if>
+      <if test="showBt3" >
+        bt3,
+      </if>
+      <if test="showL3" >
+        l3,
+      </if>
+      <if test="showTf2" >
+        tf2,
+      </if>
+      <if test="showTd2" >
+        td2,
+      </if>
+      <if test="showBt2" >
+        bt2,
+      </if>
+      <!-- 
+      <if test="showKd" >
+        kd,
+      </if>
+       -->
+      <if test="showT11" >
+        t11,
+      </if>
+      <if test="showT22" >
+        t22,
+      </if>
+      <if test="showT33" >
+        t33,
+      </if>
+      <if test="showT44" >
+        t44,
+      </if>
+      <if test="showT55" >
+        t55,
+      </if>
+      <if test="showT66" >
+        t66,
+      </if>
+      <if test="showT111" >
+        t111,
+      </if>
+      <if test="showT222" >
+        t222,
+      </if>
+      <if test="showT333" >
+        t333,
+      </if>
+      <if test="showT444" >
+        t444,
+      </if>
+      <if test="showT555" >
+        t555,
+      </if>
+      <if test="showT666" >
+        t666,
+      </if>
+      <if test="showTdb1" >
+        tdb1,
+      </if>
+      <if test="showTdb2" >
+        tdb2,
+      </if>
+      <if test="showTdb3" >
+        tdb3,
+      </if>
+      <if test="showTdb4" >
+        tdb4,
+      </if>
+      <if test="showTdb5" >
+        tdb5,
+      </if>
+      <if test="showTdb6" >
+        tdb6,
+      </if>
+        <if test="showTf11" >
+    1 tf11,
+  </if>
+  <if test="showTf22" >
+    1 tf22,
+  </if>
+  <if test="showTf33" >
+    1 tf33,
+  </if>
+  <if test="showTf44" >
+    1 tf44,
+  </if>
+  <if test="showTf55" >
+    1 tf55,
+  </if>
+  <if test="showTf66" >
+    1 tf66,
+  </if>
+      </trim>
+  </sql>
+  
+    
+  <!--
+   <sql id="Base_Column_List_不同子玩法显示不同字段" >
+    FLAG, B1, B2, B3, B4, B5, B6, S3, S4, S5, S6, S7, S8, S9, S10, S11, 
+    S12, S13, S14, S15, S16, S17, S18, T3, BT3, L3, TF2, TD2, BT2,T11, T22, T33, 
+    T44, T55, T66, T111, T222, T333, T444, T555, T666,TDB1, TDB2, TDB3, TDB4, TDB5, TDB6  
+  </sql>
+  -->
+  
+  
+  <sql id="Trend_K3_Base_Column" >
+    issue, drawcode drawCode, b1, b2, b3, b4, b5, b6, s3, s4, s5, s6, s7, s8, s9, s10, s11,
+    s12, s13, s14, s15, s16, s17, s18,t3,bt3,l3,tf2,bt2
+  </sql>
+ 
+  
+  <sql id="Trend_K3_Base_Column_List" >
+	<trim suffixOverrides="," >
+    <if test="showIssue" >
+    issue,
+  </if>
+  <if test="showDrawCode" >
+    drawcode,
+  </if>
+  <if test="showB1" >
+    b1,
+  </if>
+  <if test="showB2" >
+    b2,
+  </if>
+  <if test="showB3" >
+    b3,
+  </if>
+  <if test="showB4" >
+    b4,
+  </if>
+  <if test="showB5" >
+    b5,
+  </if>
+  <if test="showB6" >
+    b6,
+  </if>
+  <if test="showS" >
+    s,
+  </if>
+  <if test="showS3" >
+    s3,
+  </if>
+  <if test="showS4" >
+    s4,
+  </if>
+  <if test="showS5" >
+    s5,
+  </if>
+  <if test="showS6" >
+    s6,
+  </if>
+  <if test="showS7" >
+    s7,
+  </if>
+  <if test="showS8" >
+    s8,
+  </if>
+  <if test="showS9" >
+    s9,
+  </if>
+  <if test="showS10" >
+    s10,
+  </if>
+  <if test="showS11" >
+    s11,
+  </if>
+  <if test="showS12" >
+    s12,
+  </if>
+  <if test="showS13" >
+    s13,
+  </if>
+  <if test="showS14" >
+    s14,
+  </if>
+  <if test="showS15" >
+    s15,
+  </if>
+  <if test="showS16" >
+    s16,
+  </if>
+  <if test="showS17" >
+    s17,
+  </if>
+  <if test="showS18" >
+    s18,
+  </if>
+  <if test="showT3" >
+    t3,
+  </if>
+  <if test="showBt3" >
+    bt3,
+  </if>
+  <if test="showL3" >
+    l3,
+  </if>
+  <if test="showTf2" >
+    tf2,
+  </if>
+  <if test="showTd2" >
+    td2,
+  </if>
+  <if test="showBt2" >
+    bt2,
+  </if>
+  <if test="showT11" >
+    t11,
+  </if>
+  <if test="showT22" >
+    t22,
+  </if>
+  <if test="showT33" >
+    t33,
+  </if>
+  <if test="showT44" >
+    t44,
+  </if>
+  <if test="showT55" >
+    t55,
+  </if>
+  <if test="showT66" >
+    t66,
+  </if>
+  <if test="showT111" >
+    t111,
+  </if>
+  <if test="showT222" >
+    t222,
+  </if>
+  <if test="showT333" >
+    t333,
+  </if>
+  <if test="showT444" >
+    t444,
+  </if>
+  <if test="showT555" >
+    t555,
+  </if>
+  <if test="showT666" >
+    t666,
+  </if>
+  <if test="showBig" >
+    big,
+  </if>
+  <if test="showSmall" >
+    small,
+  </if>
+  <if test="showOdd" >
+    odd,
+  </if>
+  <if test="showEven" >
+    even,
+  </if>
+  <if test="showKd" >
+    kd,
+  </if>
+  <if test="showKd0" >
+    kd0,
+  </if>
+  <if test="showKd1" >
+    kd1,
+  </if>
+  <if test="showKd2" >
+    kd2,
+  </if>
+  <if test="showKd3" >
+    kd3,
+  </if>
+  <if test="showKd4" >
+    kd4,
+  </if>
+  <if test="showKd5" >
+    kd5,
+  </if>
+  <if test="showTdb1" >
+    tdb1,
+  </if>
+  <if test="showTdb2" >
+    tdb2,
+  </if>
+  <if test="showTdb3" >
+    tdb3,
+  </if>
+  <if test="showTdb4" >
+    tdb4,
+  </if>
+  <if test="showTdb5" >
+    tdb5,
+  </if>
+  <if test="showTdb6" >
+    tdb6,
+  </if>
+  <if test="type" >
+    type,
+  </if>
+  <if test="bs" >
+    bs,
+  </if>
+  </trim>
+  </sql>
+  
+	<sql id="Table">
+  		TREND_K3_RESULT
+	</sql>
+	
+	<select id="findResultOmit" parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO" resultMap="BaseResultMap">
+     	select <include refid="Base_Column_List"/>
+			from <include refid="Table"/>
+			WHERE LOTTERY_CODE = #{lotteryCode}
+			<if test="omitTypes != null">
+	  			and FLAG in
+	  			<foreach collection="omitTypes" item="omitType" open="(" close=")" separator=",">
+	  				#{omitType}
+	  			</foreach>
+	  		</if>
+	</select>
+	 
+	<select id="findRecentOmit" parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO" resultMap="BaseResultMap">
+         select <include refid="Trend_K3_Base_Column_List"/>
+			from TREND_K3_BASE
+			where LOTTERY_CODE = #{lotteryCode}
+			order by issue desc
+			limit 0,#{qryCount}
+	</select>
+
+	<select id="findRecentIssue"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultMap="BaseResultMap">
+		select
+		<trim suffixOverrides=",">
+			li.issue_code issue,
+			li.draw_code drawcode,
+			<if test="showS">
+				s,
+			</if>
+			<if test="type">
+				type,
+			</if>
+			<if test="bs">
+				bs,
+			</if>
+		</trim>
+		from lottery_issue li
+		left outer join TREND_K3_BASE tkb
+		on li.lottery_code = tkb.lottery_code and li.issue_code = tkb.issue
+		where li.lottery_code = #{lotteryCode}
+		and li.issue_code <![CDATA[<]]>
+		(select li.issue_code
+		from lottery_issue li
+		where lottery_code = #{lotteryCode}
+		and current_issue = 1
+		limit 1)
+		order by li.issue_code desc
+		limit #{qryCount}
+	</select>
+	
+	<select id="findBaseTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.high.bo.K3BaseBO">
+		select <include refid="Trend_K3_Base_Column"/>
+		from `trend_k3_base` where lottery_code =#{lotteryCode}
+		<if test="startIssue!=null">
+			and issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		order by issue desc
+		<if test="qryCount!=null">
+			limit #{qryCount}	
+		</if>
+	</select>
+	
+	<select id="findTrendRangeFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.high.bo.K3BaseBO">
+		select <include refid="Trend_K3_Base_Column"/>
+		from `trend_k3_base` where lottery_code =#{lotteryCode}
+		<if test="startIssue!=null">
+			and issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		order by issue desc
+		<if test="qryCount!=null">
+			limit #{qryCount}	
+		</if>
+	</select>
+
+
+</mapper>

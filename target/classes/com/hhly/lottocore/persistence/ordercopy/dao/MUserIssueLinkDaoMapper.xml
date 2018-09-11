@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.ordercopy.dao.MUserIssueLinkDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.MUserIssueLinkBO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_issue_id" jdbcType="INTEGER" property="userIssueId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="data_status" jdbcType="BIT" property="dataStatus"/>
+    </resultMap>
+    
+    <resultMap id="BaseBOResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.MUserIssueLinkBO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_issue_id" jdbcType="INTEGER" property="userIssueId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="begin_time" jdbcType="TIMESTAMP" property="beginTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="data_status" jdbcType="BIT" property="dataStatus"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_issue_id, user_id, begin_time, end_time, update_time, data_status
+    </sql>
+    
+    <sql id="Condition_Column_List">
+        a.id, a.user_issue_id, a.user_id, a.begin_time, a.end_time, a.update_time, a.data_status
+    </sql>
+    
+    <sql id="Base_Condition_List">
+        <if test = "userIssueId != null">
+			and a.user_issue_id = #{userIssueId}
+		</if>
+		<if test = "userId != null">
+			and a.user_id = #{userId}
+		</if>
+		
+		<if test = "dataStatus != null">
+			and a.data_status = #{dataStatus,jdbcType=BIT}
+		</if>
+    </sql>
+    
+     <!-- 排序  -->
+    <sql id="Order_SQL">
+        <if test = "sortField != null and sortOrder !=null">
+          ORDER BY ${sortField} ${sortOrder}
+        </if>
+    </sql>
+    
+    <sql id="Page_SQL">
+        LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from m_user_issue_link
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    
+    <!-- 通过条件查询 ,返回集合-->
+    <select id="selectByCondition" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.MUserIssueLinkVO" resultType="com.hhly.skeleton.lotto.base.ordercopy.bo.QueryUserIssueLinkBO">
+        SELECT
+           a.id,
+		   c.nick_name nickName,
+		   a.begin_time focusTime,
+		   CASE WHEN d.num > 0 THEN 1
+		          ELSE 0 END remark 
+        FROM m_user_issue_link a
+        LEFT JOIN m_user_info c ON a.user_id = c.id
+        LEFT JOIN (SELECT a.user_id,count(0)num 
+					FROM order_followed_info a
+					INNER JOIN order_issue_info b ON b.id = a.order_issue_id 
+					AND b.user_issue_id = #{userIssueId}
+                    AND a.data_status = 1 group by a.user_id) d ON a.user_id = d.user_id
+        WHERE 1=1
+        <include refid="Base_Condition_List"/>
+        <include refid="Order_SQL"/>
+        <include refid="Page_SQL"/>
+    </select>
+    <!-- 通过条件查询 , 总记录数-->
+    <select id="selectByConditionCount" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.MUserIssueLinkVO" resultType="int">
+        SELECT
+           count(0)
+        FROM m_user_issue_link a
+        LEFT JOIN m_user_info b ON a.user_id = b.id
+        WHERE 1=1
+        <include refid="Base_Condition_List"/>
+    </select>
+
+    <!-- 查询用户是否关注 -->
+    <select id="selectCountByUserId" resultType="int">
+        SELECT count(1)
+        FROM m_user_issue_link
+        WHERE user_issue_id = #{userIssueId} AND user_id = #{userId} AND data_status = 1
+    </select>
+    
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM m_user_issue_link
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueLinkPO">
+        INSERT INTO m_user_issue_link (user_issue_id, user_id,
+                                       begin_time, end_time, update_time,
+                                       data_status)
+        VALUES (#{userIssueId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},
+                #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+                #{dataStatus,jdbcType=BIT})
+    </insert>
+    <insert id="insertSelective" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueLinkPO">
+        insert into m_user_issue_link
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userIssueId != null">
+                user_issue_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="beginTime != null">
+                begin_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="dataStatus != null">
+                data_status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userIssueId != null">
+                #{userIssueId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="beginTime != null">
+                #{beginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="dataStatus != null">
+                #{dataStatus,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueLinkPO">
+        update m_user_issue_link
+        <set>
+            <if test="userIssueId != null">
+                user_issue_id = #{userIssueId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="dataStatus != null">
+                data_status = #{dataStatus,jdbcType=BIT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueLinkPO">
+        UPDATE m_user_issue_link
+        SET user_issue_id = #{userIssueId,jdbcType=INTEGER},
+            user_id       = #{userId,jdbcType=INTEGER},
+            begin_time    = #{beginTime,jdbcType=TIMESTAMP},
+            end_time      = #{endTime,jdbcType=TIMESTAMP},
+            update_time   = #{updateTime,jdbcType=TIMESTAMP},
+            data_status   = #{dataStatus,jdbcType=BIT}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <select id="queryMyAttentionCount" parameterType="Integer" resultType="Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        m_user_issue_link muil
+        INNER JOIN m_user_issue_info mu ON muil.user_issue_id = mu.id
+        WHERE
+        muil.user_id = #{userId}  and muil.data_status=1
+    </select>
+
+    <select id="queryMyAttentionList" parameterType="Integer" resultType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdAttentionBO">
+        SELECT
+           mu.id userIssueInfoId,
+            mu.user_id rcmdUserId,
+            mui.account_name accountName,
+            mui.head_url headUrl,
+            rut.level type,
+            mu.focus_num focusNum,
+            ruc.summary summary
+        FROM
+            m_user_issue_link muil
+        INNER JOIN m_user_issue_info mu ON muil.user_issue_id = mu.id
+        INNER JOIN m_user_info mui ON mu.user_id = mui.id
+        INNER JOIN rcmd_user_check ruc ON mu.user_id = ruc.user_id
+        INNER JOIN m_user_issue_level m ON mu.id = m.user_issue_info_id
+        INNER JOIN rcmd_user_type rut ON m.`level` = rut.id
+        WHERE
+            muil.user_id = #{userId} and muil.data_status=1 and ruc.lottery_code=300 and ruc.status=3
+            LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </select>
+</mapper>

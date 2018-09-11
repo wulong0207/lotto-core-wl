@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.jc.dao.MatchDataDaoMapper">
+
+    <!-- 竞彩足球映射实体 -->
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.sport.bo.MatchDataBO">
+        <id column="id" property="id" jdbcType="DECIMAL"></id>
+        <result column="match_name" property="matchName" jdbcType="VARCHAR"/>
+        <result column="five_league" property="fiveLeague" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <!-- 查询投注竞彩足球对阵以及SP值数据 -->
+    <select id="findMatchData" resultMap="BaseResultMap" parameterType="com.hhly.skeleton.lotto.base.sport.vo.JcParamVO">
+        select m.id as id,
+        if(m.match_short_name is not null and
+        m.match_short_name!='',m.match_short_name,m.match_full_name) as match_name,
+        five_league
+        from sport_match_info m
+        inner join (select distinct a.sport_match_info_id as id
+        from sport_against_info a
+        where a.lottery_code=#{lotteryCode}
+        <if test="issueCode == null or issueCode == ''">
+            and a.match_status=#{matchStatus}
+            <![CDATA[ and sale_end_time >= now()  ]]>
+        </if>
+        <if test="issueCode != null and issueCode != ''">
+            and a.issue_code=#{issueCode}
+        </if>
+        ) b
+        on m.id=b.id and m.match_type=#{matchType}
+    </select>
+
+
+</mapper>

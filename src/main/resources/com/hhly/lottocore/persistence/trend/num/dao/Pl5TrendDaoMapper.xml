@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.trend.num.dao.Pl5TrendDaoMapper">
+  
+  <!--                           Used to CMS                           -->
+  
+  
+  
+  <!--                           Used to LOTTO                           -->
+  
+  	<!-- 从彩期表获取最近几期的期号 -->
+	<sql id="findRecentIssueCode">
+		SELECT issue_code 
+           FROM lottery_issue li 
+		  WHERE li.lottery_code = #{lotteryCode}
+		    AND li.issue_code <![CDATA[ < ]]> (SELECT li.issue_code FROM lottery_issue li WHERE lottery_code = #{lotteryCode} AND current_issue = 1 LIMIT 1 ) 
+		  ORDER BY li.issue_code DESC 
+		  LIMIT #{qryCount}
+	</sql>
+	
+	<!-- 从彩期表获取最近几期的期号 -->
+  	<sql id="front_sql_columns_pl5_base_trend">
+			tpb.w0,
+			tpb.w1,
+			tpb.w2,
+			tpb.w3,
+			tpb.w4,
+			tpb.w5,
+			tpb.w6,
+			tpb.w7,
+			tpb.w8,
+			tpb.w9,
+			tpb.q0,
+			tpb.q1,
+			tpb.q2,
+			tpb.q3,
+			tpb.q4,
+			tpb.q5,
+			tpb.q6,
+			tpb.q7,
+			tpb.q8,
+			tpb.q9,
+			tpb.b0,
+			tpb.b1,
+			tpb.b2,
+			tpb.b3,
+			tpb.b4,
+			tpb.b5,
+			tpb.b6,
+			tpb.b7,
+			tpb.b8,
+			tpb.b9,
+			tpb.s0,
+			tpb.s1,
+			tpb.s2,
+			tpb.s3,
+			tpb.s4,
+			tpb.s5,
+			tpb.s6,
+			tpb.s7,
+			tpb.s8,
+			tpb.s9,
+			tpb.g0,
+			tpb.g1,
+			tpb.g2,
+			tpb.g3,
+			tpb.g4,
+			tpb.g5,
+			tpb.g6,
+			tpb.g7,
+			tpb.g8,
+			tpb.g9
+	</sql>
+	
+  	<!-- 前端接口：sql语句块：基础信息遗漏(对应彩种base结尾基础表)(万、千、百、十、个位遗漏) -->
+	<sql id="front_sql_statement_pl5_base_trend">
+		SELECT
+			tpb.issue,
+			tpb.drawcode drawCode,
+			<include refid="front_sql_columns_pl5_base_trend"/>
+		FROM
+			trend_p5_base tpb
+	</sql>
+	<!-- 前端接口：基础信息遗漏(对应彩种base结尾基础表)(万、千、百、十、个位遗漏)：查询最大的遗漏期数数据 -->
+  	<select id="findMaxTrendFront" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5TrendBO">
+		<include refid="front_sql_statement_pl5_base_trend" />
+		ORDER BY tpb.issue DESC
+		LIMIT 1
+  	</select>
+  	<!-- 前端接口：基础信息遗漏(对应彩种base结尾基础表)(万、千、百、十、个位遗漏)：查询单条遗漏走势 -->
+  	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5TrendBO">
+		<include refid="front_sql_statement_pl5_base_trend" />
+		WHERE tpb.issue = #{issueCode,jdbcType=VARCHAR}
+		LIMIT 1
+  	</select>
+  	<!-- 前端接口：基础信息遗漏(对应彩种base结尾基础表)(万、千、百、十、个位遗漏)：查询范围内的遗漏走势集合(即从指定期开始的近多少期) -->
+  	<select id="findTrendRangeFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5TrendBO">
+  		<include refid="front_sql_statement_pl5_base_trend" />
+		WHERE 1 = 1
+			<if test="issueCode != null and issueCode != ''">
+         	AND tpb.issue <![CDATA[<=]]> #{issueCode,jdbcType=VARCHAR}
+       		</if>
+		ORDER BY tpb.issue DESC
+		LIMIT 0,#{qryCount}
+  	</select>
+  	
+  	
+  	<!-- 前端接口：查询最新开奖的开奖其它信息(eg:和值、奇偶比、大小比等) 注：用于彩种首页最新开奖信息的补充信息-->
+  	<select id="findLatestDrawOtherFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5DrawOtherBO">
+		select
+			tps.sum,
+		  	tpbs.than bs,
+		  	tpo.oe
+		from trend_p5_sum tps
+		inner join trend_p5_bs tpbs on tps.issue = tpbs.issue
+		inner join trend_p5_oe tpo on tps.issue = tpo.issue
+		WHERE
+			tps.issue = #{issueCode,jdbcType=VARCHAR}
+		LIMIT 1
+  	</select>
+  	<!-- 前端接口：近期开奖：查询近期遗漏走势 -->
+  	<select id="findRecentTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5RecentTrendBO">		
+		SELECT
+			iss.issue_code issue,
+			tps.drawcode drawCode,
+			tps.sum,
+			tpbs.than bs,
+			tpo.oe
+		FROM
+			(<include refid="findRecentIssueCode"/>) iss
+		LEFT JOIN trend_p5_sum tps ON iss.issue_code = tps.issue
+		LEFT JOIN trend_p5_bs tpbs ON tps.issue = tpbs.issue
+		LEFT JOIN trend_p5_oe tpo ON tps.issue = tpo.issue
+  	</select>
+  	<!-- 公共结果集: 前端接口：(近期开奖：查询近期遗漏走势) or (走势投注：查询走势投注信息) -->
+  	<resultMap id="RecentTrendResultMap" type="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5RecentTrendBO">
+  	  <result property="issue" column="issue" jdbcType="VARCHAR"/>
+  	  <result property="drawCode" column="drawcode" jdbcType="VARCHAR"/>
+  	  <result property="sum" column="sum" jdbcType="INTEGER"/>
+  	  <result property="bs" column="bs" jdbcType="INTEGER"/>
+  	  <result property="oe" column="oe" jdbcType="INTEGER"/>
+  	  <association property="baseTrend" javaType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5TrendBO">
+  	  	  <result property="w0" column="w0" jdbcType="INTEGER"/>
+  	  	  <result property="w1" column="w1" jdbcType="INTEGER"/>
+  	  	  <result property="w2" column="w2" jdbcType="INTEGER"/>
+  	  	  <result property="w3" column="w3" jdbcType="INTEGER"/>
+  	  	  <result property="w4" column="w4" jdbcType="INTEGER"/>
+  	  	  <result property="w5" column="w5" jdbcType="INTEGER"/>
+  	  	  <result property="w6" column="w6" jdbcType="INTEGER"/>
+  	  	  <result property="w7" column="w7" jdbcType="INTEGER"/>
+  	  	  <result property="w8" column="w8" jdbcType="INTEGER"/>
+  	  	  <result property="w9" column="w9" jdbcType="INTEGER"/>
+  	  	  <result property="q0" column="q0" jdbcType="INTEGER"/>
+  	  	  <result property="q1" column="q1" jdbcType="INTEGER"/>
+  	  	  <result property="q2" column="q2" jdbcType="INTEGER"/>
+  	  	  <result property="q3" column="q3" jdbcType="INTEGER"/>
+  	  	  <result property="q4" column="q4" jdbcType="INTEGER"/>
+  	  	  <result property="q5" column="q5" jdbcType="INTEGER"/>
+  	  	  <result property="q6" column="q6" jdbcType="INTEGER"/>
+  	  	  <result property="q7" column="q7" jdbcType="INTEGER"/>
+  	  	  <result property="q8" column="q8" jdbcType="INTEGER"/>
+  	  	  <result property="q9" column="q9" jdbcType="INTEGER"/>
+  	  	  <result property="b0" column="b0" jdbcType="INTEGER"/>
+  	  	  <result property="b1" column="b1" jdbcType="INTEGER"/>
+  	  	  <result property="b2" column="b2" jdbcType="INTEGER"/>
+  	  	  <result property="b3" column="b3" jdbcType="INTEGER"/>
+  	  	  <result property="b4" column="b4" jdbcType="INTEGER"/>
+  	  	  <result property="b5" column="b5" jdbcType="INTEGER"/>
+  	  	  <result property="b6" column="b6" jdbcType="INTEGER"/>
+  	  	  <result property="b7" column="b7" jdbcType="INTEGER"/>
+  	  	  <result property="b8" column="b8" jdbcType="INTEGER"/>
+  	  	  <result property="b9" column="b9" jdbcType="INTEGER"/>
+  	  	  <result property="s0" column="s0" jdbcType="INTEGER"/>
+  	  	  <result property="s1" column="s1" jdbcType="INTEGER"/>
+  	  	  <result property="s2" column="s2" jdbcType="INTEGER"/>
+  	  	  <result property="s3" column="s3" jdbcType="INTEGER"/>
+  	  	  <result property="s4" column="s4" jdbcType="INTEGER"/>
+  	  	  <result property="s5" column="s5" jdbcType="INTEGER"/>
+  	  	  <result property="s6" column="s6" jdbcType="INTEGER"/>
+  	  	  <result property="s7" column="s7" jdbcType="INTEGER"/>
+  	  	  <result property="s8" column="s8" jdbcType="INTEGER"/>
+  	  	  <result property="s9" column="s9" jdbcType="INTEGER"/>
+  	  	  <result property="g0" column="g0" jdbcType="INTEGER"/>
+  	  	  <result property="g1" column="g1" jdbcType="INTEGER"/>
+  	  	  <result property="g2" column="g2" jdbcType="INTEGER"/>
+  	  	  <result property="g3" column="g3" jdbcType="INTEGER"/>
+  	  	  <result property="g4" column="g4" jdbcType="INTEGER"/>
+  	  	  <result property="g5" column="g5" jdbcType="INTEGER"/>
+  	  	  <result property="g6" column="g6" jdbcType="INTEGER"/>
+  	  	  <result property="g7" column="g7" jdbcType="INTEGER"/>
+  	  	  <result property="g8" column="g8" jdbcType="INTEGER"/>
+  	  	  <result property="g9" column="g9" jdbcType="INTEGER"/>
+  	  </association>
+  	  <association property="bsTrend" javaType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5BigSmallTrendBO">
+  	  	  <result property="bs50" column="bs50" jdbcType="INTEGER"/>
+  	  	  <result property="bs41" column="bs41" jdbcType="INTEGER"/>
+  	  	  <result property="bs32" column="bs32" jdbcType="INTEGER"/>
+  	  	  <result property="bs23" column="bs23" jdbcType="INTEGER"/>
+  	  	  <result property="bs14" column="bs14" jdbcType="INTEGER"/>
+  	  	  <result property="bs05" column="bs05" jdbcType="INTEGER"/>
+  	  </association>
+  	  <association property="oeTrend" javaType="com.hhly.skeleton.lotto.base.trend.num.bo.pl5.Pl5OddEvenTrendBO">
+  	  	  <result property="oe50" column="oe50" jdbcType="INTEGER"/>
+  	  	  <result property="oe41" column="oe41" jdbcType="INTEGER"/>
+  	  	  <result property="oe32" column="oe32" jdbcType="INTEGER"/>
+  	  	  <result property="oe23" column="oe23" jdbcType="INTEGER"/>
+  	  	  <result property="oe14" column="oe14" jdbcType="INTEGER"/>
+  	  	  <result property="oe05" column="oe05" jdbcType="INTEGER"/>
+  	  </association>
+  	</resultMap>
+  	<!-- 前端接口：走势投注：查询走势投注信息(返回的数据结构在Pl5RecentTrendBO里面扩展，该接口比最近开奖详情列表的返回字段要更多) -->
+  	<select id="findTrendBettingInfo" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="RecentTrendResultMap">		
+		SELECT
+			iss.issue_code issue,
+			tpb.drawcode drawCode,
+			<include refid="front_sql_columns_pl5_base_trend"/>,
+			tpbs.than bs,
+			tpbs.bs50,
+			tpbs.bs41,
+			tpbs.bs32,
+			tpbs.bs23,
+			tpbs.bs14,
+			tpbs.bs05,
+			tpo.oe,
+			tpo.oe50,
+			tpo.oe41,
+			tpo.oe32,
+			tpo.oe23,
+			tpo.oe14,
+			tpo.oe05,
+			tps.sum
+		   FROM
+			(<include refid="findRecentIssueCode"/>) iss
+			LEFT JOIN  trend_p5_base tpb ON iss.issue_code = tpb.issue 
+			LEFT JOIN  trend_p5_bs  tpbs ON iss.issue_code = tpbs.issue
+			LEFT JOIN  trend_p5_oe   tpo ON iss.issue_code = tpo.issue
+			LEFT JOIN  trend_p5_sum  tps ON iss.issue_code = tps.issue
+  	</select>
+
+  	<!--        走势图专用             -->
+  	
+  	
+</mapper>

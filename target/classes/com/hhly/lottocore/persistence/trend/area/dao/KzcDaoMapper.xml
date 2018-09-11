@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.trend.area.dao.KzcDaoMapper">
+	<sql id="Base_Table">
+		TREND_KZC_BASE 
+	</sql>
+
+	
+	<sql id="Base_Column">
+		issue,drawcode drawCode,
+		g01,g02,g03,g04,g05,g06,g07,g08,g09,g10,
+		g11,g12,g13,g14,g15,g16,g17,g18,g19,g20,
+		s01,s02,s03,s04
+	</sql>
+	
+	<select id="findBaseTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.high.bo.KzcTrendBaseBO">
+		select <include refid="Base_Column"/>
+		from <include refid="Base_Table"/>
+		where 1=1 
+		<if test="startIssue!=null">
+			and issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		order by issue desc
+		<if test="qryCount!=null">
+			limit #{qryCount}
+		</if>
+	</select>
+
+</mapper>

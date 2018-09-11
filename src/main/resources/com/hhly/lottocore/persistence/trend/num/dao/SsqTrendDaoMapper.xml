@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.trend.num.dao.SsqTrendDaoMapper">
+  
+  <!--                           Used to CMS                           -->
+  
+  
+  
+  <!--                           Used to LOTTO                           -->
+  	
+  	<!--          遗漏、冷热、概率数据专用             -->
+  	<!-- 前端接口：sql公共列：双色球基本走势查询 -->
+	<sql id="front_sql_columns_ssq_base_trend">
+	  	       tsb.issue,
+		       tsb.r01,
+		       tsb.r02,
+		       tsb.r03,
+		       tsb.r04,
+		       tsb.r05,
+		       tsb.r06,
+		       tsb.r07,
+		       tsb.r08,
+		       tsb.r09,
+		       tsb.r10,
+		       tsb.r11,
+		       tsb.r12,
+		       tsb.r13,
+		       tsb.r14,
+		       tsb.r15,
+		       tsb.r16,
+		       tsb.r17,
+		       tsb.r18,
+		       tsb.r19,
+		       tsb.r20,
+		       tsb.r21,
+		       tsb.r22,
+		       tsb.r23,
+		       tsb.r24,
+		       tsb.r25,
+		       tsb.r26,
+		       tsb.r27,
+		       tsb.r28,
+		       tsb.r29,
+		       tsb.r30,
+		       tsb.r31,
+		       tsb.r32,
+		       tsb.r33,
+		       tsb.b01,
+		       tsb.b02,
+		       tsb.b03,
+		       tsb.b04,
+		       tsb.b05,
+		       tsb.b06,
+		       tsb.b07,
+		       tsb.b08,
+		       tsb.b09,
+		       tsb.b10,
+		       tsb.b11,
+		       tsb.b12,
+		       tsb.b13,
+		       tsb.b14,
+		       tsb.b15,
+		       tsb.b16
+	</sql>
+	<!-- 前端接口：查询目前最大的遗漏期数数据 -->
+  	<select id="findMaxTrendFront" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.SsqTrendBO">
+		select <include refid="front_sql_columns_ssq_base_trend" />
+		    from TREND_SSQ_BASE tsb 
+		  order by tsb.issue desc 
+		LIMIT 1
+  	</select>
+  	<!-- 前端接口：查询单条子玩法配置 -->
+  	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.SsqTrendBO">
+		select 
+			<include refid="front_sql_columns_ssq_base_trend" />
+		  from TREND_SSQ_BASE tsb
+		  where tsb.issue = #{issueCode,jdbcType=VARCHAR}
+			LIMIT 1
+  	</select>
+  	<!-- 前端接口：查询多条子玩法配置 -->
+  	<select id="findTrendRangeFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.SsqTrendBO">
+  		select <include refid="front_sql_columns_ssq_base_trend" />
+          from TREND_SSQ_BASE tsb
+         where 1 = 1 
+         	<if test="issueCode != null and issueCode != ''">
+	          	and tsb.issue <![CDATA[<=]]> #{issueCode,jdbcType=VARCHAR}
+	        </if>
+	       order by tsb.issue desc
+		   LIMIT 0,#{qryCount}
+  	</select>
+  	
+  	<select id="findBaseTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.SsqTrendBO">
+  		select <include refid="front_sql_columns_ssq_base_trend"/>,tsb.drawcode drawCode from TREND_SSQ_BASE tsb
+  		where 1=1 
+  		<if test="startIssue!=null">
+  			and issue>=#{startIssue}
+  		</if>
+  		<if test="endIssue!=null">
+  			and issue &lt;=#{endIssue}
+  		</if>
+  		order by tsb.issue desc
+  		<if test="startIssue==null and endIssue==null">
+  			limit #{qryCount}
+  		</if>
+  	</select>
+  	
+  	<!--        走势图专用             -->
+  	
+</mapper>

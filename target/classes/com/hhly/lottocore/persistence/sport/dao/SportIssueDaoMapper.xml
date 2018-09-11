@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.sport.dao.SportIssueDaoMapper">
+  <resultMap id="ResultMap" type="com.hhly.lottocore.persistence.sport.po.LotteryIssuePO">
+    <id column="ID" jdbcType="DECIMAL" property="id" />
+    <result column="LOTTERY_CODE" jdbcType="DECIMAL" property="lotteryCode" />
+    <result column="ISSUE_CODE" jdbcType="VARCHAR" property="issueCode" />
+    <result column="LOTTERY_NAME" jdbcType="VARCHAR" property="lotteryName" />
+    <result column="CURRENT_ISSUE" jdbcType="DECIMAL" property="currentIssue" />
+    <result column="SALE_STATUS" jdbcType="DECIMAL" property="saleStatus" />
+    <result column="OFFICIAL_END_TIME" jdbcType="TIMESTAMP" property="officialEndTime" />
+    <result column="LOTTERY_TIME" jdbcType="TIMESTAMP" property="lotteryTime" />
+    <result column="SALE_TIME" jdbcType="TIMESTAMP" property="saleTime" />
+    <result column="SALE_END_TIME" jdbcType="TIMESTAMP" property="saleEndTime" />
+    <result column="SALES_AMOUNT" jdbcType="DECIMAL" property="salesAmount" />
+    <result column="JACKPOT_AMOUNT" jdbcType="DECIMAL" property="jackpotAmount" />
+    <result column="DRAW_CODE" jdbcType="VARCHAR" property="drawCode" />
+    <result column="DRAW_DETAIL" jdbcType="VARCHAR" property="drawDetail" />
+    <result column="CREATE_BY" jdbcType="VARCHAR" property="createBy" />
+    <result column="MODIFY_BY" jdbcType="VARCHAR" property="modifyBy" />
+    <result column="MODIFY_TIME" jdbcType="TIMESTAMP" property="modifyTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+   </resultMap>
+  
+ 	<resultMap id="drawDetailBOMap" type="com.hhly.skeleton.lotto.base.issue.bo.DrawDetailBO" >
+    <result column="LOTTERY_CODE" jdbcType="DECIMAL" property="lotteryCode" />
+    <result column="ISSUE_CODE" jdbcType="VARCHAR" property="lotteryIssue" />
+    <result column="DRAW_CODE" jdbcType="VARCHAR" property="drawCodes" typeHandler="com.hhly.persistence.typeHandler.String2ListTypeHandler"/>
+    <result column="DRAW_DETAIL" jdbcType="VARCHAR" property="prizes" typeHandler="prizeTypeHandler"/>
+	</resultMap>
+	
+  <sql id="Base_Column_List">
+    ID, LOTTERY_CODE, ISSUE_CODE, LOTTERY_NAME, CURRENT_ISSUE, SALE_STATUS, 
+    OFFICIAL_END_TIME, LOTTERY_TIME, SALE_TIME, SALE_END_TIME, SALES_AMOUNT, JACKPOT_AMOUNT, 
+    DRAW_CODE, CREATE_BY, MODIFY_BY, MODIFY_TIME, UPDATE_TIME, CREATE_TIME, REMARK
+  </sql>
+   <select id="findIssueCode" parameterType="com.hhly.skeleton.lotto.base.vo.LotteryIssueVO" resultType="String">
+			select li.issue_code
+  				from lottery_issue li
+ 				where li.lottery_code = #{lotteryCode}
+   				and li.issue_code >= (
+   				           select issue_code
+                           from lottery_issue
+                           where lottery_code = #{lotteryCode}
+                           and current_issue = 1)
+                 order by li.issue_code  
+                 LIMIT #{qryCount}        
+   </select>
+   <select id="find" parameterType="com.hhly.skeleton.lotto.base.vo.LotteryIssueVO" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryIssueCmsBO">
+		select 
+	      li.ID id,
+	      li.ISSUE_CODE issueCode,
+	      li.LOTTERY_CODE lotteryCode,
+	      li.LOTTERY_NAME lotteryName,
+	      li.CURRENT_ISSUE currentIssue,
+	      li.SALE_STATUS saleStatus,
+	      li.SALE_TIME saleTime,
+	      li.SALE_END_TIME saleEndTime,
+	      li.LOTTERY_TIME  lotteryTime,
+	      li.DRAW_CODE drawCode,
+	      li.UPDATE_TIME updateTime,
+	      li.CREATE_TIME createTime
+	    from 
+	         lottery_issue li
+	    left join  lottery_type lt on lt.lottery_code = li.lottery_code 
+	    <where>
+	        <if test="lotteryCode!=null">
+	          and li.LOTTERY_CODE = #{lotteryCode}
+	        </if>
+	        <if test="issueCode !=null and issueCode !=''">
+	          and li.ISSUE_CODE =  #{issueCode}
+	        </if>
+	        <if test="saleStatus !=null">
+	          and li.SALE_STATUS =  #{saleStatus}
+	        </if>
+	        <if test="lotteryCategory!=null">
+	          and lt.LOTTERY_CATEGORY = #{lotteryCategory}
+	        </if>
+	    </where>
+	      	order by 
+	       <choose>  
+            <when test="sortField !=null and sortField!=''">  
+                ${sortField} ${sortOrder}
+            </when >   
+            <otherwise>  
+                li.id desc
+            </otherwise>  
+          </choose>	     
+	  	 <if test="startRow != null and pageSize != null">
+	  	 	limit #{startRow},#{pageSize} 
+	 	 </if>
+   </select>
+   
+   <select id="findTotal" parameterType="com.hhly.skeleton.lotto.base.vo.LotteryIssueVO" resultType="int">
+		select 
+	       count(1)
+	    from 
+	         lottery_issue li
+	    left join  lottery_type lt on lt.lottery_code = li.lottery_code 
+	    <where>
+	        <if test="lotteryCode!=null">
+	          and li.LOTTERY_CODE = #{lotteryCode}
+	        </if>
+	        <if test="issueCode !=null and issueCode !=''">
+	          and li.ISSUE_CODE =  #{issueCode}
+	        </if>
+	        <if test="saleStatus !=null">
+	          and li.SALE_STATUS =  #{saleStatus}
+	        </if>
+	        <if test="lotteryCategory!=null">
+	          and lt.LOTTERY_CATEGORY = #{lotteryCategory}
+	        </if>
+	    </where>    
+   </select>
+   <insert id="addIssue" useGeneratedKeys="true" keyProperty="id" parameterType="com.hhly.lottocore.persistence.sport.po.LotteryIssuePO">
+    insert into LOTTERY_ISSUE (LOTTERY_CODE, ISSUE_CODE, 
+      LOTTERY_NAME, CURRENT_ISSUE, SALE_STATUS, 
+      OFFICIAL_END_TIME, LOTTERY_TIME, SALE_TIME, 
+      SALE_END_TIME, SALES_AMOUNT, JACKPOT_AMOUNT, 
+      DRAW_CODE, DRAW_DETAIL, CREATE_BY, 
+      MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+      CREATE_TIME, REMARK)
+    values (#{lotteryCode}, #{issueCode,jdbcType=VARCHAR}, 
+      #{lotteryName,jdbcType=VARCHAR}, #{currentIssue,jdbcType=DECIMAL}, #{saleStatus,jdbcType=DECIMAL}, 
+      #{officialEndTime,jdbcType=TIMESTAMP}, #{lotteryTime,jdbcType=TIMESTAMP}, #{saleTime,jdbcType=TIMESTAMP}, 
+      #{saleEndTime,jdbcType=TIMESTAMP}, #{salesAmount,jdbcType=DECIMAL}, #{jackpotAmount,jdbcType=DECIMAL}, 
+      #{drawCode,jdbcType=VARCHAR}, #{drawDetail,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{modifyBy,jdbcType=VARCHAR}, now(),now(),now(), #{remark,jdbcType=VARCHAR})
+   </insert>
+   
+   <insert id="addIssueList">
+    <foreach collection="po" item="item">
+	    insert into LOTTERY_ISSUE (LOTTERY_CODE, ISSUE_CODE, 
+	      LOTTERY_NAME, CURRENT_ISSUE, SALE_STATUS, 
+	      OFFICIAL_END_TIME, LOTTERY_TIME, SALE_TIME, 
+	      SALE_END_TIME, SALES_AMOUNT, JACKPOT_AMOUNT, 
+	      DRAW_CODE, DRAW_DETAIL, CREATE_BY, 
+	      MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+	      CREATE_TIME, REMARK)
+	    values (#{item.lotteryCode}, #{item.issueCode,jdbcType=VARCHAR}, 
+	      #{item.lotteryName,jdbcType=VARCHAR}, #{item.currentIssue,jdbcType=DECIMAL}, #{item.saleStatus,jdbcType=DECIMAL}, 
+	      #{item.officialEndTime,jdbcType=TIMESTAMP}, #{item.lotteryTime,jdbcType=TIMESTAMP}, #{item.saleTime,jdbcType=TIMESTAMP}, 
+	      #{item.saleEndTime,jdbcType=TIMESTAMP}, #{item.salesAmount,jdbcType=DECIMAL}, #{item.jackpotAmount,jdbcType=DECIMAL}, 
+	      #{item.drawCode,jdbcType=VARCHAR}, #{item.drawDetail,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR}, 
+	      #{item.modifyBy,jdbcType=VARCHAR}, now(),now(),now(), #{item.remark,jdbcType=VARCHAR});
+    </foreach>
+   </insert>
+   <update id="updIssueByKey" parameterType="com.hhly.lottocore.persistence.sport.po.LotteryIssuePO">
+		update LOTTERY_ISSUE
+		    set 
+		      ISSUE_CODE = #{issueCode,jdbcType=VARCHAR},
+		      CURRENT_ISSUE = #{currentIssue,jdbcType=DECIMAL},
+		      SALE_STATUS = #{saleStatus,jdbcType=DECIMAL},
+		      OFFICIAL_END_TIME = #{officialEndTime,jdbcType=TIMESTAMP},
+		      LOTTERY_TIME = #{lotteryTime,jdbcType=TIMESTAMP},
+		      SALE_TIME = #{saleTime,jdbcType=TIMESTAMP},
+		      SALE_END_TIME = #{saleEndTime,jdbcType=TIMESTAMP},
+		      SALES_AMOUNT = #{salesAmount,jdbcType=DECIMAL},
+		      JACKPOT_AMOUNT = #{jackpotAmount,jdbcType=DECIMAL},
+		      DRAW_CODE = #{drawCode,jdbcType=VARCHAR},
+		      DRAW_DETAIL = #{drawDetail,jdbcType=VARCHAR},
+		      MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+		      MODIFY_TIME = now(),
+		      REMARK = #{remark,jdbcType=VARCHAR}
+		    where ID = #{id,jdbcType=DECIMAL}   
+   </update>
+   <select id="findIssueToExcel" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryIssueExcelBO" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryIssueCmsVO">
+	  select 
+	      @rownum:=@rownum+1 AS id,
+	      li.ISSUE_CODE issueCode,
+	      li.LOTTERY_NAME lotteryName,
+	      li.CURRENT_ISSUE currentIssue,
+	      li.SALE_STATUS saleStatus,
+	      date_format( li.SALE_TIME,'%Y-%m-%d %H:%i:%s') saleTime,
+	      date_format(li.SALE_END_TIME,'%Y-%m-%d %H:%i:%s')  saleEndTime,
+	      date_format(li.LOTTERY_TIME,'%Y-%m-%d %H:%i:%s')   lotteryTime,
+	      li.DRAW_CODE drawCode,
+	      date_format(li.UPDATE_TIME,'%Y-%m-%d %H:%i:%s')  updateTime,
+	      date_format(li.CREATE_TIME,'%Y-%m-%d %H:%i:%s')  createTime
+	    from 
+	         lottery_issue li
+	    left join  lottery_type lt on lt.lottery_code = li.lottery_code, (SELECT @rownum:=0) r 
+	    <where>
+	        <if test="lotteryCode!=null">
+	          and li.LOTTERY_CODE = #{lotteryCode}
+	        </if>
+	        <if test="issueCode !=null and issueCode !=''">
+	          and li.ISSUE_CODE =  #{issueCode}
+	        </if>
+	        <if test="saleStatus !=null">
+	          and li.SALE_STATUS =  #{saleStatus}
+	        </if>
+	        <if test="lotteryCategory!=null">
+	          and lt.LOTTERY_CATEGORY = #{lotteryCategory}
+	        </if>
+	    </where> 
+	    order by li.ID  
+   </select>
+   <select id="findIssueDetial" resultType="com.hhly.skeleton.lotto.base.bo.LotteryIssueBO">
+    select 
+          ID id,
+          LOTTERY_CODE lotteryCode,
+	      ISSUE_CODE issueCode,
+	      LOTTERY_NAME lotteryName,
+	      CURRENT_ISSUE currentIssue,
+	      SALE_STATUS saleStatus,
+	      date_format(SALE_TIME,'%Y-%m-%d %H:%i:%s') saleTime,
+	      date_format(SALE_END_TIME,'%Y-%m-%d %H:%i:%s') saleEndTime,
+	      date_format(LOTTERY_TIME,'%Y-%m-%d %H:%i:%s')  lotteryTime,
+	      DRAW_CODE drawCode,
+	      DRAW_DETAIL drawDetail,
+	      date_format(UPDATE_TIME,'%Y-%m-%d %H:%i:%s') updateTime,
+	      date_format(CREATE_TIME,'%Y-%m-%d %H:%i:%s') createTime,
+	      date_format(OFFICIAL_END_TIME,'%Y-%m-%d %H:%i:%s') officialEndTime,
+	      SALES_AMOUNT salesAmount,
+	      JACKPOT_AMOUNT jackpotAmount,
+	      CREATE_BY createBy, 
+          MODIFY_BY modifyBy, 
+          date_format(MODIFY_TIME,'%Y-%m-%d %H:%i:%s') modifyTime,
+          REMARK
+    from LOTTERY_ISSUE
+    where ID = #{id}
+   </select>
+   <select id="findIssueCount" resultType="int">
+	    select count(1) 
+	    from LOTTERY_ISSUE
+	    <where>
+	    	<if test="lotteryCode != null">
+	    		and LOTTERY_CODE = #{lotteryCode} 
+	    	</if>
+	    	<if test="issueCode != null and issueCode != ''">
+	    		and ISSUE_CODE = #{issueCode}
+	    	</if>
+	    	<if test="partIssueCode !=null and partIssueCode !=''">
+	    		and ISSUE_CODE like CONCAT(#{partIssueCode}, '%')
+	    	</if>
+	    	<if test="minSaleStatus != null">
+	    		and SALE_STATUS >= #{minSaleStatus}
+	    	</if>
+	    </where>
+   </select>
+   <select id="findIssue" resultMap="ResultMap">
+        select 
+        <include refid="Base_Column_List" />
+        from LOTTERY_ISSUE
+        <where>
+           <if test="lotteryCode!=null">
+               and LOTTERY_CODE = #{lotteryCode}
+           </if>
+           <if test="currentIssue !=null and currentIssue!=''">
+          	   and CURRENT_ISSUE = #{currentIssue}
+           </if>
+        </where>
+   </select>
+    <select id="findValidIssue" resultType="int">
+		select ID
+		  from lottery_issue
+		 where lottery_code = #{lotteryCode}
+		   and sale_status in (
+		    <foreach collection="saleStatus" item="item" separator=",">
+		      #{item}
+		    </foreach>
+		   )
+    </select>
+    <update id="updIssueBuyEndTime">
+     update  LOTTERY_ISSUE 
+     set sale_end_time =  DATE_ADD(OFFICIAL_END_TIME,INTERVAL #{buyEndTime} SECOND) 
+     ,update_time = now()
+     where
+     lottery_code =  #{lotteryCode}
+     and issue_code >= #{issueCode}
+    </update>
+    <select id="findIssueOfficialEndTime" resultMap="ResultMap">
+        select
+            ID,
+            OFFICIAL_END_TIME
+        from LOTTERY_ISSUE
+        where lottery_code =  #{lotteryCode}
+        and  issue_code >= #{issueCode}
+	    order by issue_code
+    </select>
+    <update id="updateByKeySelective" parameterType="com.hhly.lottocore.persistence.sport.po.LotteryIssuePO">
+     update LOTTERY_ISSUE
+    <set>
+      <if test="lotteryCode != null">
+        LOTTERY_CODE = #{lotteryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="issueCode != null">
+        ISSUE_CODE = #{issueCode,jdbcType=VARCHAR},
+      </if>
+      <if test="lotteryName != null">
+        LOTTERY_NAME = #{lotteryName,jdbcType=VARCHAR},
+      </if>
+      <if test="currentIssue != null">
+        CURRENT_ISSUE = #{currentIssue,jdbcType=DECIMAL},
+      </if>
+      <if test="saleStatus != null">
+        SALE_STATUS = #{saleStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="officialEndTime != null">
+        OFFICIAL_END_TIME = #{officialEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lotteryTime != null">
+        LOTTERY_TIME = #{lotteryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="saleTime != null">
+        SALE_TIME = #{saleTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="saleEndTime != null">
+        SALE_END_TIME = #{saleEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="salesAmount != null">
+        SALES_AMOUNT = #{salesAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="jackpotAmount != null">
+        JACKPOT_AMOUNT = #{jackpotAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="drawCode != null">
+        DRAW_CODE = #{drawCode,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        CREATE_BY = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyBy != null">
+        MODIFY_BY = #{modifyBy,jdbcType=VARCHAR},
+      </if>
+      <if test="modifyTime != null">
+        MODIFY_TIME = #{modifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateSaleTime">
+      <foreach collection="updateList" item="item" index="index">
+				update LOTTERY_ISSUE
+				set  SALE_TIME = #{item.saleTime}
+				,update_time = now()
+				where ID = ${item.id};
+	   </foreach>
+  </update>
+  
+  
+  
+  <sql id="sql_statement_all">
+	  	select ID  id,
+		       LOTTERY_CODE      lotteryCode,
+		       ISSUE_CODE        issueCode,
+		       LOTTERY_NAME      lotteryName,
+		       CURRENT_ISSUE     currentIssue,
+		       SALE_STATUS       saleStatus,
+		       OFFICIAL_END_TIME officialEndTime,
+		       LOTTERY_TIME      lotteryTime,
+		       SALE_TIME         saleTime,
+		       SALE_END_TIME     saleEndTime,
+		       SALES_AMOUNT      salesAmount,
+		       JACKPOT_AMOUNT    jackpotAmount,
+		       DRAW_CODE         drawCode,
+		       CREATE_BY         createBy,
+		       MODIFY_BY         modifyBy,
+		       MODIFY_TIME       modifyTime,
+		       UPDATE_TIME       updateTime,
+		       CREATE_TIME       createTime,
+		       REMARK            remark
+		  from LOTTERY_ISSUE
+  </sql>
+  <sql id="sql_condition_all">
+  		where 1 = 1
+  		<if test="id != null">
+  			and ID = #{id,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryCode != null">
+          	and LOTTERY_CODE = #{lotteryCode}
+        </if>
+        <if test="issueCode != null and issueCode != ''">
+          	and ISSUE_CODE = #{issueCode}
+        </if>
+        <if test="currentIssue != null">
+          	and CURRENT_ISSUE = #{currentIssue}
+        </if>
+  </sql>
+  <!-- 查询单条 -->
+  <select id="findSingle" parameterType="com.hhly.skeleton.lotto.base.vo.LotteryIssueVO" resultType="com.hhly.skeleton.lotto.base.bo.LotteryIssueBO">
+		<include refid="sql_statement_all" />
+		<include refid="sql_condition_all" />
+		limit 1
+  </select>
+  <!-- 查询最近开奖彩期，即当前期的上一期 -->
+  <!-- <select id="findLatestDrawIssue" parameterType="string" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryIssueBO">
+		<![CDATA[
+	select li.lottery_code lotteryCode,
+		               li.issue_code issueCode,
+		               li.draw_code drawCode,
+		               li.draw_detail drawDetail
+		          from lottery_issue li
+		         where li.lottery_code = #{lotteryCode}
+		           and li.issue_code < (select li.issue_code
+		                                  from lottery_issue li
+		                                 where lottery_code = #{lotteryCode}
+		                                   and current_issue = 1 limit 1)
+					order by li.issue_code desc limit 1
+		 ]]>
+  </select> -->
+  <!-- 查询最近几期的开奖彩期,当前期的上几期-->
+  <select id="findRecentDrawIssue" resultType="com.hhly.skeleton.lotto.base.bo.LotteryIssueBO">
+		<![CDATA[
+			select li.lottery_code lotteryCode,
+		               li.issue_code issueCode,
+		               li.draw_code drawCode,
+		               li.draw_detail drawDetail
+		          from lottery_issue li
+		         where li.lottery_code = #{lotteryCode}
+		           and li.issue_code < (select li.issue_code
+		                                  from lottery_issue li
+		                                 where lottery_code = #{lotteryCode}
+		                                   and current_issue = 1
+		                                   limit 1)
+		             order by li.issue_code desc
+		                                   
+		 			limit <= #{qryCount}
+		 ]]>
+  </select>
+  
+  <select id="findLastIssue" resultMap="ResultMap">
+	   select 
+	       
+		   issue_code, 
+		   OFFICIAL_END_TIME,
+		   SALE_END_TIME,
+		   LOTTERY_TIME,
+		   SALE_TIME
+	   from lottery_issue
+	   where lottery_code = #{lotteryCode}
+	   and issue_code =
+	       (select max(issue_code) from lottery_issue where lottery_code = #{lotteryCode})
+  </select>
+  <select id="findIssueCountCurrent" resultType="int">
+      select count(1)
+      from lottery_issue
+      where lottery_code = #{lotteryCode}
+      and current_issue = 1
+  </select>
+  <update id="updCurrentIssue">
+    update lottery_issue
+    set current_issue = 0
+    where lottery_code = #{lotteryCode}
+    and current_issue = 1
+  </update>
+  
+ <select id="findDrawDetails" parameterType="com.hhly.skeleton.lotto.base.vo.LotteryIssueVO" resultMap="drawDetailBOMap"> 
+   		select 
+   		LOTTERY_CODE,
+   		ISSUE_CODE,
+   		DRAW_CODE,
+   		DRAW_DETAIL from lottery_issue
+   		where lottery_code = #{lotteryCode} and draw_code is not null 
+   		order by LOTTERY_TIME desc 
+  		limit #{qryCount} 
+  </select>
+  
+  <!-- 查询当天已销售期数量 -->
+  <select id="findSaledNum">
+  	select count(1)
+  	from lottery_issue
+  	where 
+  	lottery_code = #{lotteryCode} and issue like CONCAT(#{partIssueCode}, '%')
+  	<!-- 0：暂停销售；1：未开售；2：预售中；3：销售中；4：销售截止；5：已开奖；6：已派奖；7：已兑奖 -->
+  	and SALE_STATUS > 3;
+  </select> 
+  <select id="listCurrentIssue" resultType="String">
+	 select li.issue_code
+	 from LOTTERY_ISSUE li
+	 <if test="adminCategory!=null and adminCategory!=''">
+	   join lottery_type lt on (lt.lottery_code = li.lottery_code and lt.admin_category = #{adminCategory})
+	 </if>
+	 where li.current_issue = 1     
+  </select>
+</mapper>

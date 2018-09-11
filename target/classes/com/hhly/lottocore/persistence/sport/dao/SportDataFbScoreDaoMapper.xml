@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.sport.dao.SportDataFbScoreDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportDataFbScoreBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="SPORT_AGAINST_INFO_ID" property="sportAgainstInfoId" jdbcType="DECIMAL" />
+    <result column="SP_1_0" property="sp10" jdbcType="DECIMAL" />
+    <result column="SP_2_0" property="sp20" jdbcType="DECIMAL" />
+    <result column="SP_2_1" property="sp21" jdbcType="DECIMAL" />
+    <result column="SP_3_0" property="sp30" jdbcType="DECIMAL" />
+    <result column="SP_3_1" property="sp31" jdbcType="DECIMAL" />
+    <result column="SP_3_2" property="sp32" jdbcType="DECIMAL" />
+    <result column="SP_4_0" property="sp40" jdbcType="DECIMAL" />
+    <result column="SP_4_1" property="sp41" jdbcType="DECIMAL" />
+    <result column="SP_4_2" property="sp42" jdbcType="DECIMAL" />
+    <result column="SP_5_0" property="sp50" jdbcType="DECIMAL" />
+    <result column="SP_5_1" property="sp51" jdbcType="DECIMAL" />
+    <result column="SP_5_2" property="sp52" jdbcType="DECIMAL" />
+    <result column="SP_W_OTHER" property="spWOther" jdbcType="DECIMAL" />
+    <result column="SP_0_0" property="sp00" jdbcType="DECIMAL" />
+    <result column="SP_1_1" property="sp11" jdbcType="DECIMAL" />
+    <result column="SP_2_2" property="sp22" jdbcType="DECIMAL" />
+    <result column="SP_3_3" property="sp33" jdbcType="DECIMAL" />
+    <result column="SP_D_OTHER" property="spDOther" jdbcType="DECIMAL" />
+    <result column="SP_0_1" property="sp01" jdbcType="DECIMAL" />
+    <result column="SP_0_2" property="sp02" jdbcType="DECIMAL" />
+    <result column="SP_1_2" property="sp12" jdbcType="DECIMAL" />
+    <result column="SP_0_3" property="sp03" jdbcType="DECIMAL" />
+    <result column="SP_1_3" property="sp13" jdbcType="DECIMAL" />
+    <result column="SP_2_3" property="sp23" jdbcType="DECIMAL" />
+    <result column="SP_0_4" property="sp04" jdbcType="DECIMAL" />
+    <result column="SP_1_4" property="sp14" jdbcType="DECIMAL" />
+    <result column="SP_2_4" property="sp24" jdbcType="DECIMAL" />
+    <result column="SP_0_5" property="sp05" jdbcType="DECIMAL" />
+    <result column="SP_1_5" property="sp15" jdbcType="DECIMAL" />
+    <result column="SP_2_5" property="sp25" jdbcType="DECIMAL" />
+    <result column="SP_F_OTHER" property="spFOther" jdbcType="DECIMAL" />
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    ID, SPORT_AGAINST_INFO_ID, SP_1_0, SP_2_0, SP_2_1, SP_3_0, SP_3_1, 
+    SP_3_2, SP_4_0, SP_4_1, SP_4_2, SP_5_0, SP_5_1, SP_5_2, SP_W_OTHER, SP_0_0, SP_1_1, 
+    SP_2_2, SP_3_3, SP_D_OTHER, SP_0_1, SP_0_2, SP_1_2, SP_0_3, SP_1_3, SP_2_3, SP_0_4, 
+    SP_1_4, SP_2_4, SP_0_5, SP_1_5, SP_2_5, SP_F_OTHER, RELEASE_TIME, UPDATE_TIME, CREATE_TIME
+  </sql>
+
+  <select id="findByAgainstInfoId" resultMap="BaseResultMap" parameterType="long" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM SPORT_DATA_FB_SCORE
+    WHERE SPORT_AGAINST_INFO_ID=#{sportAgainstInfoId,jdbcType=DECIMAL}
+    ORDER BY RELEASE_TIME ASC
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.hhly.lottocore.persistence.sport.po.SportDataFbScorePO" >
+    insert into SPORT_DATA_FB_SCORE (SPORT_AGAINST_INFO_ID, 
+      SP_1_0, SP_2_0, SP_2_1, SP_3_0, 
+      SP_3_1, SP_3_2, SP_4_0, SP_4_1, 
+      SP_4_2, SP_5_0, SP_5_1, SP_5_2, 
+      SP_W_OTHER, SP_0_0, SP_1_1, 
+      SP_2_2, SP_3_3, SP_D_OTHER, 
+      SP_0_1, SP_0_2, SP_1_2, SP_0_3, 
+      SP_1_3, SP_2_3, SP_0_4, SP_1_4, 
+      SP_2_4, SP_0_5, SP_1_5, SP_2_5, 
+      SP_F_OTHER, RELEASE_TIME, UPDATE_TIME, 
+      CREATE_TIME)
+    values (#{sportAgainstInfoId,jdbcType=DECIMAL}, 
+      #{sp10,jdbcType=DECIMAL}, #{sp20,jdbcType=DECIMAL}, #{sp21,jdbcType=DECIMAL}, #{sp30,jdbcType=DECIMAL}, 
+      #{sp31,jdbcType=DECIMAL}, #{sp32,jdbcType=DECIMAL}, #{sp40,jdbcType=DECIMAL}, #{sp41,jdbcType=DECIMAL}, 
+      #{sp42,jdbcType=DECIMAL}, #{sp50,jdbcType=DECIMAL}, #{sp51,jdbcType=DECIMAL}, #{sp52,jdbcType=DECIMAL}, 
+      #{spWOther,jdbcType=DECIMAL}, #{sp00,jdbcType=DECIMAL}, #{sp11,jdbcType=DECIMAL}, 
+      #{sp22,jdbcType=DECIMAL}, #{sp33,jdbcType=DECIMAL}, #{spDOther,jdbcType=DECIMAL}, 
+      #{sp01,jdbcType=DECIMAL}, #{sp02,jdbcType=DECIMAL}, #{sp12,jdbcType=DECIMAL}, #{sp03,jdbcType=DECIMAL}, 
+      #{sp13,jdbcType=DECIMAL}, #{sp23,jdbcType=DECIMAL}, #{sp04,jdbcType=DECIMAL}, #{sp14,jdbcType=DECIMAL}, 
+      #{sp24,jdbcType=DECIMAL}, #{sp05,jdbcType=DECIMAL}, #{sp15,jdbcType=DECIMAL}, #{sp25,jdbcType=DECIMAL}, 
+      #{spFOther,jdbcType=DECIMAL}, #{releaseTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.sport.po.SportDataFbScorePO" >
+    update SPORT_DATA_FB_SCORE
+    <set >
+      <if test="sportAgainstInfoId != null" >
+        SPORT_AGAINST_INFO_ID = #{sportAgainstInfoId,jdbcType=DECIMAL},
+      </if>
+      <if test="sp10 != null" >
+        SP_1_0 = #{sp10,jdbcType=DECIMAL},
+      </if>
+      <if test="sp20 != null" >
+        SP_2_0 = #{sp20,jdbcType=DECIMAL},
+      </if>
+      <if test="sp21 != null" >
+        SP_2_1 = #{sp21,jdbcType=DECIMAL},
+      </if>
+      <if test="sp30 != null" >
+        SP_3_0 = #{sp30,jdbcType=DECIMAL},
+      </if>
+      <if test="sp31 != null" >
+        SP_3_1 = #{sp31,jdbcType=DECIMAL},
+      </if>
+      <if test="sp32 != null" >
+        SP_3_2 = #{sp32,jdbcType=DECIMAL},
+      </if>
+      <if test="sp40 != null" >
+        SP_4_0 = #{sp40,jdbcType=DECIMAL},
+      </if>
+      <if test="sp41 != null" >
+        SP_4_1 = #{sp41,jdbcType=DECIMAL},
+      </if>
+      <if test="sp42 != null" >
+        SP_4_2 = #{sp42,jdbcType=DECIMAL},
+      </if>
+      <if test="sp50 != null" >
+        SP_5_0 = #{sp50,jdbcType=DECIMAL},
+      </if>
+      <if test="sp51 != null" >
+        SP_5_1 = #{sp51,jdbcType=DECIMAL},
+      </if>
+      <if test="sp52 != null" >
+        SP_5_2 = #{sp52,jdbcType=DECIMAL},
+      </if>
+      <if test="spWOther != null" >
+        SP_W_OTHER = #{spWOther,jdbcType=DECIMAL},
+      </if>
+      <if test="sp00 != null" >
+        SP_0_0 = #{sp00,jdbcType=DECIMAL},
+      </if>
+      <if test="sp11 != null" >
+        SP_1_1 = #{sp11,jdbcType=DECIMAL},
+      </if>
+      <if test="sp22 != null" >
+        SP_2_2 = #{sp22,jdbcType=DECIMAL},
+      </if>
+      <if test="sp33 != null" >
+        SP_3_3 = #{sp33,jdbcType=DECIMAL},
+      </if>
+      <if test="spDOther != null" >
+        SP_D_OTHER = #{spDOther,jdbcType=DECIMAL},
+      </if>
+      <if test="sp01 != null" >
+        SP_0_1 = #{sp01,jdbcType=DECIMAL},
+      </if>
+      <if test="sp02 != null" >
+        SP_0_2 = #{sp02,jdbcType=DECIMAL},
+      </if>
+      <if test="sp12 != null" >
+        SP_1_2 = #{sp12,jdbcType=DECIMAL},
+      </if>
+      <if test="sp03 != null" >
+        SP_0_3 = #{sp03,jdbcType=DECIMAL},
+      </if>
+      <if test="sp13 != null" >
+        SP_1_3 = #{sp13,jdbcType=DECIMAL},
+      </if>
+      <if test="sp23 != null" >
+        SP_2_3 = #{sp23,jdbcType=DECIMAL},
+      </if>
+      <if test="sp04 != null" >
+        SP_0_4 = #{sp04,jdbcType=DECIMAL},
+      </if>
+      <if test="sp14 != null" >
+        SP_1_4 = #{sp14,jdbcType=DECIMAL},
+      </if>
+      <if test="sp24 != null" >
+        SP_2_4 = #{sp24,jdbcType=DECIMAL},
+      </if>
+      <if test="sp05 != null" >
+        SP_0_5 = #{sp05,jdbcType=DECIMAL},
+      </if>
+      <if test="sp15 != null" >
+        SP_1_5 = #{sp15,jdbcType=DECIMAL},
+      </if>
+      <if test="sp25 != null" >
+        SP_2_5 = #{sp25,jdbcType=DECIMAL},
+      </if>
+      <if test="spFOther != null" >
+        SP_F_OTHER = #{spFOther,jdbcType=DECIMAL},
+      </if>
+      <if test="releaseTime != null" >
+        RELEASE_TIME = #{releaseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+
+</mapper>

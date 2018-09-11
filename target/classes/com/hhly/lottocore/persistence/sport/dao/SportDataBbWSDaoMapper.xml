@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.sport.dao.SportDataBbWSDaoMapper" >
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportDataBbWSBO" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="SPORT_AGAINST_INFO_ID" property="sportAgainstInfoId" jdbcType="DECIMAL" />
+    <result column="SP_FAIL_1_5" property="spFail15" jdbcType="DECIMAL" />
+    <result column="SP_FAIL_6_10" property="spFail610" jdbcType="DECIMAL" />
+    <result column="SP_FAIL_11_15" property="spFail1115" jdbcType="DECIMAL" />
+    <result column="SP_FAIL_16_20" property="spFail1620" jdbcType="DECIMAL" />
+    <result column="SP_FAIL_21_25" property="spFail2125" jdbcType="DECIMAL" />
+    <result column="SP_FAIL_26" property="spFail26" jdbcType="DECIMAL" />
+    <result column="SP_WIN_1_5" property="spWin15" jdbcType="DECIMAL" />
+    <result column="SP_WIN_6_10" property="spWin610" jdbcType="DECIMAL" />
+    <result column="SP_WIN_11_15" property="spWin1115" jdbcType="DECIMAL" />
+    <result column="SP_WIN_16_20" property="spWin1620" jdbcType="DECIMAL" />
+    <result column="SP_WIN_21_25" property="spWin2125" jdbcType="DECIMAL" />
+    <result column="SP_WIN_26" property="spWin26" jdbcType="DECIMAL" />
+    <result column="RELEASE_TIME" property="releaseTime" jdbcType="TIMESTAMP" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    ID, SPORT_AGAINST_INFO_ID, SP_FAIL_1_5, SP_FAIL_6_10, SP_FAIL_11_15,
+    SP_FAIL_16_20, SP_FAIL_21_25, SP_FAIL_26, SP_WIN_1_5, SP_WIN_6_10, SP_WIN_11_15,
+    SP_WIN_16_20, SP_WIN_21_25, SP_WIN_26, RELEASE_TIME, UPDATE_TIME, CREATE_TIME
+  </sql>
+
+  <select id="findByAgainstInfoId" resultMap="BaseResultMap" parameterType="long" >
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM SPORT_DATA_BB_WS
+    WHERE SPORT_AGAINST_INFO_ID=#{sportAgainstInfoId,jdbcType=DECIMAL}
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id"  parameterType="com.hhly.lottocore.persistence.sport.po.SportDataBbWSPO" >
+    insert into SPORT_DATA_BB_WS (SPORT_AGAINST_INFO_ID, 
+      SP_FAIL_1_5, SP_FAIL_6_10, SP_FAIL_11_15, 
+      SP_FAIL_16_20, SP_FAIL_21_25, SP_FAIL_26, 
+      SP_WIN_1_5, SP_WIN_6_10, SP_WIN_11_15, 
+      SP_WIN_16_20, SP_WIN_21_25, SP_WIN_26, 
+      RELEASE_TIME, UPDATE_TIME, CREATE_TIME
+      )
+    values (#{sportAgainstInfoId,jdbcType=DECIMAL}, 
+      #{spFail15,jdbcType=DECIMAL}, #{spFail610,jdbcType=DECIMAL}, #{spFail1115,jdbcType=DECIMAL}, 
+      #{spFail1620,jdbcType=DECIMAL}, #{spFail2125,jdbcType=DECIMAL}, #{spFail26,jdbcType=DECIMAL}, 
+      #{spWin15,jdbcType=DECIMAL}, #{spWin610,jdbcType=DECIMAL}, #{spWin1115,jdbcType=DECIMAL}, 
+      #{spWin1620,jdbcType=DECIMAL}, #{spWin2125,jdbcType=DECIMAL}, #{spWin26,jdbcType=DECIMAL}, 
+      #{releaseTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.sport.po.SportDataBbWSPO" >
+    update SPORT_DATA_BB_WS
+    <set >
+      <if test="sportAgainstInfoId != null" >
+        SPORT_AGAINST_INFO_ID = #{sportAgainstInfoId,jdbcType=DECIMAL},
+      </if>
+      <if test="spFail15 != null" >
+        SP_FAIL_1_5 = #{spFail15,jdbcType=DECIMAL},
+      </if>
+      <if test="spFail610 != null" >
+        SP_FAIL_6_10 = #{spFail610,jdbcType=DECIMAL},
+      </if>
+      <if test="spFail1115 != null" >
+        SP_FAIL_11_15 = #{spFail1115,jdbcType=DECIMAL},
+      </if>
+      <if test="spFail1620 != null" >
+        SP_FAIL_16_20 = #{spFail1620,jdbcType=DECIMAL},
+      </if>
+      <if test="spFail2125 != null" >
+        SP_FAIL_21_25 = #{spFail2125,jdbcType=DECIMAL},
+      </if>
+      <if test="spFail26 != null" >
+        SP_FAIL_26 = #{spFail26,jdbcType=DECIMAL},
+      </if>
+      <if test="spWin15 != null" >
+        SP_WIN_1_5 = #{spWin15,jdbcType=DECIMAL},
+      </if>
+      <if test="spWin610 != null" >
+        SP_WIN_6_10 = #{spWin610,jdbcType=DECIMAL},
+      </if>
+      <if test="spWin1115 != null" >
+        SP_WIN_11_15 = #{spWin1115,jdbcType=DECIMAL},
+      </if>
+      <if test="spWin1620 != null" >
+        SP_WIN_16_20 = #{spWin1620,jdbcType=DECIMAL},
+      </if>
+      <if test="spWin2125 != null" >
+        SP_WIN_21_25 = #{spWin2125,jdbcType=DECIMAL},
+      </if>
+      <if test="spWin26 != null" >
+        SP_WIN_26 = #{spWin26,jdbcType=DECIMAL},
+      </if>
+      <if test="releaseTime != null" >
+        RELEASE_TIME = #{releaseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+</mapper>

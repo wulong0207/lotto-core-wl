@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhly.lottocore.persistence.sport.dao.SportDrawOldInfoDaoMapper" >
+
+
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.cms.sportmgr.bo.SportOldLotteryInfoBO">
+    <id column="SPORT_AGAINST_INFO_ID" property="againstId"  jdbcType="INTEGER"/>
+    <result column="LOTTERY_CODE" property="lotteryCode" jdbcType="DECIMAL"></result>
+    <result column="ISSUE_CODE" property="issueCode" jdbcType="VARCHAR"></result>
+    <result column="SYSTEM_CODE" property="systemCode" jdbcType="VARCHAR"></result>
+    <result column="HOME_TEAM_ID" property="homeTeamId" jdbcType="INTEGER"></result>
+    <result column="VISITI_TEAM_ID" property="guestTeamId" jdbcType="INTEGER"></result>
+    <result column="MATCH_ANALYSIS_URL" property="analysisUrl" jdbcType="VARCHAR"></result>
+    <result column="START_TIME" property="startTime" jdbcType="TIMESTAMP"></result>
+    <result column="SPORT_MATCH_INFO_ID" property="matchId" jdbcType="INTEGER"></result>
+    <result column="OFFICIAL_MATCH_CODE" property="officialMatchCode" jdbcType="VARCHAR"></result>
+    <result column="MATCH_STATUS" property="matchStatus" jdbcType="VARCHAR"></result>
+    <result column="MATCH_INFO_URL" property="matchInfoUrl" jdbcType="VARCHAR"></result>
+    <result column="IS_RECOMMEND" property="isRecommend" jdbcType="VARCHAR"></result>
+    <result column="MATCH_LABEL_COLOR" property="color" jdbcType="VARCHAR"></result>
+    <result column="OFFICIAL_ID" property="officialId" jdbcType="VARCHAR"></result>
+    <result column="IS_NEUTRAL" property="isNeutral" jdbcType="INTEGER"></result>
+    <result column="STADIUM" property="stadium" jdbcType="VARCHAR"></result>
+    <result column="WEATHER" property="weather" jdbcType="VARCHAR"></result>
+    <result column="SALE_END_TIME" property="saleEndTime" jdbcType="TIMESTAMP"></result>
+    <result column="MATCH_NAME" property="matchName" jdbcType="VARCHAR"></result>
+    <result column="HOME_NAME" property="homeName" jdbcType="VARCHAR"></result>
+    <result column="VISITI_NAME" property="guestName" jdbcType="VARCHAR"></result>
+
+    <result column="SPORT_DRAW_OLD_INFO_ID" property="drawOldInfoId" jdbcType="INTEGER"></result>
+    <result column="HALF_SCORE" property="halfScore" jdbcType="VARCHAR"></result>
+    <result column="FULL_SCORE" property="fullScore" jdbcType="VARCHAR"></result>
+    <result column="FOUR_GOAL" property="fourGoal" jdbcType="VARCHAR"></result>
+    <result column="SIX_HF_WDF" property="sixHfWdf" jdbcType="VARCHAR"></result>
+    <result column="FOURTEEN_WDF" property="fourteenWdf" jdbcType="VARCHAR"></result>
+    <result column="DRAW_TIME" property="drawTime" jdbcType="TIMESTAMP"></result>
+
+      <result column="LOTTERY_TIME" property="lotteryTime" jdbcType="TIMESTAMP"></result>
+      <result column="SALE_STATUS" property="saleStatus" jdbcType="VARCHAR"></result>
+      <result column="MATCH_DATA_URL" property="matchDataUrl" jdbcType="VARCHAR"></result>
+      <result column="MATCH_FULL_NAME" property="matchFullName" jdbcType="VARCHAR"></result>
+      <result column="MATCH_SHORT_NAME" property="matchShortName" jdbcType="VARCHAR"></result>
+      <result column="LOGO_URL" property="logoUrl" jdbcType="VARCHAR"></result>
+      <result column="MATCH_TYPE" property="matchType" jdbcType="VARCHAR"></result>
+      <result column="ODDS_WIN" property="oddsWin" jdbcType="VARCHAR"></result>
+      <result column="ODDS_DRAW" property="oddsDraw" jdbcType="VARCHAR"></result>
+      <result column="ODDS_FAIL" property="oddsFail" jdbcType="VARCHAR"></result>
+      <result column="HOME_TEAM_DATA_URL" property="homeTeamDataUrl" jdbcType="VARCHAR"></result>
+      <result column="HOME_TEAM_FULL_NAME" property="homeTeamFullName" jdbcType="VARCHAR"></result>
+      <result column="HOME_TEAM_SHORT_NAME" property="homeTeamShortName" jdbcType="VARCHAR"></result>
+      <result column="HOME_TEAM_ORDER" property="homeTeamOrder" jdbcType="VARCHAR"></result>
+      <result column="HOME_LOGO_URL" property="homeLogoUrl" jdbcType="VARCHAR"></result>
+      <result column="GUEST_TEAM_DATA_URL" property="guestTeamDataUrl" jdbcType="VARCHAR"></result>
+      <result column="GUEST_TEAM_FULL_NAME" property="guestTeamFullName" jdbcType="VARCHAR"></result>
+      <result column="GUEST_TEAM_SHORT_NAME" property="guestTeamShortName" jdbcType="VARCHAR"></result>
+      <result column="GUEST_TEAM_ORDER" property="guestTeamOrder" jdbcType="VARCHAR"></result>
+      <result column="GUEST_LOGO_URL" property="guestLogoUrl" jdbcType="VARCHAR"></result>
+
+      <result column="CREATE_BY" property="createBy" jdbcType="VARCHAR"></result>
+      <result column="CREATE_TIME" property="createTime" jdbcType="VARCHAR"></result>
+      <result column="MODIFY_BY" property="modifyBy" jdbcType="VARCHAR"></result>
+      <result column="MODIFY_TIME" property="modifyTime" jdbcType="VARCHAR"></result>
+      <result column="UPDATE_TIME" property="updateTime" jdbcType="VARCHAR"></result>
+      <result column="REMARK" property="remark" jdbcType="VARCHAR"></result>
+      
+      <result column="matchPrimaryId" property="matchPrimaryId" jdbcType="DECIMAL"></result>
+      <result column="homeTeamPrimaryId" property="homeTeamPrimaryId" jdbcType="DECIMAL"></result>
+      <result column="guestTeamPrimaryId" property="guestTeamPrimaryId" jdbcType="DECIMAL"></result>
+      
+      
+  </resultMap>
+
+    <sql id="Base_Column_List" >
+        ID, SPORT_AGAINST_INFO_ID, HALF_SCORE, FULL_SCORE, FOUR_GOAL,
+        SIX_HF_WDF, FOURTEEN_WDF, DRAW_TIME, MODIFY_BY, MODIFY_TIME, UPDATE_TIME, CREATE_TIME
+    </sql>
+
+    <sql id="Select_">
+    	<if test="lotteryCode != null">
+    		AND B.LOTTERY_CODE = #{lotteryCode}
+    	</if>
+        <if test="lotteryIssue != null">
+            AND B.ISSUE_CODE=#{lotteryIssue}
+        </if>
+        <if test="systemCode != null">
+            AND B.SYSTEM_CODE=#{systemCode}
+        </if>
+        <if test="issueStatus != null">
+            AND E.SALE_STATUS=#{issueStatus}
+        </if>
+        <if test="matchStatus != null">
+            AND B.MATCH_STATUS=#{matchStatus}
+        </if>
+        <if test="officialId != null">
+            AND B.OFFICIAL_ID=#{officialId}
+        </if>
+        <if test="officialNum != null">
+            AND B.OFFICIAL_MATCH_CODE=#{officialNum}
+        </if>
+        <if test="analysisId != null">
+            AND B.MATCH_ANALYSIS_URL=#{analysisId}
+        </if>
+        <if test="matchBeginTime != null">
+            <![CDATA[ AND B.START_TIME >= #{matchBeginTime} ]]>
+        </if>
+        <if test="matchEndTime != null">
+            <![CDATA[ AND B.START_TIME <= #{matchEndTime} ]]>
+        </if>
+        <if test="saleStartTime != null">
+            <![CDATA[ AND B.SALE_END_TIME <= #{saleStartTime} ]]>
+        </if>
+        <if test="saleEndTime != null">
+            <![CDATA[ AND B.SALE_END_TIME <= #{saleEndTime} ]]>
+        </if>
+        <if test="lotteryIssue == null">
+         AND E.CURRENT_ISSUE = 1
+        </if>        
+    </sql>
+
+    <sql id="innerTableSql">
+        FROM SPORT_AGAINST_INFO B
+        LEFT JOIN SPORT_DRAW_OLD_INFO A ON A.SPORT_AGAINST_INFO_ID = B.ID
+        LEFT JOIN LOTTERY_ISSUE E ON E.ISSUE_CODE = B.ISSUE_CODE AND E.LOTTERY_CODE = B.LOTTERY_CODE
+        LEFT JOIN SPORT_MATCH_INFO M ON M.ID = B.SPORT_MATCH_INFO_ID AND M.MATCH_TYPE=1
+        LEFT JOIN SPORT_TEAM_INFO H ON H.ID = B.HOME_TEAM_ID AND H.TEAM_TYPE=1
+        LEFT JOIN SPORT_TEAM_INFO G ON G.ID = B.VISITI_TEAM_ID AND G.TEAM_TYPE=1
+        WHERE 1=1 
+    </sql>
+
+  <select id="countByParamVO" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SMGLotteryParamVO" resultType="java.lang.Integer" >
+      SELECT COUNT(1)
+      <include refid="innerTableSql"/>
+      <include refid="Select_"/>
+
+  </select>
+
+  <select id="selectByParamVO" resultMap="BaseResultMap" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SMGLotteryParamVO" >
+          SELECT
+          B.ID as SPORT_AGAINST_INFO_ID,
+          B.LOTTERY_CODE,
+          B.ISSUE_CODE,
+          B.SYSTEM_CODE,
+          B.HOME_TEAM_ID,
+          B.VISITI_TEAM_ID,
+          B.START_TIME,
+   		  B.SPORT_MATCH_INFO_ID,
+          B.MATCH_STATUS,
+          B.MATCH_ANALYSIS_URL,
+          B.MATCH_INFO_URL,
+          B.IS_RECOMMEND,
+          B.MATCH_LABEL_COLOR,
+          B.OFFICIAL_MATCH_CODE,
+          B.OFFICIAL_ID,
+          B.IS_NEUTRAL,
+          B.STADIUM,
+          B.WEATHER,
+          B.SALE_END_TIME,
+          B.MATCH_NAME,
+          B.HOME_NAME,
+          B.VISITI_NAME,
+      	  B.ODDS_WIN,
+      	  B.ODDS_DRAW,
+      	  B.ODDS_FAIL,
+          A.ID as SPORT_DRAW_OLD_INFO_ID,
+          A.HALF_SCORE,
+          A.FULL_SCORE,
+          A.FOUR_GOAL,
+          A.SIX_HF_WDF,
+          A.FOURTEEN_WDF,
+          A.DRAW_TIME,
+          E.LOTTERY_TIME,
+          E.SALE_STATUS,
+          M.ID as matchPrimaryId,
+          M.MATCH_DATA_URL,
+          M.MATCH_FULL_NAME,
+          M.MATCH_SHORT_NAME,
+          M.LOGO_URL,
+          M.MATCH_TYPE,
+          H.ID as homeTeamPrimaryId,
+          H.TEAM_DATA_URL AS HOME_TEAM_DATA_URL,
+          H.TEAM_FULL_NAME AS HOME_TEAM_FULL_NAME,
+          H.TEAM_SHORT_NAME AS HOME_TEAM_SHORT_NAME,
+          H.TEAM_ORDER AS HOME_TEAM_ORDER,
+          H.LOGO_URL AS HOME_LOGO_URL,
+          G.id as guestTeamPrimaryId,
+          G.TEAM_DATA_URL AS GUEST_TEAM_DATA_URL,
+          G.TEAM_FULL_NAME  AS GUEST_TEAM_FULL_NAME,
+          G.TEAM_SHORT_NAME  AS GUEST_TEAM_SHORT_NAME,
+          G.TEAM_ORDER AS GUEST_TEAM_ORDER,
+          G.LOGO_URL  AS GUEST_LOGO_URL,
+          B.CREATE_BY,
+          B.CREATE_TIME,
+          B.MODIFY_BY,
+          B.MODIFY_TIME,
+          B.UPDATE_TIME,
+          B.REMARK
+      <include refid="innerTableSql"/>
+      <include refid="Select_"/>
+	   		ORDER BY
+	  		<choose>  
+	        <when test="sortField !=null and sortField!=''">  
+	            ${sortField} ${sortOrder}
+	        </when>   
+	        <otherwise>  
+	            B.SYSTEM_CODE,B.ID DESC
+	        </otherwise>  
+	      </choose>        
+      <![CDATA[
+               LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+                
+      ]]>
+  </select>
+  
+  
+  <select id="findAllList" resultType="com.hhly.skeleton.cms.sportmgr.bo.SportDataFbOldExcelBo" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SMGLotteryParamVO" >
+      SELECT
+          B.ID AS againstId ,
+          B.ISSUE_CODE AS issueCode,
+          B.SYSTEM_CODE AS systemCode,
+          B.START_TIME AS startTime,
+          B.MATCH_STATUS AS matchStatus,
+          B.MATCH_ANALYSIS_URL AS analysisUrl,
+          B.OFFICIAL_ID AS officialId,
+          A.HALF_SCORE AS halfScore,
+          A.FULL_SCORE AS fullScore,
+          A.FOURTEEN_WDF AS fourteenWdf,
+          E.SALE_STATUS AS saleStatus,
+          M.MATCH_FULL_NAME AS matchFullName,
+          M.MATCH_SHORT_NAME AS matchShortName,
+          H.TEAM_FULL_NAME AS homeTeamFullName,
+          H.TEAM_SHORT_NAME AS homeTeamShortName,
+          G.TEAM_FULL_NAME  AS guestTeamFullName,
+          G.TEAM_SHORT_NAME  AS guestTeamShortName
+      <include refid="innerTableSql"/>
+      <include refid="Select_"/>
+      ORDER BY B.SYSTEM_CODE DESC,B.ID DESC
+     
+  </select>
+  
+  <select id="findOldOrderMatchDetail" parameterType="com.hhly.skeleton.cms.sportmgr.vo.SMGLotteryParamVO" resultMap="BaseResultMap">
+		SELECT  B.SYSTEM_CODE, B.HOME_NAME, B.VISITI_NAME, C.HALF_SCORE, C.FULL_SCORE, C.FOUR_GOAL,C.SIX_HF_WDF, C.FOURTEEN_WDF
+		FROM SPORT_AGAINST_INFO B LEFT JOIN SPORT_DRAW_OLD_INFO C ON B.ID = C.SPORT_AGAINST_INFO_ID 
+			where 1 = 1
+		 <include refid="Select_"/>
+		ORDER BY B.SYSTEM_CODE,B.ID DESC
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SPORT_DRAW_OLD_INFO
+    where id = #{sportDrawOldInfoId}
+  </delete>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id"  parameterType="com.hhly.lottocore.persistence.sport.po.SportDrawOldInfoPO" >
+    insert into SPORT_DRAW_OLD_INFO (SPORT_AGAINST_INFO_ID,
+      HALF_SCORE, FULL_SCORE, FOUR_GOAL, 
+      SIX_HF_WDF, FOURTEEN_WDF, DRAW_TIME, 
+      MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+      CREATE_TIME)
+    values (#{sportAgainstInfoId,jdbcType=DECIMAL},
+      #{halfScore,jdbcType=VARCHAR}, #{fullScore,jdbcType=VARCHAR}, #{fourGoal,jdbcType=DECIMAL}, 
+      #{sixHfWdf,jdbcType=VARCHAR}, #{fourteenWdf,jdbcType=DECIMAL}, #{drawTime,jdbcType=TIMESTAMP}, 
+      #{modifyBy,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.sport.po.SportDrawOldInfoPO" >
+    insert into SPORT_DRAW_OLD_INFO (ID,SPORT_AGAINST_INFO_ID,
+      HALF_SCORE, FULL_SCORE, FOUR_GOAL, 
+      SIX_HF_WDF, FOURTEEN_WDF, DRAW_TIME, 
+      MODIFY_BY, MODIFY_TIME, UPDATE_TIME, 
+      CREATE_TIME)
+    values (#{id,jdbcType=DECIMAL}, #{sportAgainstInfoId,jdbcType=DECIMAL},
+      #{halfScore,jdbcType=VARCHAR}, #{fullScore,jdbcType=VARCHAR}, #{fourGoal,jdbcType=DECIMAL}, 
+      #{sixHfWdf,jdbcType=VARCHAR}, #{fourteenWdf,jdbcType=DECIMAL}, #{drawTime,jdbcType=TIMESTAMP}, 
+      #{modifyBy,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+      now())
+       ON DUPLICATE KEY UPDATE 
+        	SPORT_AGAINST_INFO_ID=#{sportAgainstInfoId,jdbcType=DECIMAL},
+	        HALF_SCORE=#{halfScore,jdbcType=VARCHAR},
+	        FULL_SCORE=#{fullScore,jdbcType=VARCHAR},
+	        FOUR_GOAL = #{fourGoal,jdbcType=DECIMAL},
+	        SIX_HF_WDF = #{sixHfWdf,jdbcType=VARCHAR},
+	        FOURTEEN_WDF = #{fourteenWdf,jdbcType=DECIMAL},
+	        DRAW_TIME=#{drawTime,jdbcType=TIMESTAMP},
+	        MODIFY_BY=#{modifyBy,jdbcType=VARCHAR},
+	        MODIFY_TIME=now(),
+	        UPDATE_TIME=now()
+  </update>
+
+
+</mapper>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.lottery.dao.LotteryTypeDaoMapper">
+  
+  
+  <sql id="sql_statement_all">
+	  	select ID,
+		       LOTTERY_CODE     lotteryCode,
+		       LOTTERY_NAME     lotteryName,
+		       CON_ISSUE_NUM    conIssueNum,
+		       STOP_ADD_ISSUE   stopAddIssue,
+		       LOTTERY_LOGO_URL lotteryLogoUrl,
+		       ADMIN_CATEGORY   adminCategory,
+		       LOTTERY_CATEGORY lotteryCategory,
+		       SALE_STATUS      saleStatus,
+		       AREA             area,
+		       AUTO_TYPE        autoType,
+		       SYN_ISSUE        synIssue,
+		       SALE_TIME        saleTime,
+		       BUY_END_TIME     buyEndTime,
+		       SPLIT_MAX_NUM    splitMaxNum,
+		       END_CHECK_TIME   endCheckTime,
+		       SPLIT_MAX_AMOUNT splitMaxAmount,
+		       COME_OUT_TIME    comeOutTime,
+		       CREATE_BY        createBy,
+		       MODIFY_BY        modifyBy,
+		       MODIFY_TIME      modifyTime,
+		       UPDATE_TIME      updateTime,
+		       CREATE_TIME      createTime,
+		       REMARK           remark
+		  from LOTTERY_TYPE
+  </sql>
+  <sql id="sql_condition_all">
+  		where 1 = 1
+  		<if test="id != null">
+  			and ID = #{id,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryCode != null">
+          	and LOTTERY_CODE = #{lotteryCode}
+        </if>
+        <if test="lotteryCategory != null">
+          	and LOTTERY_CATEGORY =  #{lotteryCategory}
+        </if>
+  </sql>
+  <!-- 查询单条 -->
+  <select id="findSingle" parameterType="com.hhly.skeleton.cms.lotterymgr.vo.LotteryTypeVO" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeBO">
+		<include refid="sql_statement_all" />
+		<include refid="sql_condition_all" />
+		LIMIT 1
+  </select>
+	
+	
+	
+	
+	<!--                           Used to LOTTO                           -->
+	<!-- sql结果集：前端接口：彩种  -->
+	<resultMap id="LotteryFrontResultMap" type="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+		<result property="lotteryCode" column="lottery_code" jdbcType="INTEGER"/>
+  	  	<result property="lotteryName" column="lottery_name" jdbcType="VARCHAR"/>
+  	  	<result property="lotteryLogoUrl" column="lottery_logo_url" jdbcType="VARCHAR"/>
+  	  	<result property="saleStatus" column="sale_status" jdbcType="SMALLINT"/>
+  	  	<result property="drawTime" column="draw_time" jdbcType="VARCHAR"/>
+  	  	<result property="vacations" column="vacations" jdbcType="VARCHAR"/>
+  	  	<result property="startSailTime" column="start_sail_time" jdbcType="VARCHAR"/>
+  	  	<result property="endSaleTime" column="end_sail_time" jdbcType="VARCHAR"/>
+  	  	<result property="endCheckTime" column="end_check_time" jdbcType="VARCHAR"/>
+  	  	<result property="sailDayCycle" column="sail_day_cycle" jdbcType="VARCHAR"/>
+        <result property="buyEndTime" column="buy_end_time" jdbcType="DECIMAL"/>
+        <result property="platform" column="platform" jdbcType="VARCHAR"/>
+		<result property="minBet" column="min_bet" jdbcType="DECIMAL"/>
+		<result property="mrMultiple" column="mr_multiple" jdbcType="INTEGER"/>
+		<result property="minMultiple" column="min_multiple" jdbcType="INTEGER"/>
+	</resultMap>
+	<!-- 前端接口：查询单个彩种 -->
+	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultMap="LotteryFrontResultMap">
+		select lottery_code,
+		       lottery_name,
+		       lottery_logo_url,
+		       sale_status,
+		       draw_time,
+		       vacations,
+		       start_sail_time,
+		       end_sail_time,
+		       end_check_time,
+        	   sail_day_cycle,
+        	   buy_end_time,
+       		   platform,
+			   min_bet,
+			   mr_multiple,
+			   min_multiple
+		  from LOTTERY_TYPE lt
+		 where lt.lottery_code = #{lotteryCode,jdbcType=VARCHAR}
+	</select>
+	<!-- 前端接口： 查询所有大彩种 -->
+	<select id="findMultipleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+	     select lottery_code lotteryCode,
+		       lottery_name lotteryName,
+		       lottery_logo_url lotteryLogoUrl,
+		       sale_status saleStatus,
+		       draw_time drawTime,
+		       vacations 
+		  from LOTTERY_TYPE lt
+	</select>
+	<select id="findTypeUseAddIssue" resultType="com.hhly.skeleton.base.issue.entity.NewTypeBO">
+		select
+		ID,
+		ADMIN_CATEGORY  adminCategory,
+		START_SAIL_TIME startSailTime,
+		END_SAIL_TIME endSailTime,
+		SAIL_DAY_CYCLE sailDayCycle,
+		VACATIONS vacations,
+		LOTTERY_CODE lotteryCode,
+		LOTTERY_NAME lotteryName,
+		CON_ISSUE_NUM conIssueNum,
+		STOP_ADD_ISSUE stopAddIssue,
+		LOTTERY_CATEGORY lotteryCategory,
+		SALE_STATUS saleStatus,
+		SYN_ISSUE synIssue,
+		SALE_TIME saleTime,
+		BUY_END_TIME buyEndTime,
+		END_CHECK_TIME endCheckTime,
+		DRAW_TIME DRAWTIME,
+		format
+		from LOTTERY_TYPE
+		where LOTTERY_CODE = #{lotteryCode}
+	</select>
+	<!-- 前端接口： 查询彩种信息-->
+	<select id="findAllLotteryType" resultType="com.hhly.skeleton.cms.lotterymgr.bo.LotteryTypeBO">
+	     select lottery_code lotteryCode,
+		       lottery_name lotteryName,
+		       lottery_logo_url lotteryLogoUrl,
+		       end_sail_time endSailTime,
+		       SAIL_DAY_CYCLE sailDayCycle,
+		       buy_end_time buyEndTime
+		  from LOTTERY_TYPE
+	</select>
+	
+	<!-- 前端接口: 查询彩种下拉基本信息 -->
+  <select id="queryLotterySelectList" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" 
+   resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotteryBO">
+   		select lottery_code lotteryCode, lottery_name lotteryName
+   		from lottery_type
+   		<where>
+   			1=1
+   			<if test="drawType != null">
+   				<choose>
+   					<when test="drawType == 1">
+   						and lottery_category in (1, 3)
+   					</when>
+   					<when test="drawType == 2">
+   						and lottery_category = 2
+   					</when>
+   					<when test="drawType == 3">
+   						and lottery_category = 4
+   					</when>
+   				</choose>
+   			</if>
+   		</where>
+   		order by order_id, lottery_code
+   </select>
+
+</mapper>

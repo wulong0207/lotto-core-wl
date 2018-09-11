@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.hhly.lottocore.persistence.trend.high.dao.SscDaoMapper">
+
+	<sql id="Table">
+		TREND_SSC_RESULT
+	</sql>
+	
+	<sql id="base_column">
+			b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,wb0,wb1,wb2,wb3,wb4,wb5,wb6,wb7,wb8,wb9,wbig,wsmall,wodd,weven,
+			qb0,qb1,qb2,qb3,qb4,qb5,qb6,qb7,qb8,qb9,qbig,qsmall,qodd,qeven,
+			bb0,bb1,bb2,bb3,bb4,bb5,bb6,bb7,bb8,bb9,bbig,bsmall,bodd,beven,
+			sb0,sb1,sb2,sb3,sb4,sb5,sb6,sb7,sb8,sb9,sbig,ssmall,sodd,seven,
+			gb0,gb1,gb2,gb3,gb4,gb5,gb6,gb7,gb8,gb9,gbig,gsmall,godd,geven,
+			q3z3,q3z6,q3bz,h3z3,h3z6,h3bz,h2lh,h2dz,span,
+			s0,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13,s14,s15,s16,s17,s18,
+			zxs1,zxs2,zxs3,zxs4,zxs5,zxs6,zxs7,zxs8,zxs9,zxs10,zxs11,zxs12,zxs13,zxs14,zxs15,
+			zxs16,zxs17,zxs18,zxs19,zxs20,zxs21,zxs22,zxs23,zxs24,zxs25,zxs26,zxs27,
+			zx2_0 groupTwo0,zx2_1 groupTwo1,zx2_2 groupTwo2,zx2_3 groupTwo3,zx2_4 groupTwo4,zx2_5 groupTwo5,
+			zx2_6 groupTwo6,zx2_7 groupTwo7,zx2_8 groupTwo8,zx2_9 groupTwo9,zx3_0 groupThree0,zx3_1 groupThree1,
+			zx3_2 groupThree2,zx3_3 groupThree3,zx3_4 groupThree4,zx3_5 groupThree5,zx3_6 groupThree6,zx3_7 groupThree7,
+			zx3_8 groupThree8,zx3_9 groupThree9,
+			drawcode drawCode,issue
+	</sql>
+	
+	<sql id="base_column_trend">
+			b.b0,b.b1,b.b2,b.b3,b.b4,b.b5,b.b6,b.b7,b.b8,b.b9,b.wb0,b.wb1,b.wb2,b.wb3,b.wb4,b.wb5,b.wb6,b.wb7,b.wb8,b.wb9,b.wbig,b.wsmall,b.wodd,b.weven,b.
+			qb0,b.qb1,b.qb2,b.qb3,b.qb4,b.qb5,b.qb6,b.qb7,b.qb8,b.qb9,b.qbig,b.qsmall,b.qodd,b.qeven,b.
+			bb0,b.bb1,b.bb2,b.bb3,b.bb4,b.bb5,b.bb6,b.bb7,b.bb8,b.bb9,b.bbig,b.bsmall,b.bodd,b.beven,b.
+			sb0,b.sb1,b.sb2,b.sb3,b.sb4,b.sb5,b.sb6,b.sb7,b.sb8,b.sb9,b.sbig,b.ssmall,b.sodd,b.seven,b.
+			gb0,b.gb1,b.gb2,b.gb3,b.gb4,b.gb5,b.gb6,b.gb7,b.gb8,b.gb9,b.gbig,b.gsmall,b.godd,b.geven,b.
+			q3z3,b.q3z6,b.q3bz,b.h3z3,b.h3z6,b.h3bz,b.h2lh,b.h2dz,b.span,b.
+			s0,b.s1,b.s2,b.s3,b.s4,b.s5,b.s6,b.s7,b.s8,b.s9,b.s10,b.s11,b.s12,b.s13,b.s14,b.s15,b.s16,b.s17,b.s18,b.
+			zxs1,b.zxs2,b.zxs3,b.zxs4,b.zxs5,b.zxs6,b.zxs7,b.zxs8,b.zxs9,b.zxs10,b.zxs11,b.zxs12,b.zxs13,b.zxs14,b.zxs15,b.
+			zxs16,b.zxs17,b.zxs18,b.zxs19,b.zxs20,b.zxs21,b.zxs22,b.zxs23,b.zxs24,b.zxs25,b.zxs26,b.zxs27,b.
+			zx2_0 groupTwo0,b.zx2_1 groupTwo1,b.zx2_2 groupTwo2,b.zx2_3 groupTwo3,b.zx2_4 groupTwo4,b.zx2_5 groupTwo5,b.
+			zx2_6 groupTwo6,b.zx2_7 groupTwo7,b.zx2_8 groupTwo8,b.zx2_9 groupTwo9,b.zx3_0 groupThree0,b.zx3_1 groupThree1,b.
+			zx3_2 groupThree2,b.zx3_3 groupThree3,b.zx3_4 groupThree4,b.zx3_5 groupThree5,b.zx3_6 groupThree6,b.zx3_7 groupThree7,b.
+			zx3_8 groupThree8,b.zx3_9 groupThree9,a.draw_code drawCode,a.issue_code issue
+	</sql>
+	<select id="findResultOmit"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.high.bo.SscOmitBO">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="Table" />
+		WHERE LOTTERY_CODE = #{lotteryCode}
+		<if test="omitTypes != null">
+			and FLAG in
+			<foreach collection="omitTypes" item="omitType" open="("
+				close=")" separator=",">
+				#{omitType}
+			</foreach>
+		</if>
+	</select>
+
+	<select id="findRecentOmit"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.high.bo.SscOmitBO">
+		select
+		<include refid="Base_Column_List" />
+		from TREND_SSC_BASE
+		where LOTTERY_CODE = #{lotteryCode}
+		order by issue desc
+		limit 0,#{qryCount}
+	</select>
+	
+	<select id="findBaseTrend" 	
+		parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.high.bo.SscBaseBO">
+		select <include refid="base_column"/>
+		from `TREND_SSC_BASE`
+		where LOTTERY_CODE = #{lotteryCode}
+		<if test="startIssue!=null">
+			and issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		order by issue desc
+		<if test="qryCount!=null">
+			limit #{qryCount}	
+		</if>
+	</select>
+	
+	<select id="findRecentTrend" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryTrendVO" resultType="com.hhly.skeleton.lotto.base.trend.high.bo.SscBaseBO">
+		select <include refid="base_column_trend"/>
+		from (<include refid="com.hhly.lottocore.persistence.trend.high.dao.X115DaoMapper.findRecentIssueCode"/>) a 
+		left join TREND_SSC_BASE b
+		on a.issue_code = b.issue and b.lottery_code = #{lotteryCode}
+		<if test="startIssue!=null">
+			and b.issue >= #{startIssue}
+		</if>
+		<if test="endIssue!=null">
+			and b.issue <![CDATA[ <= ]]>#{endIssue}
+		</if> 
+		order by issue 
+		<if test="qryCount!=null">
+			limit #{qryCount}
+		</if>
+	</select>
+
+
+	<select id="findRecentIssue"
+		parameterType="com.hhly.skeleton.lotto.base.trend.vo.high.HighLotteryVO"
+		resultType="com.hhly.skeleton.lotto.base.trend.high.bo.SscOmitBO">
+		select
+		<trim suffixOverrides=",">
+			li.issue_code issue,
+			li.draw_code drawcode,
+			<if test="sbig">
+				sbig,
+			</if>
+			<if test="ssmall">
+				ssmall,
+			</if>
+			<if test="sodd">
+				sodd,
+			</if>
+			<if test="seven">
+				seven,
+			</if>
+			<if test="gbig">
+				gbig,
+			</if>
+			<if test="gsmall">
+				gsmall,
+			</if>
+			<if test="godd">
+				godd,
+			</if>
+			<if test="geven">
+				geven,
+			</if>
+			<if test="h3z3">
+				h3z3,
+			</if>
+			<if test="h3z6">
+				h3z6,
+			</if>
+			<if test="h3bz">
+				h3bz,
+			</if>
+		</trim>
+		from lottery_issue li
+		left outer join TREND_SSC_BASE tsb
+		on
+		li.lottery_code = tsb.lottery_code and li.issue_code = tsb.issue
+		where
+		li.lottery_code = #{lotteryCode}
+		and li.issue_code <![CDATA[<]]>
+		(select li.issue_code
+		from lottery_issue li
+		where lottery_code =
+		#{lotteryCode}
+		and current_issue = 1
+		limit 1)
+		order by li.issue_code desc
+		limit #{qryCount}
+	</select>
+
+	<sql id="Base_Column_List">
+		<trim suffixOverrides=",">
+			<if test="showFlag">
+				flag omitType,
+			</if>
+			<if test="showIssue">
+				issue,
+			</if>
+			<if test="showDrawCode">
+				drawcode drawCode,
+			</if>
+			<if test="span">
+				span,
+			</if>
+			<if test="b0">
+				b0,
+			</if>
+			<if test="b1">
+				b1,
+			</if>
+			<if test="b2">
+				b2,
+			</if>
+			<if test="b3">
+				b3,
+			</if>
+			<if test="b4">
+				b4,
+			</if>
+			<if test="b5">
+				b5,
+			</if>
+			<if test="b6">
+				b6,
+			</if>
+			<if test="b7">
+				b7,
+			</if>
+			<if test="b8">
+				b8,
+			</if>
+			<if test="b9">
+				b9,
+			</if>
+			<if test="wb0">
+				wb0,
+			</if>
+			<if test="wb1">
+				wb1,
+			</if>
+			<if test="wb2">
+				wb2,
+			</if>
+			<if test="wb3">
+				wb3,
+			</if>
+			<if test="wb4">
+				wb4,
+			</if>
+			<if test="wb5">
+				wb5,
+			</if>
+			<if test="wb6">
+				wb6,
+			</if>
+			<if test="wb7">
+				wb7,
+			</if>
+			<if test="wb8">
+				wb8,
+			</if>
+			<if test="wb9">
+				wb9,
+			</if>
+			<if test="wbig">
+				wbig,
+			</if>
+			<if test="wsmall">
+				wsmall,
+			</if>
+			<if test="wodd">
+				wodd,
+			</if>
+			<if test="weven">
+				weven,
+			</if>
+			<if test="qb0">
+				qb0,
+			</if>
+			<if test="qb1">
+				qb1,
+			</if>
+			<if test="qb2">
+				qb2,
+			</if>
+			<if test="qb3">
+				qb3,
+			</if>
+			<if test="qb4">
+				qb4,
+			</if>
+			<if test="qb5">
+				qb5,
+			</if>
+			<if test="qb6">
+				qb6,
+			</if>
+			<if test="qb7">
+				qb7,
+			</if>
+			<if test="qb8">
+				qb8,
+			</if>
+			<if test="qb9">
+				qb9,
+			</if>
+			<if test="qbig">
+				qbig,
+			</if>
+			<if test="qsmall">
+				qsmall,
+			</if>
+			<if test="qodd">
+				qodd,
+			</if>
+			<if test="qeven">
+				qeven,
+			</if>
+			<if test="bb0">
+				bb0,
+			</if>
+			<if test="bb1">
+				bb1,
+			</if>
+			<if test="bb2">
+				bb2,
+			</if>
+			<if test="bb3">
+				bb3,
+			</if>
+			<if test="bb4">
+				bb4,
+			</if>
+			<if test="bb5">
+				bb5,
+			</if>
+			<if test="bb6">
+				bb6,
+			</if>
+			<if test="bb7">
+				bb7,
+			</if>
+			<if test="bb8">
+				bb8,
+			</if>
+			<if test="bb9">
+				bb9,
+			</if>
+			<if test="bbig">
+				bbig,
+			</if>
+			<if test="bsmall">
+				bsmall,
+			</if>
+			<if test="bodd">
+				bodd,
+			</if>
+			<if test="beven">
+				beven,
+			</if>
+			<if test="sb0">
+				sb0,
+			</if>
+			<if test="sb1">
+				sb1,
+			</if>
+			<if test="sb2">
+				sb2,
+			</if>
+			<if test="sb3">
+				sb3,
+			</if>
+			<if test="sb4">
+				sb4,
+			</if>
+			<if test="sb5">
+				sb5,
+			</if>
+			<if test="sb6">
+				sb6,
+			</if>
+			<if test="sb7">
+				sb7,
+			</if>
+			<if test="sb8">
+				sb8,
+			</if>
+			<if test="sb9">
+				sb9,
+			</if>
+			<if test="sbig">
+				sbig,
+			</if>
+			<if test="ssmall">
+				ssmall,
+			</if>
+			<if test="sodd">
+				sodd,
+			</if>
+			<if test="seven">
+				seven,
+			</if>
+			<if test="gb0">
+				gb0,
+			</if>
+			<if test="gb1">
+				gb1,
+			</if>
+			<if test="gb2">
+				gb2,
+			</if>
+			<if test="gb3">
+				gb3,
+			</if>
+			<if test="gb4">
+				gb4,
+			</if>
+			<if test="gb5">
+				gb5,
+			</if>
+			<if test="gb6">
+				gb6,
+			</if>
+			<if test="gb7">
+				gb7,
+			</if>
+			<if test="gb8">
+				gb8,
+			</if>
+			<if test="gb9">
+				gb9,
+			</if>
+			<if test="gbig">
+				gbig,
+			</if>
+			<if test="gsmall">
+				gsmall,
+			</if>
+			<if test="godd">
+				godd,
+			</if>
+			<if test="geven">
+				geven,
+			</if>
+			<if test="q3z3">
+				q3z3,
+			</if>
+			<if test="q3z6">
+				q3z6,
+			</if>
+			<if test="q3bz">
+				q3bz,
+			</if>
+			<if test="h3z3">
+				h3z3,
+			</if>
+			<if test="h3z6">
+				h3z6,
+			</if>
+			<if test="h3bz">
+				h3bz,
+			</if>
+			<if test="span">
+				span,
+			</if>
+			<if test="s0">
+				s0,
+			</if>
+			<if test="s1">
+				s1,
+			</if>
+			<if test="s2">
+				s2,
+			</if>
+			<if test="s3">
+				s3,
+			</if>
+			<if test="s4">
+				s4,
+			</if>
+			<if test="s5">
+				s5,
+			</if>
+			<if test="s6">
+				s6,
+			</if>
+			<if test="s7">
+				s7,
+			</if>
+			<if test="s8">
+				s8,
+			</if>
+			<if test="s9">
+				s9,
+			</if>
+			<if test="s10">
+				s10,
+			</if>
+			<if test="s11">
+				s11,
+			</if>
+			<if test="s12">
+				s12,
+			</if>
+			<if test="s13">
+				s13,
+			</if>
+			<if test="s14">
+				s14,
+			</if>
+			<if test="s15">
+				s15,
+			</if>
+			<if test="s16">
+				s16,
+			</if>
+			<if test="s17">
+				s17,
+			</if>
+			<if test="s18">
+				s18,
+			</if>
+			<if test="zxs0">
+				zxs0,
+			</if>
+			<if test="zxs1">
+				zxs1,
+			</if>
+			<if test="zxs2">
+				zxs2,
+			</if>
+			<if test="zxs3">
+				zxs3,
+			</if>
+			<if test="zxs4">
+				zxs4,
+			</if>
+			<if test="zxs5">
+				zxs5,
+			</if>
+			<if test="zxs6">
+				zxs6,
+			</if>
+			<if test="zxs7">
+				zxs7,
+			</if>
+			<if test="zxs8">
+				zxs8,
+			</if>
+			<if test="zxs9">
+				zxs9,
+			</if>
+			<if test="zxs10">
+				zxs10,
+			</if>
+			<if test="zxs11">
+				zxs11,
+			</if>
+			<if test="zxs12">
+				zxs12,
+			</if>
+			<if test="zxs13">
+				zxs13,
+			</if>
+			<if test="zxs14">
+				zxs14,
+			</if>
+			<if test="zxs15">
+				zxs15,
+			</if>
+			<if test="zxs16">
+				zxs16,
+			</if>
+			<if test="zxs17">
+				zxs17,
+			</if>
+			<if test="zxs18">
+				zxs18,
+			</if>
+			<if test="zxs19">
+				zxs19,
+			</if>
+			<if test="zxs20">
+				zxs20,
+			</if>
+			<if test="zxs21">
+				zxs21,
+			</if>
+			<if test="zxs22">
+				zxs22,
+			</if>
+			<if test="zxs23">
+				zxs23,
+			</if>
+			<if test="zxs24">
+				zxs24,
+			</if>
+			<if test="zxs25">
+				zxs25,
+			</if>
+			<if test="zxs26">
+				zxs26,
+			</if>
+			<if test="zxs27">
+				zxs27,
+			</if>
+			<if test="groupTwo0">
+				zx2_0 groupTwo0,
+			</if>
+			<if test="groupTwo1">
+				zx2_1 groupTwo1,
+			</if>
+			<if test="groupTwo2">
+				zx2_2 groupTwo2,
+			</if>
+			<if test="groupTwo3">
+				zx2_3 groupTwo3,
+			</if>
+			<if test="groupTwo4">
+				zx2_4 groupTwo4,
+			</if>
+			<if test="groupTwo5">
+				zx2_5 groupTwo5,
+			</if>
+			<if test="groupTwo6">
+				zx2_6 groupTwo6,
+			</if>
+			<if test="groupTwo7">
+				zx2_7 groupTwo7,
+			</if>
+			<if test="groupTwo8">
+				zx2_8 groupTwo8,
+			</if>
+			<if test="groupTwo9">
+				zx2_9 groupTwo9,
+			</if>
+			<if test="groupThree0">
+				zx3_0 groupThree0,
+			</if>
+			<if test="groupThree1">
+				zx3_1 groupThree1,
+			</if>
+			<if test="groupThree2">
+				zx3_2 groupThree2,
+			</if>
+			<if test="groupThree3">
+				zx3_3 groupThree3,
+			</if>
+			<if test="groupThree4">
+				zx3_4 groupThree4,
+			</if>
+			<if test="groupThree5">
+				zx3_5 groupThree5,
+			</if>
+			<if test="groupThree6">
+				zx3_6 groupThree6,
+			</if>
+			<if test="groupThree7">
+				zx3_7 groupThree7,
+			</if>
+			<if test="groupThree8">
+				zx3_8 groupThree8,
+			</if>
+			<if test="groupThree9">
+				zx3_9 groupThree9,
+			</if>
+		</trim>
+	</sql>
+</mapper>

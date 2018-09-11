@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.ordercopy.dao.MUserIssueInfoDaoMapper">
+    <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.MUserIssueInfoBO">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="recent_record" jdbcType="VARCHAR" property="recentRecordTemp"/>
+        <result column="hit_rate" jdbcType="DECIMAL" property="hitRateTemp"/>
+        <result column="profit_rate" jdbcType="DECIMAL" property="profitRateTemp"/>
+        <result column="focus_num" jdbcType="INTEGER" property="focusNum"/>
+        <result column="issue_num" jdbcType="INTEGER" property="issueNum"/>
+        <result column="issue_amount" jdbcType="DECIMAL" property="issueAmount"/>
+        <result column="hit_num" jdbcType="INTEGER" property="hitNum"/>
+        <result column="hit_money" jdbcType="DECIMAL" property="hitMoney"/>
+        <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount"/>
+        <result column="follow_num" jdbcType="INTEGER" property="followNum"/>
+        <result column="follow_amount" jdbcType="INTEGER" property="followAmount"/>
+        <result column="win_amount" jdbcType="DECIMAL" property="winAmount"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="modify_by" jdbcType="VARCHAR" property="modifyBy"/>
+        <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="head_url" jdbcType="VARCHAR" property="headUrl"/>
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="continue_hit" jdbcType="VARCHAR" property="continueHitStr"/>
+    </resultMap>
+
+    <!-- 我的关注  -->
+    <resultMap id="UserIssueInfoResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.QueryUserIssueInfoBO">
+        <result column="id" jdbcType="INTEGER" property="id"/>
+        <result column="recent_record" jdbcType="VARCHAR" property="recentRecord"/>
+        <result column="hit_rate" jdbcType="DECIMAL" property="hitRateDb"/>
+        <result column="issue_num" jdbcType="INTEGER" property="issueNum"/>
+        <result column="hit_num" jdbcType="INTEGER" property="hitNum"/>
+        <result column="focus_num" jdbcType="INTEGER" property="focusNum"/>
+        <result column="head_url" jdbcType="VARCHAR" property="headUrl"/>
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="level" jdbcType="INTEGER" property="level"/>
+        <result column="continue_hit" jdbcType="INTEGER" property="continueHitDb"/>
+        <result column="bonus_rate" jdbcType="DECIMAL" property="bonusRateDb"/>
+        <result column="copy_issue_num" jdbcType="INTEGER" property="updateNum"/>
+    </resultMap>
+
+    <!-- 返佣情况 -->
+    <resultMap id="CommissionInfoResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.CommissionBO">
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="follow_num" jdbcType="INTEGER" property="followNum"/>
+        <result column="follow_amount" jdbcType="DECIMAL" property="followAmount"/>
+        <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="winning_status" jdbcType="INTEGER" property="winStatus"/>
+    </resultMap>
+
+    <!-- 返佣明细 -->
+    <resultMap id="CommissionDetailsResultMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.CommissionBO">
+        <result column="order_code" jdbcType="VARCHAR" property="orderCode"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+        <result column="follow_amount" jdbcType="DECIMAL" property="followAmount"/>
+        <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount"/>
+        <result column="winning_status" jdbcType="INTEGER" property="winStatus"/>
+    </resultMap>
+
+    <!-- 获取总提成 -->
+    <resultMap id="SumCommissionOfCopyOrderMap" type="com.hhly.skeleton.lotto.base.ordercopy.bo.CommissionBO">
+        <result column="winning_status" jdbcType="INTEGER" property="winStatus"/>
+        <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, recent_record, hit_rate, profit_rate, focus_num, issue_num, issue_amount,
+        hit_num, hit_money, commission_amount, follow_num, follow_amount, win_amount, create_time,
+        modify_by, modify_time, update_time
+    </sql>
+
+    <!-- 排序  -->
+    <sql id="Order_SQL">
+        <if test="sortField != null and sortOrder !=null">
+            ORDER BY ${sortField} ${sortOrder}
+        </if>
+    </sql>
+
+    <!-- 分页 -->
+    <sql id="Page_SQL">
+        LIMIT #{startRow,jdbcType=INTEGER}, #{pageSize,jdbcType=INTEGER}
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+            a.id,
+            a.user_id,
+            recent_record,
+            hit_rate,
+            profit_rate,
+            focus_num,
+            issue_num,
+            issue_amount,
+            continue_hit,
+            hit_num,
+            hit_money,
+            commission_amount,
+            follow_num,
+            follow_amount,
+            win_amount,
+            a.create_time,
+            b.nick_name,
+            a.modify_by,
+            a.modify_time,
+            a.update_time,
+            head_url
+        FROM m_user_issue_info a
+            INNER JOIN m_user_info b ON a.user_id = b.id
+        WHERE a.id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="findUserIssueInfoByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        a.id,
+        a.user_id,
+        recent_record,
+        hit_rate,
+        profit_rate,
+        focus_num,
+        issue_num,
+        issue_amount,
+        continue_hit,
+        hit_num,
+        hit_money,
+        commission_amount,
+        follow_num,
+        follow_amount,
+        win_amount,
+        a.create_time,
+        b.nick_name,
+        a.modify_by,
+        a.modify_time,
+        a.update_time,
+        head_url
+        FROM m_user_issue_info a
+        INNER JOIN m_user_info b ON a.user_id = b.id
+        WHERE a.user_id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!-- 查询用户是否已经成为发单用户 -->
+    <select id="findUserIssueInfoCountByUserId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM m_user_issue_info
+        WHERE user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+    <!-- 查询动态列表-我的关注/专家推荐-专家列表 记录-->
+    <select id="selectByCondition" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO"
+            resultMap="UserIssueInfoResultMap">
+        SELECT
+        a.id,<!-- 发单ID -->
+        a.recent_record, <!-- 最近战况 -->
+        a.hit_rate,<!-- 命中率 -->
+        a.issue_num,<!-- 发单数 -->
+        a.hit_num,<!-- 命中次数 -->
+        a.focus_num,<!-- 被关注次数 -->
+        a.continue_hit,<!-- 最大连红 -->
+        <if test="lotteryCode != null">
+            b.level, <!-- 专家级别  -->
+        </if>
+        <if test="lotteryCode == null">
+            -1 level,
+        </if>
+        c.head_url,<!-- 头像 -->
+        a.profit_rate bonus_rate,<!-- 盈利率 -->
+        f.copy_issue_num, <!-- 可抄单 -->
+        c.nick_name <!-- 昵称 -->
+        FROM m_user_issue_info a
+        <if test="lotteryCode != null">
+            INNER JOIN m_user_issue_level b ON a.id = b.user_issue_info_id
+        </if>
+        INNER JOIN m_user_info c ON a.user_id = c.id
+        <if test="userId != null">
+            LEFT JOIN m_user_issue_link d ON a.id = d.user_issue_id
+        </if>
+        LEFT JOIN (SELECT user_issue_info_id, CASE WHEN sum(level) >= 1 THEN 1 ELSE 0 END level
+        FROM m_user_issue_level GROUP BY user_issue_info_id) e ON e.user_issue_info_id = a.id
+        LEFT JOIN (SELECT a.user_issue_id, count(0)copy_issue_num
+        FROM order_issue_info a
+        INNER JOIN order_info b ON a.order_code = b.order_code
+        WHERE 1=1
+        AND b.order_status = 6
+        AND DATE_FORMAT(b.end_local_time,'%Y-%m-%d %H:%i:%s') > DATE_FORMAT(now(),'%Y-%m-%d %H:%i:%s')
+        GROUP BY a.user_issue_id ) f ON a.id = f.user_issue_id
+        WHERE 1 = 1
+        AND a.status = 1
+        <if test="userId != null">
+            AND d.data_status = 1
+        </if>
+        <!-- 普通用户id -->
+        <if test="userId != null">
+            AND d.user_id = #{userId}
+        </if>
+        <if test="lotteryCode != null">
+            AND e.level = 1
+            AND b.lottery_code = #{lotteryCode}
+        </if>
+        <!-- 60%以上专家 -->
+        <if test="percent != null">
+            AND e.level = 1
+            AND <![CDATA[a.profit_rate > #{percent}]]>
+        </if>
+
+        <include refid="Order_SQL"/>
+        <include refid="Page_SQL"/>
+    </select>
+
+    <!-- 查询动态列表-我的关注/专家推荐-专家列表 总数-->
+    <select id="selectByConditionCount" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO"
+            resultType="int">
+        SELECT
+        count(1)
+        FROM m_user_issue_info a
+        <if test="lotteryCode != null">
+            INNER JOIN m_user_issue_level b ON a.id = b.user_issue_info_id
+        </if>
+        INNER JOIN m_user_info c ON a.user_id = c.id
+        <if test="userId != null">
+            LEFT JOIN m_user_issue_link d ON a.id = d.user_issue_id
+        </if>
+        LEFT JOIN (SELECT user_issue_info_id, CASE WHEN sum(level) >= 1 THEN 1 ELSE 0 END level
+        FROM m_user_issue_level GROUP BY user_issue_info_id) e ON e.user_issue_info_id = a.id
+        WHERE 1 = 1
+        AND a.status = 1
+        <if test="userId != null">
+            AND d.data_status = 1
+        </if>
+        <!-- 普通用户id -->
+        <if test="userId != null">
+            AND d.user_id = #{userId}
+        </if>
+        <if test="lotteryCode != null">
+            AND e.level = 1
+            AND b.lottery_code = #{lotteryCode}
+        </if>
+        <!-- -->
+        <if test="percent != null">
+            AND e.level = 1
+            AND <![CDATA[a.profit_rate > #{percent}]]>
+        </if>
+
+    </select>
+
+    <!-- 查询返佣情况 -->
+    <select id="queryCommission" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO"
+            resultMap="CommissionInfoResultMap">
+        SELECT
+        a.order_code,
+        a.follow_num,
+        a.follow_amount,
+        a.commission_amount,
+        b.id,
+        a.user_issue_id
+        FROM order_issue_info a
+        LEFT JOIN m_user_issue_info b ON a.user_issue_id = b.id
+        WHERE 1=1
+        <!-- 普通用户id -->
+        <if test="userId != null">
+            AND b.user_id = #{userId}
+        </if>
+        <if test="beginTime != null">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') <![CDATA[>=]]> #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') <![CDATA[<=]]> #{endTime}
+        </if>
+        <include refid="Order_SQL"/>
+        <include refid="Page_SQL"/>
+    </select>
+
+    <!-- 查询返佣情况 总记录数-->
+    <select id="queryCommissionCount" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO"
+            resultType="int">
+        SELECT
+        count(1)
+        FROM order_issue_info a
+        LEFT JOIN m_user_issue_info b ON a.user_issue_id = b.id
+        WHERE 1=1
+        <!-- 普通用户id -->
+        <if test="userId != null">
+            AND b.user_id = #{userId}
+        </if>
+        <if test="beginTime != null">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') <![CDATA[>=]]> #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND DATE_FORMAT(a.create_time,'%Y-%m-%d %H:%i:%s') <![CDATA[<=]]> #{endTime}
+        </if>
+    </select>
+
+    <!-- 查询返佣明细 -->
+    <select id="queryCommissionDetails" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO"
+            resultMap="CommissionDetailsResultMap">
+        SELECT
+        a.order_code,
+        b.create_time,
+        b.nick_name,
+        c.order_amount follow_amount,
+        c.winning_status,
+        b.commission_amount
+        FROM order_issue_info a
+        INNER JOIN order_followed_info b ON a.id = b.order_issue_id
+        INNER JOIN order_info c ON b.order_code = c.order_code
+        WHERE 1=1
+        AND c.pay_status = 2
+        AND c.order_status = 6
+        <if test="orderCode != null">
+            AND a.order_code = #{orderCode}
+        </if>
+        <include refid="Order_SQL"/>
+        <include refid="Page_SQL"/>
+    </select>
+
+    <!-- 查询返佣明细  总记录数-->
+    <select id="queryCommissionDetailsCount" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO"
+            resultType="int">
+        SELECT
+        count(1)
+        FROM order_issue_info a
+        INNER JOIN order_followed_info b ON a.id = b.order_issue_id
+        INNER JOIN order_info c ON b.order_code = c.order_code
+        WHERE 1=1
+        AND c.pay_status = 2
+        AND c.order_status = 6
+        <if test="orderCode != null">
+            AND a.order_code = #{orderCode}
+        </if>
+    </select>
+
+    <!-- 查询返佣明细  总返佣金额-->
+    <select id="getCommissionDetailsSumCommission" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.QueryVO"
+            resultMap="SumCommissionOfCopyOrderMap">
+        SELECT
+        a.commission_amount, b.winning_status
+        FROM order_issue_info a
+        INNER JOIN order_info b ON b.order_code = a.order_code
+        WHERE 1=1
+        <if test="orderCode != null">
+            AND a.order_code = #{orderCode}
+        </if>
+    </select>
+
+
+    <!-- 查询专家近期战绩未中奖 战绩 -->
+    <select id="selectIssueUserPrizeOrder" parameterType="com.hhly.skeleton.lotto.base.ordercopy.vo.MUserIssueInfoVO"
+            resultType="com.hhly.skeleton.lotto.base.ordercopy.bo.MUserIssueCountPrizeViewBO">
+        SELECT *
+        FROM (SELECT
+        sum(temp.total) AS prizeTotal,
+        sum(temp.notTotal) AS notPrizeTotal,
+        temp.createTime AS date
+        FROM (SELECT
+        if(b.winning_status = 3 OR b.winning_status = 4, 1, 0) total,
+        if(b.winning_status = 2, 1, 0) notTotal,
+        date_format(a.create_time, '%Y-%m-%d') AS createTime
+        FROM order_issue_info a
+        INNER JOIN order_info b ON a.order_code = b.order_code
+        WHERE a.user_issue_id = #{id} AND b.lottery_code = #{lotteryCode} AND b.pay_status = 2 AND b.order_status = 6
+        AND
+        b.winning_status != 1
+        ORDER BY a.create_time DESC
+
+        ) temp
+        GROUP BY temp.createTime
+        ORDER BY temp.createTime DESC
+        LIMIT 7) tableTemp
+        ORDER BY tableTemp.date ASC
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        DELETE FROM m_user_issue_info
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueInfoPO">
+        INSERT INTO m_user_issue_info (id, user_id, recent_record,
+                                       hit_rate, profit_rate, focus_num,
+                                       issue_num, issue_amount, hit_num,
+                                       hit_money, commission_amount, follow_num,
+                                       follow_amount, win_amount, create_time,
+                                       modify_by, modify_time, update_time
+        )
+        VALUES (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{recentRecord,jdbcType=VARCHAR},
+                                        #{hitRate,jdbcType=DECIMAL}, #{profitRate,jdbcType=DECIMAL},
+                                        #{focusNum,jdbcType=INTEGER},
+                                        #{issueNum,jdbcType=INTEGER}, #{issueAmount,jdbcType=DECIMAL},
+                                        #{hitNum,jdbcType=INTEGER},
+                                        #{hitMoney,jdbcType=DECIMAL}, #{commissionAmount,jdbcType=DECIMAL},
+                #{followNum,jdbcType=INTEGER},
+                #{followAmount,jdbcType=INTEGER}, #{winAmount,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP},
+                #{modifyBy,jdbcType=VARCHAR}, #{modifyTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <insert id="insertSelective" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueInfoPO">
+        insert into m_user_issue_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="recentRecord != null">
+                recent_record,
+            </if>
+            <if test="hitRate != null">
+                hit_rate,
+            </if>
+            <if test="profitRate != null">
+                profit_rate,
+            </if>
+            <if test="focusNum != null">
+                focus_num,
+            </if>
+            <if test="issueNum != null">
+                issue_num,
+            </if>
+            <if test="issueAmount != null">
+                issue_amount,
+            </if>
+            <if test="hitNum != null">
+                hit_num,
+            </if>
+            <if test="hitMoney != null">
+                hit_money,
+            </if>
+            <if test="commissionAmount != null">
+                commission_amount,
+            </if>
+            <if test="followNum != null">
+                follow_num,
+            </if>
+            <if test="followAmount != null">
+                follow_amount,
+            </if>
+            <if test="winAmount != null">
+                win_amount,
+            </if>
+            create_time,
+            modify_time,
+            update_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="recentRecord != null">
+                #{recentRecord,jdbcType=VARCHAR},
+            </if>
+            <if test="hitRate != null">
+                #{hitRate,jdbcType=DECIMAL},
+            </if>
+            <if test="profitRate != null">
+                #{profitRate,jdbcType=DECIMAL},
+            </if>
+            <if test="focusNum != null">
+                #{focusNum,jdbcType=INTEGER},
+            </if>
+            <if test="issueNum != null">
+                #{issueNum,jdbcType=INTEGER},
+            </if>
+            <if test="issueAmount != null">
+                #{issueAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="hitNum != null">
+                #{hitNum,jdbcType=INTEGER},
+            </if>
+            <if test="hitMoney != null">
+                #{hitMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="commissionAmount != null">
+                #{commissionAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="followNum != null">
+                #{followNum,jdbcType=INTEGER},
+            </if>
+            <if test="followAmount != null">
+                #{followAmount,jdbcType=INTEGER},
+            </if>
+            <if test="winAmount != null">
+                #{winAmount,jdbcType=DECIMAL},
+            </if>
+            now(),
+            now(),
+            now()
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective"
+            parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueInfoPO">
+        update m_user_issue_info
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="recentRecord != null">
+                recent_record = #{recentRecord,jdbcType=VARCHAR},
+            </if>
+            <if test="hitRate != null">
+                hit_rate = #{hitRate,jdbcType=DECIMAL},
+            </if>
+            <if test="profitRate != null">
+                profit_rate = #{profitRate,jdbcType=DECIMAL},
+            </if>
+            <if test="focusNum != null">
+                focus_num = #{focusNum,jdbcType=INTEGER},
+            </if>
+            <if test="issueNum != null">
+                issue_num = #{issueNum,jdbcType=INTEGER},
+            </if>
+            <if test="issueAmount != null">
+                issue_amount = #{issueAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="hitNum != null">
+                hit_num = #{hitNum,jdbcType=INTEGER},
+            </if>
+            <if test="hitMoney != null">
+                hit_money = #{hitMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="commissionAmount != null">
+                commission_amount = #{commissionAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="followNum != null">
+                follow_num = #{followNum,jdbcType=INTEGER},
+            </if>
+            <if test="followAmount != null">
+                follow_amount = #{followAmount,jdbcType=INTEGER},
+            </if>
+            <if test="winAmount != null">
+                win_amount = #{winAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyBy != null">
+                modify_by = #{modifyBy,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null">
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hhly.lottocore.persistence.ordercopy.po.MUserIssueInfoPO">
+        UPDATE m_user_issue_info
+        SET user_id           = #{userId,jdbcType=INTEGER},
+            recent_record     = #{recentRecord,jdbcType=VARCHAR},
+            hit_rate          = #{hitRate,jdbcType=DECIMAL},
+            profit_rate       = #{profitRate,jdbcType=DECIMAL},
+            focus_num         = #{focusNum,jdbcType=INTEGER},
+            issue_num         = #{issueNum,jdbcType=INTEGER},
+            issue_amount      = #{issueAmount,jdbcType=DECIMAL},
+            hit_num           = #{hitNum,jdbcType=INTEGER},
+            hit_money         = #{hitMoney,jdbcType=DECIMAL},
+            commission_amount = #{commissionAmount,jdbcType=DECIMAL},
+            follow_num        = #{followNum,jdbcType=INTEGER},
+            follow_amount     = #{followAmount,jdbcType=INTEGER},
+            win_amount        = #{winAmount,jdbcType=DECIMAL},
+            create_time       = #{createTime,jdbcType=TIMESTAMP},
+            modify_by         = #{modifyBy,jdbcType=VARCHAR},
+            modify_time       = #{modifyTime,jdbcType=TIMESTAMP},
+            update_time       = #{updateTime,jdbcType=TIMESTAMP}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="queryUserIssueInfoByUserId" parameterType="Integer" resultType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdRersonInfoBO">
+        SELECT
+          msi.id mUserIssueInfoId,
+          mui.head_url headPic,
+          mui.account_name accountName,
+          msi.issue_num issueNum,
+          msi.clicks clicks,
+          (select count(muil.id) from m_user_issue_link muil LEFT JOIN m_user_issue_info m on muil.user_issue_id = m.id where m.user_id=#{userId} and muil.data_status=1) fanNum,
+          msi.pay_amount totalIncome
+        FROM
+            m_user_issue_info msi
+        LEFT JOIN m_user_info mui ON msi.user_id = mui.id
+        where msi.user_id=#{userId}
+    </select>
+</mapper>

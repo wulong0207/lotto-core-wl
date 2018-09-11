@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.lottery.dao.LotteryBettingMulDaoMapper">
+   
+   <!--                           Used to CMS                           -->
+   
+  <!--                           Used to LOTTO                           -->
+  
+  	<!-- 前端接口：sql语句块：注、倍数配置查询 -->
+	<sql id="front_sql_statement_betting_mul">
+	  	select lottery_code lotteryCode,
+		       bettind_num  bettindNum,
+		       multiple_num multipleNum,
+		       end_time     endTime
+		  from LOTTERY_BETTING_MUL
+	</sql>
+	<!-- 前端接口：sql查询条件：注、倍数配置查询 -->
+	<sql id="front_sql_condition_betting_mul">
+  		where 1 = 1
+  		<if test="lotteryCode != null">
+  			and lottery_code = #{lotteryCode,jdbcType=INTEGER}
+  		</if>
+	</sql>
+	<!-- 前端接口：查询多条注、倍数配置 -->
+	<select id="findMultipleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotBettingMulBO">
+  		<include refid="front_sql_statement_betting_mul" />
+  		<include refid="front_sql_condition_betting_mul" />
+  		order by end_time desc
+	</select>
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.trend.num.dao.QlcTrendDaoMapper">
+  
+  <!--                           Used to CMS                           -->
+  
+  
+  
+  <!--                           Used to LOTTO                           -->
+  	
+  	<!-- 从彩期表获取最近几期的期号 -->
+	<sql id="findRecentIssueCode">
+		SELECT
+			issue_code
+		FROM
+			lottery_issue li
+		WHERE
+			li.lottery_code = #{lotteryCode}
+		AND li.issue_code <![CDATA[ < ]]> (
+			SELECT
+				li.issue_code
+			FROM
+				lottery_issue li
+			WHERE
+				lottery_code = #{lotteryCode}
+			AND current_issue = 1
+			LIMIT 1
+		)
+		ORDER BY
+			li.issue_code DESC
+		LIMIT #{qryCount}
+	</sql>
+  	
+  	<!-- 前端接口：sql语句块：基础信息遗漏(对应彩种base结尾基础表)(不分位遗漏) -->
+	<sql id="front_sql_statement_qlc_base_trend">
+		SELECT
+			tqb.issue,
+			tqb.drawcode drawCode,
+			tqb.b01,
+			tqb.b02,
+			tqb.b03,
+			tqb.b04,
+			tqb.b05,
+			tqb.b06,
+			tqb.b07,
+			tqb.b08,
+			tqb.b09,
+			tqb.b10,
+			tqb.b11,
+			tqb.b12,
+			tqb.b13,
+			tqb.b14,
+			tqb.b15,
+			tqb.b16,
+			tqb.b17,
+			tqb.b18,
+			tqb.b19,
+			tqb.b20,
+			tqb.b21,
+			tqb.b22,
+			tqb.b23,
+			tqb.b24,
+			tqb.b25,
+			tqb.b26,
+			tqb.b27,
+			tqb.b28,
+			tqb.b29,
+			tqb.b30
+		FROM
+			trend_qlc_base tqb
+	</sql>
+	<!-- 前端接口：基础信息遗漏(对应彩种base结尾基础表)：查询最大的遗漏期数数据 -->
+  	<select id="findMaxTrendFront" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.qlc.QlcTrendBO">
+		<include refid="front_sql_statement_qlc_base_trend" />
+		ORDER BY tqb.issue DESC
+		LIMIT 1
+  	</select>
+  	<!-- 前端接口：基础信息遗漏(对应彩种base结尾基础表)：查询单条遗漏走势 -->
+  	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.qlc.QlcTrendBO">
+		<include refid="front_sql_statement_qlc_base_trend" />
+		WHERE tqb.issue = #{issueCode,jdbcType=VARCHAR}
+		LIMIT 1
+  	</select>
+  	<!-- 前端接口：基础信息遗漏(对应彩种base结尾基础表)：查询范围内的遗漏走势集合(即从指定期开始的近多少期) -->
+  	<select id="findTrendRangeFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.qlc.QlcTrendBO">		
+		SELECT
+			iss.issue_code issue,
+			tqb.drawcode drawCode,
+			tqb.b01,
+			tqb.b02,
+			tqb.b03,
+			tqb.b04,
+			tqb.b05,
+			tqb.b06,
+			tqb.b07,
+			tqb.b08,
+			tqb.b09,
+			tqb.b10,
+			tqb.b11,
+			tqb.b12,
+			tqb.b13,
+			tqb.b14,
+			tqb.b15,
+			tqb.b16,
+			tqb.b17,
+			tqb.b18,
+			tqb.b19,
+			tqb.b20,
+			tqb.b21,
+			tqb.b22,
+			tqb.b23,
+			tqb.b24,
+			tqb.b25,
+			tqb.b26,
+			tqb.b27,
+			tqb.b28,
+			tqb.b29,
+			tqb.b30
+		FROM (<include refid="findRecentIssueCode"/>) iss
+		LEFT JOIN
+			trend_qlc_base tqb on iss.issue_code = tqb.issue
+  	</select>
+  	
+  	
+  	<!-- 前端接口：近期开奖：查询近期遗漏走势(简易版-手机端使用) -->
+  	<select id="findRecentTrendSimple" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.trend.num.bo.qlc.QlcRecentTrendBO">
+		
+		SELECT 
+			iss.issue_code issue,
+			tqb.drawcode drawCode
+		FROM 
+			(<include refid="findRecentIssueCode"/>) iss
+		LEFT JOIN 	
+			trend_qlc_base tqb on iss.issue_code =tqb.issue
+  	</select>
+  	
+  	
+  	
+  	<!--        走势图专用             -->
+  	
+  	
+</mapper>

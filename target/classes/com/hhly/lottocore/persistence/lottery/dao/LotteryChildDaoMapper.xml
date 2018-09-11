@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.lottery.dao.LotteryChildDaoMapper">
+  
+  <!--                           Used to CMS                           -->
+  
+  <!--                           Used to LOTTO                           -->
+  
+  	<!-- 前端接口：sql语句块：子玩法配置查询 -->
+	<sql id="front_sql_statement_child">
+	  	select lottery_child_code lotteryChildCode,
+		       lottery_code       lotteryCode,
+		       child_name         childName,
+		       sale_status        saleStatus
+		  from LOTTERY_CHILD
+	</sql>
+	<!-- 前端接口：sql查询条件：子玩法配置查询 -->
+	<sql id="front_sql_condition_child">
+  		where 1 = 1
+  		<if test="lotteryCode != null">
+  			and lottery_code = #{lotteryCode,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryChildCode != null">
+  			and lottery_child_code = #{lotteryChildCode,jdbcType=INTEGER}
+  		</if>
+  		<if test="lotteryChildCodes != null">
+  			and lottery_child_code in
+  			<foreach collection="lotteryChildCodes" item="lotteryChildCode" index="index" open="(" separator="," close=")">
+  				#{lotteryChildCode,jdbcType=VARCHAR}
+  			</foreach>
+  		</if>
+  		<if test="saleStatus">
+  			and SALE_STATUS = #{saleStatus}
+  		</if>
+	</sql>
+  	<!-- 前端接口：查询单条子玩法配置 -->
+  	<select id="findSingleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotChildVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotChildBO">
+		<include refid="front_sql_statement_child" />
+		<include refid="front_sql_condition_child" />
+		LIMIT 1
+  	</select>
+  	<!-- 前端接口：查询多条子玩法配置 -->
+  	<select id="findMultipleFront" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotteryVO" resultType="com.hhly.skeleton.lotto.base.lottery.bo.LotChildBO">
+  		<include refid="front_sql_statement_child" />
+  		 where 1 = 1
+  		<if test="lotteryCode != null">
+  			and lottery_code = #{lotteryCode,jdbcType=INTEGER}
+  		</if>
+  		order by lottery_child_code
+  	</select>
+  	<select id="count" parameterType="com.hhly.skeleton.lotto.base.lottery.vo.LotChildVO" resultType="int">
+  		select count(*) from LOTTERY_CHILD <include refid="front_sql_condition_child" />
+  	</select>
+</mapper>

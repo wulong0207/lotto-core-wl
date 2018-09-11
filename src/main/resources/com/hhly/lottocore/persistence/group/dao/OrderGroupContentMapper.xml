@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.group.dao.OrderGroupContentMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.group.bo.OrderGroupContentBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="order_code" jdbcType="VARCHAR" property="orderCode" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="buy_ratio" jdbcType="DECIMAL" property="buyRatio" />
+    <result column="buy_amount" jdbcType="DECIMAL" property="buyAmount" />
+    <result column="buy_time" jdbcType="TIMESTAMP" property="buyTime" />
+    <result column="pre_bonus" jdbcType="DECIMAL" property="preBonus" />
+    <result column="aft_bonus" jdbcType="DECIMAL" property="aftBonus" />
+    <result column="commission_amount" jdbcType="DECIMAL" property="commissionAmount" />
+    <result column="send_bonus" jdbcType="DECIMAL" property="sendBonus" />
+    <result column="added_bonus" jdbcType="DECIMAL" property="addedBonus" />
+    <result column="site_added_bonus" jdbcType="DECIMAL" property="siteAddedBonus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, order_code, user_id, buy_ratio, buy_amount, buy_time, pre_bonus, aft_bonus, commission_amount, added_bonus,site_added_bonus,
+    send_bonus, create_time, update_time, remark
+  </sql>
+
+  <insert id="insert" parameterType="com.hhly.lottocore.persistence.group.po.OrderGroupContentPO">
+    insert into order_group_content (order_code, user_id,
+      buy_ratio, buy_amount, buy_time, 
+      pre_bonus, aft_bonus, commission_amount, 
+      send_bonus, create_time, update_time, 
+      remark,buy_code,buy_flag)
+    values (#{orderCode,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER},
+      #{buyRatio,jdbcType=DECIMAL}, #{buyAmount,jdbcType=DECIMAL}, now(),
+      #{preBonus,jdbcType=DECIMAL}, #{aftBonus,jdbcType=DECIMAL}, #{commissionAmount,jdbcType=DECIMAL}, 
+      #{sendBonus,jdbcType=DECIMAL}, now(), #{updateTime,jdbcType=TIMESTAMP},
+      #{remark,jdbcType=VARCHAR},#{buyCode,jdbcType=DECIMAL},#{buyFlag,jdbcType=DECIMAL})
+  </insert>
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.hhly.skeleton.lotto.base.group.bo.OrderGroupContentBO">
+    update order_group_content
+    <set>
+      <if test="orderCode != null">
+        order_code = #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="buyRatio != null">
+        buy_ratio = #{buyRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="buyAmount != null">
+        buy_amount = #{buyAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="buyTime != null">
+        buy_time = #{buyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="preBonus != null">
+        pre_bonus = #{preBonus,jdbcType=DECIMAL},
+      </if>
+      <if test="aftBonus != null">
+        aft_bonus = #{aftBonus,jdbcType=DECIMAL},
+      </if>
+      <if test="commissionAmount != null">
+        commission_amount = #{commissionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="sendBonus != null">
+        send_bonus = #{sendBonus,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="queryOrderGroupContentByUserId" resultType="com.hhly.skeleton.lotto.base.group.bo.OrderMyGroupBO">
+    select
+    m.account_name nick,
+    o.buy_ratio buyRatio,
+    o.buy_amount buyAmount,
+    o.create_time time,
+    o.send_bonus winAmount
+    from order_group_content o  left join m_user_info m on o.user_id = m.id
+    where o.order_code=#{orderCode} and o.user_id=#{userId} order by o.create_time
+  </select>
+
+  <select id="queryOrderGroupContentById" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from order_group_content where id=#{id}
+  </select>
+
+
+
+  <select id="queryOrderGroupContentCount" parameterType="com.hhly.skeleton.lotto.base.group.vo.OrderGroupContentVO"  resultType="int">
+    select
+    count(1)
+    from order_group_content where order_code=#{orderCode}
+  </select>
+
+  <select id="queryOrderGroupContentList" parameterType="com.hhly.skeleton.lotto.base.group.vo.OrderGroupContentVO"  resultType="com.hhly.skeleton.lotto.base.group.bo.OrderMyGroupBO">
+    select
+    m.account_name nick,
+    o.buy_ratio buyRatio,
+    o.buy_amount buyAmount,
+    o.create_time time,
+    o.send_bonus winAmount
+    from order_group_content o  left join m_user_info m on o.user_id = m.id  where order_code=#{orderCode}  order by  o.create_time
+    limit #{startRow},#{pageSize}
+  </select>
+
+  <select id="findOrderGroupRecord" parameterType="String" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from order_group_content where order_code=#{orderCode} order by create_time limit 1
+
+  </select>
+
+
+  <select id="findByOrderCodeAndUserId" resultType="int">
+    select count(0)
+    from order_group_content
+    where order_code=#{orderCode}
+    and user_id=#{userId}
+  </select>
+
+
+</mapper>

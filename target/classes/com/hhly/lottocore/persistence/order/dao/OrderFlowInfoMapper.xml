@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.hhly.lottocore.persistence.order.dao.OrderFlowInfoMapper">
+
+
+    <!--根据订单编号查询订单流程信息-->
+    <select id="queryOrderFlowInfoList" resultType="com.hhly.skeleton.lotto.base.order.bo.OrderFlowInfoBO">
+        select
+           oi.buy_type buyType,
+           oi.status status,
+           oi.message message,
+           oi.CREATE_TIME createTime
+       from order_flow_info oi
+       where oi.order_code = #{orderCode}
+        <if test="userId != null">
+            and oi.user_id = #{userId}
+        </if>
+       ORDER by create_time
+    </select>
+
+</mapper>

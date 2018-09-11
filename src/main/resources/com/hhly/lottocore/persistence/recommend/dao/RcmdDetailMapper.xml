@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hhly.lottocore.persistence.recommend.dao.RcmdDetailMapper">
+  <resultMap id="BaseResultMap" type="com.hhly.skeleton.lotto.base.recommend.bo.RcmdDetailBO">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="rcmd_code" jdbcType="VARCHAR" property="rcmdCode" />
+    <result column="lottery_child_code" jdbcType="INTEGER" property="lotteryChildCode" />
+    <result column="lottery_child_name" jdbcType="VARCHAR" property="lotteryChildName" />
+    <result column="pass_way" jdbcType="TINYINT" property="passWay" />
+    <result column="min_screen" jdbcType="VARCHAR" property="minScreen" />
+    <result column="max_screen" jdbcType="VARCHAR" property="maxScreen" />
+    <result column="actual_result" jdbcType="VARCHAR" property="actualResult" />
+  </resultMap>
+
+
+  <sql id="Base_Column_List">
+    id, rcmd_code, lottery_child_code, lottery_child_name, pass_way, min_screen, max_screen, 
+    actual_result
+  </sql>
+
+
+  <insert id="insert" parameterType="com.hhly.skeleton.lotto.base.recommend.bo.RcmdDetailBO">
+    insert into rcmd_detail (id, rcmd_code, lottery_child_code, 
+      lottery_child_name, pass_way, min_screen, 
+      max_screen, actual_result, plan_content, 
+      screens)
+    values (#{id,jdbcType=INTEGER}, #{rcmdCode,jdbcType=VARCHAR}, #{lotteryChildCode,jdbcType=INTEGER}, 
+      #{lotteryChildName,jdbcType=VARCHAR}, #{passWay,jdbcType=TINYINT}, #{minScreen,jdbcType=VARCHAR}, 
+      #{maxScreen,jdbcType=VARCHAR}, #{actualResult,jdbcType=VARCHAR}, #{planContent,jdbcType=LONGVARCHAR}, 
+      #{screens,jdbcType=LONGVARCHAR})
+  </insert>
+
+</mapper>
